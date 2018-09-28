@@ -1,9 +1,9 @@
-defmodule Domain.MixProject do
+defmodule Contract.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :domain,
+      app: :contract,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -18,17 +18,17 @@ defmodule Domain.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :ecto]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:infrastructure, in_umbrella: true},
-      {:joken, "~> 1.5"},
-      {:comeonin, "~> 4.1"},
-      {:bcrypt_elixir, "~> 0.12"}
+      {:ecto, "~> 2.2.10"}
+      # {:dep_from_hexpm, "~> 0.3.0"},
+      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
+      # {:sibling_app_in_umbrella, in_umbrella: true},
     ]
   end
 end

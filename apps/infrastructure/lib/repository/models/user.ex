@@ -12,6 +12,10 @@ defmodule Infrastructure.Repository.Models.User do
   @foreign_key_type :binary_id
 
   schema "users" do
+    field :nick, :string
+    field :email, :string
+    field :password_digest, :string
+    
     timestamps()
 
     has_many :rankings, Ranking

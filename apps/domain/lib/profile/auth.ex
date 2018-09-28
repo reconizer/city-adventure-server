@@ -1,0 +1,35 @@
+defmodule Domain.Profile.Auth do
+
+  @moduledoc """
+  Domain for profile auth
+  """
+  @type t :: %__MODULE__{}
+  
+  defstruct [:id, :nick, :email, :token]
+
+  def login(user, password) do
+    Comeonin.Bcrypt.checkpw(password, user.password_digest)
+    |> case do
+      true ->
+        token = user
+        |> generate_token
+        {:ok, token}
+      false ->
+        {:error, :invalid_login_password}
+    end
+  
+  end
+
+  defp generate_token(%{id: id, nick: nick, email: email}) do
+    %{
+      "id" => id,
+      "nick" => nick,
+      "email" => email
+    }
+    |> Joken.token
+    |> Joken.with_signer(Joken.hs256("ss"))
+    |> Joken.sign
+    |> Joken.get_compact
+  end
+
+end
