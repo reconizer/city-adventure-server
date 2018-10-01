@@ -6,6 +6,12 @@ defmodule UserApiWeb.Router do
     plug(UserApiWeb.Plugs.CreateSession)
   end
 
+  pipeline :api_jwt do
+    plug :accepts, ["json"]
+    plug(UserApiWeb.Plugs.CreateSession)
+    plug(UserApiWeb.Plugs.ParseJwt)
+  end
+
   scope "/auth", UserApiWeb do
     pipe_through :api 
     
@@ -13,7 +19,7 @@ defmodule UserApiWeb.Router do
   end
 
   scope "/api", UserApiWeb do
-    pipe_through :api 
+    pipe_through :api_jwt 
 
     scope "adventures" do
       get "/", AdventureController, :index
