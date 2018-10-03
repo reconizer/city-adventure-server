@@ -32,7 +32,6 @@ defmodule UserApiWeb.Plugs.CreateSession do
 
   defp process_jwt(%Session{} = session, token) do
     token
-    |> IO.inspect()
     |> Joken.token()
     |> Joken.with_signer(Joken.hs256(secret()))
     |> Joken.verify()
