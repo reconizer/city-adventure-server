@@ -15,4 +15,15 @@ defmodule Domain.Profile.Repository.User do
     end
   end
 
+  def get_by_id(id) do
+    from(u in Models.User,
+      where: u.id == ^id
+    )
+    |> Repository.one()
+    |> case do
+      nil -> {:error, :user_not_found}
+      result -> {:ok, result}
+    end
+  end
+
 end

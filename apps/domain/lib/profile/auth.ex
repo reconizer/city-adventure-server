@@ -27,9 +27,13 @@ defmodule Domain.Profile.Auth do
       "email" => email
     }
     |> Joken.token
-    |> Joken.with_signer(Joken.hs256("ss"))
+    |> Joken.with_signer(Joken.hs256(secret()))
     |> Joken.sign
     |> Joken.get_compact
+  end
+
+  defp secret() do
+    Application.get_env(:user_api, :secret)
   end
 
 end

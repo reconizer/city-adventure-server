@@ -1,5 +1,6 @@
 defmodule UserApiWeb.Plugs.CreateSession do
   import Plug.Conn
+  alias Domain.Profile.Repository.User, as: UserRepository
 
   def init(opts), do: opts
 
@@ -31,14 +32,14 @@ defmodule UserApiWeb.Plugs.CreateSession do
 
   defp process_jwt(%Session{} = session, token) do
     token
+    |> IO.inspect()
     |> Joken.token()
     |> Joken.with_signer(Joken.hs256(secret()))
     |> Joken.verify()
     |> case do
       %{claims: current_user, error: nil} ->
         session
-        |> Session.update_context(%{"current_user" => current_user})
-        |> Core.Command.User.command(:check_current_user)
+        |> check_user(current_user)
 
       %{error: error} ->
         session
@@ -49,6 +50,18 @@ defmodule UserApiWeb.Plugs.CreateSession do
         session
         |> Session.add_error(%{key: "user.jwt", code: :invalid, message: "Unauthenticated"})
         |> Session.update_context(%{"response_code" => 401})
+    end
+  end
+
+  defp check_user(session, %{"id" => user_id} = user) do
+    UserRepository.get_by_id(user_id)
+    |> case do
+      {:ok, _result} -> 
+        session
+        |> Session.update_context(%{"current_user" => user})
+      {:error, reason} ->
+        session
+        |> Session.add_error(%{key: "user_not_found", code: :not_found, message: reason})
     end
   end
 

@@ -8,8 +8,8 @@ defmodule UserApiWeb.Router do
 
   pipeline :api_jwt do
     plug :accepts, ["json"]
-    plug(UserApiWeb.Plugs.CreateSession)
     plug(UserApiWeb.Plugs.ParseJwt)
+    plug(UserApiWeb.Plugs.CreateSession)
   end
 
   scope "/auth", UserApiWeb do
