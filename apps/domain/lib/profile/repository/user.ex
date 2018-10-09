@@ -10,7 +10,7 @@ defmodule Domain.Profile.Repository.User do
     )
     |> Repository.one()
     |> case do
-      nil -> {:error, :user_not_found}
+      nil -> {:error, {:user, "not_found"}}
       result -> {:ok, result}
     end
   end
@@ -21,7 +21,7 @@ defmodule Domain.Profile.Repository.User do
     )
     |> Repository.one()
     |> case do
-      nil -> {:error, :user_not_found}
+      nil -> {:error, {:user, "not_found"}}
       result -> {:ok, result}
     end
   end

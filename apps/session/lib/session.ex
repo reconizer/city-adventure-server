@@ -7,6 +7,11 @@ defmodule Session do
   valid?: true,
   context: %{}
 
+  def add_error(%Session{errors: errors} = session, error) when is_list(error) do
+    %{session | errors: errors ++ error}
+    |> invalidate
+  end
+
   def add_error(%Session{errors: errors} = session, error) do
     %{session | errors: [error | errors]}
     |> invalidate

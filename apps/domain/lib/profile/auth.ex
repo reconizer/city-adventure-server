@@ -15,7 +15,7 @@ defmodule Domain.Profile.Auth do
         |> generate_token
         {:ok, token}
       false ->
-        {:error, :invalid_login_password}
+        {:error, {:login_password, "invalid"}}
     end
   
   end

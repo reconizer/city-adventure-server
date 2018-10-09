@@ -1,4 +1,4 @@
-defmodule Domain.Adventure.Projections.AdventureListing do
+defmodule Domain.Adventure.Projections.Listing do
   @moduledoc """
   Projection of adventure start points
   """
@@ -12,7 +12,7 @@ defmodule Domain.Adventure.Projections.AdventureListing do
 
   alias Infrastructure.Repository
 
-  def get_start_points(%{position: %Geo.Point{coordinates: {lng, lat}, srid: srid}, current_user: %{id: id}}) do
+  def get_start_points(%{position: %Geo.Point{coordinates: {lng, lat}, srid: srid}}, %{id: id}) do
     result = from(a in Models.Adventure,
       left_join: ua in Models.UserAdventure, on: ua.adventure_id == a.id,
       left_join: sp in Models.Point, on: sp.adventure_id == a.id and is_nil(sp.parent_point_id),

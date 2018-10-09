@@ -38,6 +38,8 @@ defmodule UserApi.MixProject do
     [
       {:phoenix, github: "phoenixframework/phoenix", override: true},
       {:session, in_umbrella: true},
+      {:contract, in_umbrella: true},
+      {:domain, in_umbrella: true},
       {:phoenix_pubsub, "~> 1.1"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},

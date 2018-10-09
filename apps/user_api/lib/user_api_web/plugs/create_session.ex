@@ -1,12 +1,13 @@
 defmodule UserApiWeb.Plugs.CreateSession do
   import Plug.Conn
   alias Domain.Profile.Repository.User, as: UserRepository
+  alias Contract.User.Profile, as: ProfileContract
 
   def init(opts), do: opts
 
   def call(%Plug.Conn{assigns: %{jwt: :error}} = conn, _default) do
     Session.construct()
-    |> Session.add_error(%{key: "user.jwt", code: :invalid, message: "Unauthenticated"})
+    |> Session.add_error({:jwt, "Unauthenticated"})
     |> Session.update_context(%{"response_code" => 401})
     |> case do
       session -> conn |> assign(:session, session)
@@ -42,12 +43,12 @@ defmodule UserApiWeb.Plugs.CreateSession do
 
       %{error: error} ->
         session
-        |> Session.add_error(%{key: "user.jwt", code: :invalid, message: error})
+        |> Session.add_error(error)
         |> Session.update_context(%{"response_code" => 401})
 
       _ ->
         session
-        |> Session.add_error(%{key: "user.jwt", code: :invalid, message: "Unauthenticated"})
+        |> Session.add_error({:jwt, "Unauthenticated"})
         |> Session.update_context(%{"response_code" => 401})
     end
   end
@@ -55,12 +56,13 @@ defmodule UserApiWeb.Plugs.CreateSession do
   defp check_user(session, %{"id" => user_id} = user) do
     UserRepository.get_by_id(user_id)
     |> case do
-      {:ok, _result} -> 
+      {:ok, _result} ->
+        {:ok, user} = ProfileContract.validate(user) 
         session
         |> Session.update_context(%{"current_user" => user})
       {:error, reason} ->
         session
-        |> Session.add_error(%{key: "user_not_found", code: :not_found, message: reason})
+        |> Session.add_error(reason)
     end
   end
 

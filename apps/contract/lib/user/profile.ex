@@ -10,8 +10,20 @@ defmodule Contract.User.Profile do
     field :nick, :string
   end
 
-  def changeset(model, params) do 
-    model
+  def validate(params) do
+    params
+    |> changeset()
+    |> case do
+      %{valid?: true} = login -> 
+        result = login
+        |> apply_changes()
+        {:ok, result}
+      result -> {:error, result.errors} 
+    end
+  end
+
+  defp changeset(params) do 
+    %__MODULE__{}
     |> cast(params, @params)
     |> validate_required(@required_params)
   end

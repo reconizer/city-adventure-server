@@ -18,6 +18,7 @@ defmodule Infrastructure.Repository.Models.Adventure do
     field :language, :string
     field :difficulty_level, :integer
     field :estimated_time, :time
+    field :name, :string
     field :published, :boolean
     field :show, :boolean
 
@@ -31,7 +32,7 @@ defmodule Infrastructure.Repository.Models.Adventure do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(description code language difficulty_level estimated_time published show)a
+  @params ~w(description code language difficulty_level estimated_time published show name)a
   @required_params ~w(language description)a
 
   def changeset(model, params \\ %{}) do

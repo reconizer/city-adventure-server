@@ -1,25 +1,22 @@
-defmodule Contract.User.Login do
+defmodule Contract.Adventure.Show do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key false
-
   embedded_schema do
-    field :email, :string 
-    field :password, :string
+  
   end
 
-  @params ~w(email password)a
-  @required_params ~w(email password)a
+  @params ~w(id)a
+  @required_params ~w(id)a
 
   def validate(params) do
     params
     |> changeset()
     |> case do
-      %{valid?: true} = login -> 
-        result = login
-        |> apply_changes()
-        {:ok, result}
+      %{valid?: true} = result -> 
+        {:ok, result
+              |> apply_changes()
+        }
       result -> {:error, result.errors} 
     end
   end
@@ -28,7 +25,6 @@ defmodule Contract.User.Login do
     %__MODULE__{}
     |> cast(params, @params)
     |> validate_required(@required_params)
-    |> validate_format(:email, ~r/@/)
   end
 
 end

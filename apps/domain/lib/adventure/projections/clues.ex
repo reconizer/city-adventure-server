@@ -12,15 +12,18 @@ defmodule Domain.Adventure.Projections.Clues do
 
   alias Infrastructure.Repository
 
-  def get_all_clues_for_adventure(%{"adventure_id" => adventure_id}) do
+  def get_discovered_clues_for_adventure(%{"adventure_id" => adventure_id, "current_user_id" => user_id}) do
     from(c in Models.Clue,
-      join: p in Models.Point, on: [d: c.point_id],
+      join: p in Models.Point, on: [id: c.point_id],
+      join: up in Models.UserPoint, on: [point_id: p.id],
       select: %{
         id: c.id,
         type: c.type,
         description: c.description,
         point_id: p.id 
-      }
+      },
+      where: up.user_id == ^user_id,
+      where: p.adventure_id == ^adventure_id
     )
     |> Repository.all()
   end

@@ -12,24 +12,27 @@ defmodule Domain.Adventure.Projections.Adventure do
 
   alias Infrastructure.Repository
 
-  def get_adventure_id(adventure_id) do
-    from(a in Models.Adventure,
-      left_join: ua in Models.UserAdventure, on: [adventure_id: a.id],
-      left_join: sp in Models.Point, on:  sp.adventure_id == a.id and is_nil(sp.parent_point_id),
-      left_join: p in Models.Point, on: [adventure_id: a.id],
-      left_join: up in Models.UserPoint, on: [point_id: p.id],
+  def get_adventure_by_id(%{id: adventure_id}) do
+    from(adventure in Models.Adventure,
+      left_join: image in Models.Image, on: [adventure_id: adventure.id],
       select: %{
-        id: a.id,
-        description: a.description,
-        name: a.name,
-        estimated_time: a.estimated_time,
-        difficulty_level: a.difficulty_level,
-        language: a.language
+        id: adventure.id,
+        description: adventure.description,
+        name: adventure.name,
+        estimated_time: adventure.estimated_time,
+        difficulty_level: adventure.difficulty_level,
+        language: adventure.language,
+        image_ids: fragment("array_agg(?)", image.id)
       },
-      where: a.published == true,
-      where: a.id == ^adventure_id
+      where: adventure.published == true,
+      where: adventure.id == ^adventure_id,
+      group_by: adventure.id
     )
     |> Repository.one()
+    |> case do
+      nil -> {:error, {:adventure, "not_found"}}
+      result -> {:ok, result}
+    end
   end
 
 end
