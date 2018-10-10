@@ -14,7 +14,7 @@ defmodule Domain.Adventure.Projections.Listing do
 
   def get_start_points(%{position: %Geo.Point{coordinates: {lng, lat}, srid: srid}}, %{id: id}) do
     result = from(a in Models.Adventure,
-      left_join: ua in Models.UserAdventure, on: ua.adventure_id == a.id,
+      left_join: ua in Models.UserAdventure, on: ua.adventure_id == a.id and ua.user_id == ^id,
       left_join: sp in Models.Point, on: sp.adventure_id == a.id and is_nil(sp.parent_point_id),
       left_join: p in Models.Point, on: p.adventure_id == a.id,
       left_join: up in Models.UserPoint, on: up.point_id == p.id,
@@ -22,12 +22,11 @@ defmodule Domain.Adventure.Projections.Listing do
         adventure_id: a.id,
         start_point_id: sp.id,
         started: not is_nil(ua.user_id),
-        completed: ua.completed,
+        completed: not is_nil(ua.completed),
         position: sp.position
       },
       where: a.show == true and a.published == true,
-      where: ua.user_id == ^id,
-      where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lat, ^lng, ^srid, sp.position, @distance)
+      where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^srid, sp.position, @distance)
     )
     |> Repository.all()
     {:ok, result}

@@ -16,7 +16,7 @@ defmodule UserApiWeb.AdventureController do
                              |> ListingProjection.get_start_points(context["current_user"])
     do
       session
-      |> Session.update_context(%{"start_points" => start_points})
+      |> Session.update_context(%{"adventures" => start_points})
       |> present(conn, UserApiWeb.AdventureView, "index.json")
     else
       {:error, reason} ->

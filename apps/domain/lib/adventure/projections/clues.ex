@@ -22,6 +22,7 @@ defmodule Domain.Adventure.Projections.Clues do
         description: c.description,
         point_id: p.id 
       },
+      where: up.completed == true,
       where: up.user_id == ^user_id,
       where: p.adventure_id == ^adventure_id
     )
@@ -29,16 +30,16 @@ defmodule Domain.Adventure.Projections.Clues do
   end
 
   def get_clues_for_point(%{"adventure_id" => adventure_id, "point_id" => point_id}) do
-    from(c in Models.Clue,
-      join: p in Models.Point, on: [d: c.point_id],
+    from(clue in Models.Clue,
+      join: point in Models.Point, on: [id: clue.point_id],
       select: %{
-        id: c.id,
-        type: c.type,
-        description: c.description,
-        point_id: p.id 
+        id: clue.id,
+        type: clue.type,
+        description: clue.description,
+        point_id: point.id 
       },
-      where: p.id == ^point_id,
-      where: p.adventure_id == ^adventure_id
+      where: point.id == ^point_id,
+      where: point.adventure_id == ^adventure_id
     )
     |> Repository.one()
   end
