@@ -16,7 +16,7 @@ defmodule UserApiWeb.AdventureView do
     }
   end
 
-  defp render_start_points%{position: %{coordinates: {lng, lat}}} = (adventure) do
+  defp render_start_points(%{position: %{coordinates: {lng, lat}}} = adventure) do
     %{
       adventure_id: adventure.adventure_id,
       completed: adventure.completed,
