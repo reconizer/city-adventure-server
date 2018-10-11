@@ -11,14 +11,12 @@ defmodule UserApiWeb.AuthController do
     do
       session
       |> Session.update_context(%{"jwt" => jwt})
-      |> present(conn, UserApiWeb.AuthView, "login.json")
     else
       {:error, reason} ->
         session 
         |> Session.add_error(reason)
-        |> present(conn, UserApiWeb.AuthView, "login.json")
     end
-    
+    |> present(conn, UserApiWeb.AuthView, "login.json")
   end
 
 end

@@ -25,8 +25,8 @@ defmodule Contract.Adventure.Listing do
     end
   end
 
-  defp changeset(params) do 
-    %__MODULE__{}
+  def changeset(params, model \\ %__MODULE__{}) do 
+    model
     |> cast(params, @params)
     |> validate_required(@required_params)
   end

@@ -24,7 +24,7 @@ defmodule Contract.User.Login do
     end
   end
 
-  defp changeset(params) do 
+  def changeset(params, model \\ %__MODULE__{}) do 
     %__MODULE__{}
     |> cast(params, @params)
     |> validate_required(@required_params)

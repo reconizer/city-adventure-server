@@ -22,8 +22,8 @@ defmodule Contract.User.Profile do
     end
   end
 
-  defp changeset(params) do 
-    %__MODULE__{}
+  defp changeset(params, model \\ %__MODULE__{}) do 
+    model
     |> cast(params, @params)
     |> validate_required(@required_params)
   end
