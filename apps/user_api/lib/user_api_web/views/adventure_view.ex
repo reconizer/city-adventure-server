@@ -1,12 +1,12 @@
 defmodule UserApiWeb.AdventureView do
   use UserApiWeb, :view
 
-  def render("index.json", %{session: %Session{context: %{"adventures" => adventures}} = session}) do
+  def render("index.json", %{session: %Session{context: %{"adventures" => adventures}} = _session}) do
     adventures
     |> Enum.map(&render_start_points/1)
   end
 
-  def render("show.json", %{session: %Session{context: %{"adventure" => adventure}} = session}) do
+  def render("show.json", %{session: %Session{context: %{"adventure" => adventure}} = _session}) do
     %{
       name: adventure.name,
       description: adventure.description,

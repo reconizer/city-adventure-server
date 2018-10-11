@@ -21,13 +21,13 @@ defmodule UserApiWeb.Router do
   scope "/api", UserApiWeb do
     pipe_through :api_jwt 
 
-    scope "adventures" do
+    scope "/adventures" do
       get "/", AdventureController, :index
       get "/:id", AdventureController, :show
       get "/clues/:id", ClueController, :index
     end
 
-    scope "clues" do
+    scope "/clues" do
       get "/:adventure_id", ClueController, :index
     end
     

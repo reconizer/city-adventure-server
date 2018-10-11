@@ -1,7 +1,7 @@
 defmodule UserApiWeb.ClueView do
   use UserApiWeb, :view
 
-  def render("index.json", %{session: %Session{context: %{"discovered_clues" => discovered_clues}} = session}) do
+  def render("index.json", %{session: %Session{context: %{"discovered_clues" => discovered_clues}} = _session}) do
     discovered_clues
     |> Enum.map(&render_discovered_clues/1)
   end

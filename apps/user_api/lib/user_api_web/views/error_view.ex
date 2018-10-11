@@ -5,7 +5,7 @@ defmodule UserApiWeb.ErrorView do
     %{errors: %{detail: "Page not found"}}
   end
 
-  def render("422.json", %{session: %Session{errors: errors}} = session) do
+  def render("422.json", %{session: %Session{errors: errors}} = _session) do
     errors
     |> Enum.reduce(%{}, fn({key, list}, acc) ->
       key
