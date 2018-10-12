@@ -19,3 +19,8 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
+<<<<<<< HEAD
+=======
+.elixir_ls/
+.vscode/
+>>>>>>> 7ab9b7c4857715bbb28d0e269f0092cc171fe33f

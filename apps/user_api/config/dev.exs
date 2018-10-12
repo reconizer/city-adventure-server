@@ -1,7 +1,9 @@
 use Mix.Config
 
 config :user_api,
-  secret: "2faf35cf63a83e392592aedbb2dae62e41e4bef5efccc15a679f212d2bdab27d40d4a4eba9be3a172438fb1b91cd6c503e0a2e1c59ce1e465b611a34d528b00f"
+  secret:
+    "2faf35cf63a83e392592aedbb2dae62e41e4bef5efccc15a679f212d2bdab27d40d4a4eba9be3a172438fb1b91cd6c503e0a2e1c59ce1e465b611a34d528b00f"
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
@@ -12,9 +14,7 @@ config :user_api, UserApiWeb.Endpoint,
   http: [port: 4008],
   debug_errors: true,
   code_reloader: true,
-  check_origin: false,
-  watchers: [node: ["node_modules/webpack/bin/webpack.js", "--mode", "development", "--watch-stdin",
-                    cd: Path.expand("../assets", __DIR__)]]
+  check_origin: false
 
 # ## SSL Support
 #
