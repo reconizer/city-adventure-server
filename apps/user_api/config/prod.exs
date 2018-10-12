@@ -10,12 +10,12 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :user_api, UserApiWeb.Endpoint,
-  http: [:inet6, port: System.get_env("PORT") || 4000],
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  http: [port: 8080],
+  url: [host: "localhost", port: 8080]
 
 # Do not print debug messages in production
 config :logger, level: :info
+config :phoenix, :serve_endpoints, true
 
 # ## SSL Support
 #
