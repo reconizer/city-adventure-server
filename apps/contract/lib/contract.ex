@@ -1,6 +1,6 @@
-defmodule Domain do
+defmodule Contract do
   @moduledoc """
-  Documentation for Domain.
+  Documentation for Contract.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule Domain do
 
   ## Examples
 
-      iex> Domain.hello()
+      iex> Contract.hello()
       :world
 
   """

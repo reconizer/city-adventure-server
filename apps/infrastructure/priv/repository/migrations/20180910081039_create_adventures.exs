@@ -5,6 +5,7 @@ defmodule Infrastructure.Repository.Migrations.CreateAdventures do
     create table(:adventures, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :description, :text
+      add :name, :text
       add :estimated_time, :time
       add :difficulty_level, :integer
       add :published, :boolean

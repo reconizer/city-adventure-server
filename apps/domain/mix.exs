@@ -25,7 +25,11 @@ defmodule Domain.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:infrastructure, in_umbrella: true}
+      {:infrastructure, in_umbrella: true},
+      {:joken, "~> 1.5"},
+      {:comeonin, "~> 4.1"},
+      {:bcrypt_elixir, "~> 0.12"},
+      {:ex_machina, "~> 2.2", only: :test}
     ]
   end
 end

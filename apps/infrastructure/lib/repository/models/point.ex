@@ -16,6 +16,7 @@ defmodule Infrastructure.Repository.Models.Point do
 
   schema "points" do
     field :show, :boolean
+    field :radius, :integer
     field :position, Geo.Point
 
     timestamps()
@@ -31,8 +32,8 @@ defmodule Infrastructure.Repository.Models.Point do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(parent_point_id adventure_id show position)a
-  @required_params ~w(adventure_id position)a
+  @params ~w(parent_point_id adventure_id show position radius)a
+  @required_params ~w(adventure_id position radius)a
 
   def changeset(model, params \\ %{}) do
     model

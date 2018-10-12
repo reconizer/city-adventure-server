@@ -13,6 +13,7 @@ defmodule Infrastructure.Repository.Models.UserPoint do
   @foreign_key_type :binary_id
 
   schema "user_points" do
+    field :completed, :boolean
     timestamps()
 
     belongs_to :point, Point, primary_key: true
