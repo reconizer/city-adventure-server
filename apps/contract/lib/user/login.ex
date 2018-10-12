@@ -25,7 +25,7 @@ defmodule Contract.User.Login do
   end
 
   def changeset(params, model \\ %__MODULE__{}) do 
-    %__MODULE__{}
+    model
     |> cast(params, @params)
     |> validate_required(@required_params)
     |> validate_format(:email, ~r/@/)

@@ -20,6 +20,7 @@ defmodule UserApiWeb.AdventureView do
     %{
       adventure_id: adventure.adventure_id,
       completed: adventure.completed,
+      paid: adventure.paid,
       position: %{
         lat: lat,
         lng: lng

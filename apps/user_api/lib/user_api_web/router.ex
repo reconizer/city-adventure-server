@@ -12,12 +12,6 @@ defmodule UserApiWeb.Router do
     plug(UserApiWeb.Plugs.CreateSession)
   end
 
-  scope "/auth", UserApiWeb do
-    pipe_through :api 
-    
-    post "/", AuthController, :login
-  end
-
   scope "/api", UserApiWeb do
     pipe_through :api_jwt 
 
@@ -31,6 +25,12 @@ defmodule UserApiWeb.Router do
       get "/:adventure_id", ClueController, :index
     end
     
+  end
+
+  scope "/api/auth", UserApiWeb do
+    pipe_through :api 
+    
+    post "/", AuthController, :login
   end
 
   # Other scopes may use custom stacks.

@@ -11,7 +11,8 @@ defmodule Domain.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -22,6 +23,15 @@ defmodule Domain.MixProject do
     ]
   end
 
+  defp elixirc_paths(:test),
+  do: [
+    "lib",
+    # Domain fixtures
+    "test/adventure/fixtures"
+  ]
+
+  defp elixirc_paths(_), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
@@ -29,7 +39,8 @@ defmodule Domain.MixProject do
       {:joken, "~> 1.5"},
       {:comeonin, "~> 4.1"},
       {:bcrypt_elixir, "~> 0.12"},
-      {:ex_machina, "~> 2.2", only: :test}
+      {:ex_machina, "~> 2.2", only: :test},
+      {:faker, "~> 0.11"}
     ]
   end
 end

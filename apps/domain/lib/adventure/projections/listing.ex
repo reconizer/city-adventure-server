@@ -23,7 +23,8 @@ defmodule Domain.Adventure.Projections.Listing do
         start_point_id: sp.id,
         started: not is_nil(ua.user_id),
         completed: not is_nil(ua.completed),
-        position: sp.position
+        position: sp.position,
+        paid: false
       },
       where: a.show == true and a.published == true,
       where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^srid, sp.position, @distance)
