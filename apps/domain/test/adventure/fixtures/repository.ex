@@ -17,7 +17,8 @@ defmodule Domain.Adventure.Fixtures.Repository do
       code: "1234",
       language: "PL",
       difficulty_level: 2,
-      estimated_time: "09:00:00",
+      min_time: "02:00:00",
+      max_time: "06:00:00",
       name: Faker.Name.name,
       published: true,
       show: false
@@ -29,6 +30,7 @@ defmodule Domain.Adventure.Fixtures.Repository do
       show: false,
       radius: 5,
       adventure: build(:adventure),
+      parent_point_id: nil,
       position: %Geo.Point{coordinates: {18.602801, 53.008519}, srid: 4326}
     }
   end
@@ -38,19 +40,19 @@ defmodule Domain.Adventure.Fixtures.Repository do
       type: "text",
       tip: false,
       description: Faker.Lorem.Shakespeare.hamlet(),
-      point_id: build(:point)
+      point: build(:point)
     }
   end
 
   def user_adventure_factory do
-    %{
+    %Models.UserAdventure{
       adventure: build(:adventure),
       user: build(:user)
     }
   end
 
   def user_point_factory do
-    %{
+    %Models.UserPoint{
       point: build(:point),
       user: build(:user)
     }

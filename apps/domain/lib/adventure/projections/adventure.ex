@@ -19,7 +19,8 @@ defmodule Domain.Adventure.Projections.Adventure do
         id: adventure.id,
         description: adventure.description,
         name: adventure.name,
-        estimated_time: adventure.estimated_time,
+        min_time: adventure.min_time,
+        max_time: adventure.max_time,
         difficulty_level: adventure.difficulty_level,
         language: adventure.language,
         image_ids: fragment("array_agg(?)", image.id)

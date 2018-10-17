@@ -21,13 +21,14 @@ defmodule Domain.Adventure.Projections.Listing do
       select: %{
         adventure_id: a.id,
         start_point_id: sp.id,
-        started: not is_nil(ua.user_id),
-        completed: not is_nil(ua.completed),
+        started: not is_nil(ua.adventure_id),
+        completed: ua.completed,
         position: sp.position,
         paid: false
       },
       where: a.show == true and a.published == true,
-      where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^srid, sp.position, @distance)
+      where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^srid, sp.position, @distance),
+      group_by: [a.id, sp.id, ua.adventure_id, ua.completed]
     )
     |> Repository.all()
     {:ok, result}
