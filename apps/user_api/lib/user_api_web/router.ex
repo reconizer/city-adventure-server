@@ -23,6 +23,7 @@ defmodule UserApiWeb.Router do
 
     scope "/clues" do
       get "/:adventure_id", ClueController, :index
+      get "/point/:adventure_id/:point_id", ClueController, :list_for_point
     end
     
   end

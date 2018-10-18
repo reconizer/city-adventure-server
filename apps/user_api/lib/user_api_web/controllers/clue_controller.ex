@@ -21,4 +21,23 @@ defmodule UserApiWeb.ClueController do
     |> present(conn, UserApiWeb.ClueView, "index.json")
   end
 
+  def list_for_point(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
+    with %Session{valid?: true} <- session,
+      {:ok, validate_params} <- context
+                                |> Contract.Adventure.CluesForPoint.validate(),
+      {:ok, clues_for_point} <- validate_params
+                                 |> CluesProjection.get_clues_for_point()
+    do
+      session
+      |> Session.update_context(%{"clues_for_point" => clues_for_point})
+    else
+      %Session{valid?: false} ->
+        session
+      {:error, reason} ->
+        session
+        |> Session.add_error(reason)
+    end
+    |> present(conn, UserApiWeb.ClueView, "index.json")
+  end
+
 end
