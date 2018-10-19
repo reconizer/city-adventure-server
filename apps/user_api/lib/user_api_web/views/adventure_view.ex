@@ -12,7 +12,8 @@ defmodule UserApiWeb.AdventureView do
       description: adventure.description,
       language: adventure.language,
       estimated_time: adventure.estimated_time,
-      difficulty_level: adventure.difficulty_level
+      difficulty_level: adventure.difficulty_level,
+      image_url: MediaStorage.download_url(adventure.id)
     }
   end
 

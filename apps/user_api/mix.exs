@@ -37,6 +37,7 @@ defmodule UserApi.MixProject do
   defp deps do
     [
       {:phoenix, github: "phoenixframework/phoenix", override: true},
+      {:media_storage, git: "git@github.com:reconizer/ex_media_storage", tag: "0.1"},
       {:session, in_umbrella: true},
       {:contract, in_umbrella: true},
       {:domain, in_umbrella: true},
