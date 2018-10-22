@@ -11,7 +11,8 @@ defmodule UserApiWeb.ClueView do
       id: clue.id,
       type: clue.type,
       description: clue.description,
-      point_id: clue.point_id   
+      point_id: clue.point_id,
+      asset_url: MediaStorage.download_url(Path.join([clue.point_id, clue.type, clue.id]))   
     }
   end
 
