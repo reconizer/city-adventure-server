@@ -9,7 +9,7 @@ defmodule UserApiWeb.AdventureController do
       lng: context |> Map.get("lng", nil)
     }
     with %Session{valid?: true, context: context} <- session
-                                   |> Session.update_context(%{"position" => position}),
+                                                     |> Session.update_context(%{"position" => position}),
       {:ok, validate_params} <- context
                                 |> Contract.Adventure.Listing.validate(),
       {:ok, start_points} <- validate_params

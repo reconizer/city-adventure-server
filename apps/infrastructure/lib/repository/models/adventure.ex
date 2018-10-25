@@ -42,7 +42,10 @@ defmodule Infrastructure.Repository.Models.Adventure do
     model
     |> cast(params, @params)
     |> validate_required(@required_params)
-    |> validate_number(:end_time, greater_than: :start_time)
+    |> validate_number(:max_time, greater_than: :min_time)
+    |> validate_number(:min_time, less_than: :max_time)
+    |> validate_number(:difficulty_level, greater_than_or_equal_to: 1)
+    |> validate_number(:difficulty_level, less_than_or_equal_to: 5)
   end
 
 end

@@ -24,7 +24,8 @@ defmodule Domain.Adventure.Projections.Listing do
         started: not is_nil(ua.adventure_id),
         completed: ua.completed,
         position: sp.position,
-        paid: false
+        paid: false,
+        purchased: false
       },
       where: a.show == true and a.published == true,
       where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^srid, sp.position, @distance),

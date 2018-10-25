@@ -6,7 +6,7 @@ defmodule Contract.Adventure.Listing do
   @primary_key false
 
   embedded_schema do
-    field :position, Geo.Point
+    field :position, Geo.PostGIS.Geometry
   end
 
   @params ~w(position)a

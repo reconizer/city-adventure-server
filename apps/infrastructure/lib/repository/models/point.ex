@@ -18,7 +18,7 @@ defmodule Infrastructure.Repository.Models.Point do
   schema "points" do
     field :show, :boolean
     field :radius, :integer
-    field :position, Geo.Point
+    field :position, Geo.PostGIS.Geometry
 
     timestamps()
 
