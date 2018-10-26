@@ -58,4 +58,12 @@ defmodule Domain.Adventure.Fixtures.Repository do
     }
   end
 
+  def ranking_factory do
+    %Models.Ranking{
+      adventure: build(:adventure),
+      user: build(:user),
+      completion_time: "01:00:00"
+    }
+  end
+
 end

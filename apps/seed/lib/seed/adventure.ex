@@ -44,7 +44,7 @@ defmodule Seed.Adventure do
 
   defp build_adventure do
     Models.Adventure.build(%{
-      description: "opis",
+      description: "Wyrusz w fascynującą wyprawę po starówce Toruńskiej",
       name: "śladami Kopernika",
       difficulty_level: 3,
       published: true,

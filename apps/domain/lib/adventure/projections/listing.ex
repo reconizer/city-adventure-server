@@ -13,23 +13,23 @@ defmodule Domain.Adventure.Projections.Listing do
   alias Infrastructure.Repository
 
   def get_start_points(%{position: %Geo.Point{coordinates: {lng, lat}, srid: srid}}, %{id: id}) do
-    result = from(a in Models.Adventure,
-      left_join: ua in Models.UserAdventure, on: ua.adventure_id == a.id and ua.user_id == ^id,
-      left_join: sp in Models.Point, on: sp.adventure_id == a.id and is_nil(sp.parent_point_id),
-      left_join: p in Models.Point, on: p.adventure_id == a.id,
-      left_join: up in Models.UserPoint, on: up.point_id == p.id,
+    result = from(adventure in Models.Adventure,
+      left_join: user_adventure in Models.UserAdventure, on: user_adventure.adventure_id == adventure.id and user_adventure.user_id == ^id,
+      left_join: start_point in Models.Point, on: start_point.adventure_id == adventure.id and is_nil(start_point.parent_point_id),
+      left_join: point in Models.Point, on: point.adventure_id == adventure.id,
+      left_join: user_point in Models.UserPoint, on: user_point.point_id == point.id,
       select: %{
-        adventure_id: a.id,
-        start_point_id: sp.id,
-        started: not is_nil(ua.adventure_id),
-        completed: ua.completed,
-        position: sp.position,
+        adventure_id: adventure.id,
+        start_point_id: start_point.id,
+        started: not is_nil(user_adventure.adventure_id),
+        completed: user_adventure.completed,
+        position: start_point.position,
         paid: false,
         purchased: false
       },
-      where: a.show == true and a.published == true,
-      where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^srid, sp.position, @distance),
-      group_by: [a.id, sp.id, ua.adventure_id, ua.completed]
+      where: adventure.show == true and adventure.published == true,
+      where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^srid, start_point.position, @distance),
+      group_by: [adventure.id, start_point.id, user_adventure.adventure_id, user_adventure.completed]
     )
     |> Repository.all()
     {:ok, result}
