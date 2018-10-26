@@ -7,6 +7,10 @@ defmodule Infrastructure.Repository.Models do
     end
   end
 
+  def uuid() do
+    Ecto.UUID.generate()
+  end
+
   @spec load_type(any, any) :: any
   def load_type(value, type) do
     value
@@ -33,11 +37,13 @@ defmodule Infrastructure.Repository.Models do
     |> case do
       %{rows: rows, columns: columns} ->
         rows
-        |> Enum.map(fn(row) ->
+        |> Enum.map(fn row ->
           Enum.zip(columns, row)
           |> Map.new()
         end)
-      _ -> []
+
+      _ ->
+        []
     end
   end
 
@@ -47,5 +53,4 @@ defmodule Infrastructure.Repository.Models do
     |> zip_results()
     |> List.first()
   end
-
 end
