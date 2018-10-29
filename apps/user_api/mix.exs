@@ -47,6 +47,7 @@ defmodule UserApi.MixProject do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
+      {:timex, "~> 3.2"},
       {:cowboy, "~> 1.0"}
     ]
   end

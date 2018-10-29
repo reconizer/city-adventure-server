@@ -15,7 +15,8 @@ defmodule UserApiWeb.AdventureView do
       max_time: adventure.max_time,
       difficulty_level: adventure.difficulty_level,
       image_url: asset_url(adventure.id),
-      gallery: generate_gallery(adventure.id, adventure.image_ids)
+      gallery: generate_gallery(adventure.id, adventure.image_ids),
+      top_five: adventure.top_five |> Enum.map(&parse_ranking/1)
     }
   end
 
@@ -38,6 +39,16 @@ defmodule UserApiWeb.AdventureView do
       },
       start_point_id: adventure.start_point_id,
       started: adventure.started
+    }
+  end
+
+  defp parse_ranking({user_id, nick, position, completion_time}) do
+    IO.inspect completion_time
+    %{
+      user_id: user_id,
+      nick: nick,
+      position: position,
+      completion_time: completion_time
     }
   end
 

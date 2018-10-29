@@ -25,11 +25,11 @@ defmodule Domain.Adventure.Projections.Adventure do
         difficulty_level: adventure.difficulty_level,
         language: adventure.language,
         image_ids: fragment("array_agg(?) filter(where ? IS NOT NULL)", image.id, image.id),
-        top_five: user_ranking
+        top_five: fragment("array_agg((?, ?, ?, ?))", user_ranking.user_id, user_ranking.nick, user_ranking.position, user_ranking.completion_time)
       },
       where: adventure.published == true,
       where: adventure.id == ^adventure_id,
-      group_by: [adventure.id, user_ranking.user_id, user_ranking.adventure_id, user_ranking.position, user_ranking.nick, user_ranking.completion_time]
+      group_by: [adventure.id]
     )
     |> Repository.one()
     |> case do
