@@ -15,11 +15,13 @@ defmodule UserApiWeb.AdventureView do
       max_time: adventure.max_time,
       difficulty_level: adventure.difficulty_level,
       image_url: asset_url(adventure.id),
-      gallery: generate_gallery(adventure.id, adventure.image_ids)
+      gallery: generate_gallery(adventure.id, adventure.image_ids),
+      top_five: adventure.top_five |> Enum.map(&render_ranking/1),
+      owner_ranking: adventure.owner_ranking
     }
   end
 
-  defp generate_gallery(adventure_id, nil), do: []
+  defp generate_gallery(_adventure_id, nil), do: []
   defp generate_gallery(adventure_id, image_ids) do
     image_ids
     |> Enum.map(fn image_id -> 
@@ -38,6 +40,15 @@ defmodule UserApiWeb.AdventureView do
       },
       start_point_id: adventure.start_point_id,
       started: adventure.started
+    }
+  end
+
+  defp render_ranking({user_id, position, completion_time, nick}) do
+    %{
+      user_id: user_id,
+      position: position,
+      nick: nick,
+      completion_time: completion_time
     }
   end
 

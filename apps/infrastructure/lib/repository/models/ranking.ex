@@ -13,7 +13,7 @@ defmodule Infrastructure.Repository.Models.Ranking do
   @foreign_key_type :binary_id
 
   schema "rankings" do
-    field :completion_time, :string
+    field :completion_time, :time
 
     timestamps()
 

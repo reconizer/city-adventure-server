@@ -31,7 +31,7 @@ defmodule UserApiWeb.AdventureController do
     with %Session{valid?: true} <- session,
       {:ok, validate_params} <- context 
                                 |> Contract.Adventure.Show.validate(),
-      {:ok, adventure} <- AdventureProjection.get_adventure_by_id(validate_params)
+      {:ok, adventure} <- AdventureProjection.get_adventure_by_id(validate_params, context["current_user"])
     do
       session
       |> Session.update_context(%{"adventure" => adventure})
