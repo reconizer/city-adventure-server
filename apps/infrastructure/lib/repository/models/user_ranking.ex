@@ -15,6 +15,6 @@ defmodule Infrastructure.Repository.Models.UserRanking do
     belongs_to :adventure, Models.Adventure, foreign_key: :adventure_id
     field :position, :integer
     field :nick, :string
-    field :completion_time, :time
+    field :completion_time, :float
   end
 end
