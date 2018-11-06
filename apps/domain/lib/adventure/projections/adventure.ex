@@ -26,7 +26,7 @@ defmodule Domain.Adventure.Projections.Adventure do
         difficulty_level: adventure.difficulty_level,
         language: adventure.language,
         image_ids: fragment("array_agg(?) filter(where ? IS NOT NULL)", image.id, image.id),
-        top_five: fragment("array_agg((?::text, ?, ?, ?))", user_ranking.user_id, user_ranking.position, user_ranking.completion_time, user_ranking.nick),
+        top_five: fragment("array_agg((?::text, ?, ?, ?)) filter(where ? <= 5)", user_ranking.user_id, user_ranking.position, user_ranking.completion_time, user_ranking.nick, user_ranking.position),
         owner_ranking: %{
           user_id: owner_ranking.user_id, 
           position: owner_ranking.position, 
@@ -34,7 +34,6 @@ defmodule Domain.Adventure.Projections.Adventure do
           nick: owner_ranking.nick
         } 
       },
-      where: user_ranking.position <= 5,
       where: adventure.published == true,
       where: adventure.id == ^adventure_id,
       group_by: [adventure.id, owner_ranking.user_id, owner_ranking.position, owner_ranking.nick, owner_ranking.completion_time]
