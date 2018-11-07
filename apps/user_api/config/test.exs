@@ -13,4 +13,7 @@ config :user_api, UserApiWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
+import_config "#{Mix.env()}.secret.exs"
+
+
 
