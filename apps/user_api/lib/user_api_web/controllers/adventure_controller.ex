@@ -2,6 +2,7 @@ defmodule UserApiWeb.AdventureController do
   use UserApiWeb, :controller
   alias Domain.Adventure.Projections.Listing, as: ListingProjection
   alias Domain.Adventure.Projections.Adventure, as: AdventureProjection
+  alias Domain.Adventure.Repository.Adventure, as: AdventureRepository
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     position = %{
@@ -43,6 +44,24 @@ defmodule UserApiWeb.AdventureController do
         |> Session.add_error(reason)
     end
     |> present(conn, UserApiWeb.AdventureView, "show.json")
+  end
+
+  def start(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
+    with %Session{valid?: true} <- session,
+      {:ok, validate_params} <- context 
+                                |> Contract.Adventure.Start.validate(),
+      {:ok, adventure} <- AdventureRepository.start_adventure(validate_params, context["current_user"])
+    do
+      session
+      |> Session.update_context(%{"adventure" => adventure})
+    else
+      %Session{valid?: false} = session ->
+        session
+      {:error, reason} ->
+        session
+        |> Session.add_error(reason)
+    end
+    |> present(conn, UserApiWeb.AdventureView, "start.json")
   end
 
 end

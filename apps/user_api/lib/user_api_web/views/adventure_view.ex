@@ -22,6 +22,18 @@ defmodule UserApiWeb.AdventureView do
     }
   end
 
+  def render("start.json", %{session: %Session{context: %{"adventure" => %{start_point: %{position: %{coordinates: {lng, lat}}} = start_point}}} = _session}) do
+    %{
+      adventure_id: start_point.adventure_id,
+      id: start_point.id,
+      position: %{
+        lat: lat,
+        lng: lng
+      },
+      radius: start_point.radius
+    }
+  end
+
   defp generate_gallery(_adventure_id, nil), do: []
   defp generate_gallery(adventure_id, image_ids) do
     image_ids

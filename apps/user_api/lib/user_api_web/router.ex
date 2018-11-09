@@ -19,6 +19,7 @@ defmodule UserApiWeb.Router do
       get "/", AdventureController, :index
       get "/:id", AdventureController, :show
       get "/:id/ranking", RankingController, :index
+      post "/start", AdventureController, :start
     end
 
     scope "/clues" do
