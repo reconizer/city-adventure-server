@@ -22,7 +22,7 @@ defmodule Domain.Adventure.Projections.Listing do
         adventure_id: adventure.id,
         start_point_id: start_point.id,
         started: not is_nil(user_adventure.adventure_id),
-        completed: user_adventure.completed,
+        completed: fragment("Coalesce(?, false)", user_adventure.completed),
         position: start_point.position,
         paid: false,
         purchased: false
