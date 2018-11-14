@@ -19,6 +19,7 @@ defmodule UserApiWeb.Router do
       get "/", AdventureController, :index
       get "/:id", AdventureController, :show
       get "/:id/ranking", RankingController, :index
+      get "/:adventure_id/completed_points", PointController, :completed_points
       post "/start", AdventureController, :start
     end
 

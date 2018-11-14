@@ -9,7 +9,7 @@ defmodule Infrastructure.Repository.Migrations.CreateUserRankingView do
         "user".nick AS nick,
         "user".id AS user_id,
         ranking.adventure_id AS adventure_id,
-        EXTRACT(EPOCH FROM ranking.completion_time::time) AS completion_time
+        EXTRACT(EPOCH FROM ranking.completion_time::time)::integer AS completion_time
       FROM rankings ranking
       JOIN users "user" ON "user".id = ranking.user_id
       GROUP BY "user".id, ranking.user_id, ranking.adventure_id, ranking.completion_time, ranking.inserted_at 

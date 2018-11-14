@@ -18,7 +18,7 @@ defmodule UserApiWeb.AdventureView do
       image_url: asset_url(adventure.id),
       gallery: generate_gallery(adventure.id, adventure.image_ids),
       top_five: render_ranking(adventure.top_five),
-      owner_ranking: adventure.owner_ranking
+      owner_ranking: render_owner_ranking(adventure.owner_ranking)
     }
   end
 
@@ -42,6 +42,16 @@ defmodule UserApiWeb.AdventureView do
     end)
   end
 
+  defp render_owner_ranking(%{user_id: nil}), do: nil
+  defp render_owner_ranking(owner_ranking) do
+    %{
+      completion_time: owner_ranking.completion_time,
+      nick: owner_ranking.nick,
+      position: owner_ranking.position,
+      user_id: owner_ranking.user_id
+    }
+  end
+
   defp render_start_points(%{position: %{coordinates: {lng, lat}}} = adventure) do
     %{
       adventure_id: adventure.adventure_id,
@@ -56,7 +66,7 @@ defmodule UserApiWeb.AdventureView do
     }
   end
 
-  defp render_ranking(nil), do: nil
+  defp render_ranking(nil), do: []
   defp render_ranking(top_five) do
     top_five
     |> Enum.map(fn {user_id, position, completion_time, nick} -> 
