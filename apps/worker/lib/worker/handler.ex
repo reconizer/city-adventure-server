@@ -1,13 +1,24 @@
-defmodule Worker.FileUpload.Handler do
+defmodule Worker.Handler do
   defmacro __using__(_env) do
     quote do
       @callback process(_ :: any, _ :: any) :: :ok
 
-      import Worker.FileUpload.Handler
+      import Worker.Handler
     end
   end
 
+  def send_message(queue_name, message) do
+    queue_name
+    |> ExAws.SQS.send_message(message |> Poison.encode!())
+    |> ExAws.request()
+  end
+
   def purge(queue_name, %{receipt_handle: receipt_handle} = _event) do
+    queue_name
+    |> purge(receipt_handle)
+  end
+
+  def purge(queue_name, receipt_handle) do
     queue_name
     |> ExAws.SQS.delete_message(receipt_handle)
     |> ExAws.request()

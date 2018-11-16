@@ -8,7 +8,10 @@ defmodule Infrastructure.Repository.Models.Asset do
   @foreign_key_type :binary_id
 
   schema "assets" do
+    field(:name, :string)
+    field(:extension, :string)
     field(:type, :string)
+    field(:uploaded, :boolean, default: false)
 
     timestamps()
   end
@@ -17,8 +20,8 @@ defmodule Infrastructure.Repository.Models.Asset do
     changeset(%__MODULE__{}, params)
   end
 
-  @fields ~w(id type inserted_at updated_at)a
-  @required_fields ~w(id type inserted_at updated_at)a
+  @fields ~w(id name extension uploaded type inserted_at updated_at)a
+  @required_fields ~w(id name extension uploaded type inserted_at updated_at)a
 
   def changeset(model, params \\ %{}) do
     model

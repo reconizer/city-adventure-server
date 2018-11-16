@@ -6,9 +6,10 @@ defmodule Worker.Application do
   use Application
 
   def start(_type, _args) do
+    queue_name = Application.get_env(:worker, :file_upload_queue_name)
+
     children = [
-      {Worker.FileUpload.Producer, []},
-      {Worker.AssetConversion.Producer, []}
+      {Worker.FileUpload.Producer, queue_name}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

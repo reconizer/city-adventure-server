@@ -6,18 +6,17 @@ defmodule Worker.FileUpload.Producer do
 
   @message_handlers Application.get_env(:worker, :file_upload_handlers)
   @max_number_of_messages Application.get_env(:worker, :max_number_of_messages)
-  @queue_name Application.get_env(:worker, :file_upload_queue_name)
 
   require Logger
   use GenServer
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  def start_link(queue_name) do
+    GenServer.start_link(__MODULE__, queue_name, name: __MODULE__)
   end
 
-  def init(_) do
+  def init(queue_name) do
     Process.send(self(), :fetch_messages, [])
-    {:ok, []}
+    {:ok, queue_name}
   end
 
   def handle_info(:fetch_messages, queue_name) do
@@ -27,7 +26,7 @@ defmodule Worker.FileUpload.Producer do
       {:ok, %{body: %{messages: messages}}} -> messages
     end
     |> Enum.map(&parse_body/1)
-    |> Enum.map(&emit_message/1)
+    |> Enum.map(&emit_message(&1, queue_name))
     |> Enum.count()
     |> case do
       @max_number_of_messages ->
@@ -37,12 +36,12 @@ defmodule Worker.FileUpload.Producer do
         Process.send_after(self(), :fetch_messages, 10_000)
     end
 
-    {:noreply, []}
+    {:noreply, queue_name}
   end
 
-  def emit_message(event) do
+  def emit_message(event, queue_name) do
     @message_handlers
-    |> Enum.map(&Task.start(&1, :process, [event, @queue_name]))
+    |> Enum.map(&Task.start(&1, :process, [event, queue_name]))
   end
 
   def parse_body(%{body: body} = message) do

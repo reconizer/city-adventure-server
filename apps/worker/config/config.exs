@@ -30,11 +30,9 @@ use Mix.Config
 
 config :worker, :file_upload_handlers, [
   Worker.FileUpload.Handler.RemoveTestEvent,
-  Worker.FileUpload.Handler.AssetUpload
-]
-
-config :worker, :asset_conversion_handlers, [
-  Worker.AssetConversion.Handler.SetEventSent
+  Worker.FileUpload.Handler.AssetUpload,
+  Worker.FileUpload.Handler.ClueVideoConversion,
+  Worker.FileUpload.Handler.ClueImageConversion
 ]
 
 config :worker, :max_number_of_messages, 10

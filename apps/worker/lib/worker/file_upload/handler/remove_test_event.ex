@@ -1,5 +1,5 @@
 defmodule Worker.FileUpload.Handler.RemoveTestEvent do
-  use Worker.FileUpload.Handler
+  use Worker.Handler
 
   def process(%{body: %{"Event" => "s3:TestEvent"}} = event, queue_name) do
     purge(queue_name, event)
