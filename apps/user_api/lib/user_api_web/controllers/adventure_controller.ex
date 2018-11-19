@@ -64,4 +64,23 @@ defmodule UserApiWeb.AdventureController do
     |> present(conn, UserApiWeb.AdventureView, "start.json")
   end
 
+  def summary(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
+    with %Session{valid?: true} <- session,
+      {:ok, validate_params} <- context 
+                                |> Contract.Adventure.Summary.validate(),
+      {:ok, ranking} <- validate_params
+                          |> RankingProjection.top_ten_ranking(context["current_user"])
+    do
+      session
+      |> Session.update_context(%{"ranking" => ranking})
+    else
+      %Session{valid?: false} = session ->
+        session
+      {:error, reason} ->
+        session
+        |> Session.add_error(reason)
+    end
+    |> present(conn, UserApiWeb.AdventureView, "summary.json")
+  end 
+
 end

@@ -7,7 +7,7 @@ defmodule UserApiWeb.PointController do
       {:ok, validate_params} <- context
                                 |> Contract.Adventure.CompletedPoints.validate(),
       {:ok, points} <- validate_params
-                        |> PointProjection.get_completed_points(context["current_user"])
+                       |> PointProjection.get_completed_points(context["current_user"])
     do
       session
       |> Session.update_context(%{"completed_points" => points})

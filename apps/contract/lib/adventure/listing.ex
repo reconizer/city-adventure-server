@@ -1,5 +1,6 @@
 defmodule Contract.Adventure.Listing do
   use Ecto.Schema
+  use Contract
   import Ecto.Changeset
   alias Contract.Position
 
@@ -12,21 +13,9 @@ defmodule Contract.Adventure.Listing do
   @params ~w(position)a
   @required_params ~w(position)a
 
-  def validate(params) do
-    params
-    |> Position.position_cast()
-    |> changeset()
-    |> case do
-      %{valid?: true} = result -> 
-        {:ok, result
-              |> apply_changes()
-        }
-      result -> {:error, result.errors} 
-    end
-  end
-
-  def changeset(params, model \\ %__MODULE__{}) do 
-    model
+  def changeset(contract, params) do 
+    params = Position.position_cast(params)
+    contract
     |> cast(params, @params)
     |> validate_required(@required_params)
   end
