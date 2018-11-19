@@ -34,6 +34,18 @@ defmodule UserApiWeb.AdventureView do
     }
   end
 
+  def render("summary.json", %{session: %Session{context: %{"ranking" => ranking}} = _session}) do
+    ranking
+    |> Enum.map(fn r -> 
+      %{
+        user_id: r.user_id,
+        position: r.position,
+        nick: r.nick,
+        completion_time: r.completion_time
+      }
+    end)
+  end
+
   defp generate_gallery(_adventure_id, nil), do: []
   defp generate_gallery(adventure_id, image_ids) do
     image_ids
@@ -67,8 +79,8 @@ defmodule UserApiWeb.AdventureView do
   end
 
   defp render_ranking(nil), do: []
-  defp render_ranking(top_five) do
-    top_five
+  defp render_ranking(ranking) do
+    ranking
     |> Enum.map(fn {user_id, position, completion_time, nick} -> 
       %{
         user_id: user_id,

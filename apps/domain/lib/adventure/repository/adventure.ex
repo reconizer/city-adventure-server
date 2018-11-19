@@ -18,15 +18,6 @@ defmodule Domain.Adventure.Repository.Adventure do
     |> Infrastructure.Repository.transaction()
   end
 
-  defp build_user_adventure(%{adventure_id: id}, user_id) do
-    %{
-      adventure_id: id,
-      user_id: user_id,
-      completed: false
-    }
-    |> Models.UserAdventure.build()
-  end
-
   def build_user_point(point, user_id) do
     %{
       point_id: point.id,
@@ -34,6 +25,15 @@ defmodule Domain.Adventure.Repository.Adventure do
       completed: true
     }
     |> Models.UserPoint.build()
+  end
+
+  defp build_user_adventure(%{adventure_id: id}, user_id) do
+    %{
+      adventure_id: id,
+      user_id: user_id,
+      completed: false
+    }
+    |> Models.UserAdventure.build()
   end
 
   defp get_start_point(adventure_id) do

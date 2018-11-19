@@ -3,6 +3,7 @@ defmodule UserApiWeb.AdventureController do
   alias Domain.Adventure.Projections.Listing, as: ListingProjection
   alias Domain.Adventure.Projections.Adventure, as: AdventureProjection
   alias Domain.Adventure.Repository.Adventure, as: AdventureRepository
+  alias Domain.Adventure.Projections.Ranking, as: RankingProjection
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     position = %{
@@ -69,7 +70,7 @@ defmodule UserApiWeb.AdventureController do
       {:ok, validate_params} <- context 
                                 |> Contract.Adventure.Summary.validate(),
       {:ok, ranking} <- validate_params
-                          |> RankingProjection.top_ten_ranking(context["current_user"])
+                        |> RankingProjection.top_ten_ranking(context["current_user"])
     do
       session
       |> Session.update_context(%{"ranking" => ranking})
