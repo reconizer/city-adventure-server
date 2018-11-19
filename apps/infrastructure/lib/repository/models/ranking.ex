@@ -13,7 +13,7 @@ defmodule Infrastructure.Repository.Models.Ranking do
   @foreign_key_type :binary_id
 
   schema "rankings" do
-    field :completion_time, :string
+    field :completion_time, :time
 
     timestamps()
 
@@ -35,6 +35,7 @@ defmodule Infrastructure.Repository.Models.Ranking do
     |> validate_required(@required_params)
     |> foreign_key_constraint(:adventure_id)
     |> foreign_key_constraint(:user_id)
+    |> IO.inspect()
   end
 
 end

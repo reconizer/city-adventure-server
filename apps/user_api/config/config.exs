@@ -11,7 +11,7 @@ config :user_api,
 
 # Configures the endpoint
 config :user_api, UserApiWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: "127.0.0.1"],
   secret_key_base: "BaSgcc532P4RfaL79Nl3l/xWdo8XzF6fegqoOcJZnGnCFZUTR93gyPwxXzz4rADd",
   render_errors: [view: UserApiWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: UserApi.PubSub,

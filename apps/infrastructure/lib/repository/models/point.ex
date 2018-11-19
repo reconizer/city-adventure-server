@@ -8,7 +8,8 @@ defmodule Infrastructure.Repository.Models.Point do
     Adventure,
     Point,
     Answer,
-    Clue
+    Clue,
+    UserPoint
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -17,7 +18,7 @@ defmodule Infrastructure.Repository.Models.Point do
   schema "points" do
     field :show, :boolean
     field :radius, :integer
-    field :position, Geo.Point
+    field :position, Geo.PostGIS.Geometry
 
     timestamps()
 
@@ -26,6 +27,7 @@ defmodule Infrastructure.Repository.Models.Point do
 
     has_many :answers, Answer
     has_many :clues, Clue
+    has_many :user_points, UserPoint
   end
 
   def build(params) do

@@ -27,11 +27,11 @@ defmodule Infrastructure.MixProject do
   defp deps do
     [
       {:postgrex, ">= 0.0.0"},
-      {:ecto, "~> 2.2.10"},
-      {:geo, "~> 2.0"},
+      {:ecto, "~> 2.2"},
+      {:geo, "~> 3.0"},
       {:gettext, "~> 0.11"},
       {:poison, "~> 3.0"},
-      {:geo_postgis, "~> 1.1"}
+      {:geo_postgis, "~> 2.1"}
     ]
   end
 end

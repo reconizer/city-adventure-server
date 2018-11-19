@@ -37,6 +37,7 @@ defmodule UserApi.MixProject do
   defp deps do
     [
       {:phoenix, github: "phoenixframework/phoenix", override: true},
+      {:media_storage, git: "git@github.com:reconizer/ex_media_storage", tag: "0.1"},
       {:session, in_umbrella: true},
       {:contract, in_umbrella: true},
       {:domain, in_umbrella: true},
@@ -44,8 +45,10 @@ defmodule UserApi.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:plug_cowboy, "~> 1.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
+      {:timex, "~> 3.2"},
       {:cowboy, "~> 1.0"}
     ]
   end

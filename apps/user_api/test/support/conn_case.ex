@@ -28,9 +28,9 @@ defmodule UserApiWeb.ConnCase do
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(UserApi.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(UserApi.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Infrastructure.Repository, {:shared, self()})
     end
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end

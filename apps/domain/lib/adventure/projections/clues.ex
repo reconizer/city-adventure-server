@@ -30,8 +30,8 @@ defmodule Domain.Adventure.Projections.Clues do
     {:ok, result}
   end
 
-  def get_clues_for_point(%{"adventure_id" => adventure_id, "point_id" => point_id}) do
-    from(clue in Models.Clue,
+  def get_clues_for_point(%{adventure_id: adventure_id, point_id: point_id}) do
+    result = from(clue in Models.Clue,
       join: point in Models.Point, on: [id: clue.point_id],
       select: %{
         id: clue.id,
@@ -42,7 +42,7 @@ defmodule Domain.Adventure.Projections.Clues do
       where: point.id == ^point_id,
       where: point.adventure_id == ^adventure_id
     )
-    |> Repository.one()
+    |> Repository.all()
+    {:ok, result}
   end
-
 end
