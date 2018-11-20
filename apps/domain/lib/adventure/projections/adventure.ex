@@ -17,10 +17,16 @@ defmodule Domain.Adventure.Projections.Adventure do
       left_join: image in Models.Image, on: [adventure_id: adventure.id],
       left_join: owner_ranking in Models.UserRanking, on: [adventure_id: adventure.id, user_id: ^owner_id],
       left_join: user_ranking in Models.UserRanking, on: [adventure_id: adventure.id],
+      left_join: rating in Models.AdventureRating, on: [adventure_id: adventure.id],
+      join: creator in Models.Creator, on: [id: adventure.creator_id],
       select: %{
         id: adventure.id,
         description: adventure.description,
         name: adventure.name,
+        rating_count: count(rating.user_id),
+        rating: avg(rating.rating),
+        author_id: creator.id,
+        author_name: creator.name,
         min_time: fragment("EXTRACT(EPOCH FROM ?::time)::integer", adventure.min_time),
         max_time: fragment("EXTRACT(EPOCH FROM ?::time)::integer", adventure.max_time),
         difficulty_level: adventure.difficulty_level,
@@ -36,7 +42,7 @@ defmodule Domain.Adventure.Projections.Adventure do
       },
       where: adventure.published == true,
       where: adventure.id == ^adventure_id,
-      group_by: [adventure.id, owner_ranking.user_id, owner_ranking.position, owner_ranking.nick, owner_ranking.completion_time]
+      group_by: [adventure.id, creator.id, owner_ranking.user_id, owner_ranking.position, owner_ranking.nick, owner_ranking.completion_time]
     )
     |> Repository.one()
     |> case do

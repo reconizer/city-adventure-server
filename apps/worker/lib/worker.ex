@@ -1,0 +1,2 @@
+defmodule Worker do
+end

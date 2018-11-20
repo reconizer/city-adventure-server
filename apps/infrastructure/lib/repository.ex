@@ -1,5 +1,7 @@
 defmodule Infrastructure.Repository do
-  use Ecto.Repo, otp_app: :infrastructure
+  use Ecto.Repo,
+    otp_app: :infrastructure,
+    adapter: Ecto.Adapters.Postgres
 
   @start_apps [
     :postgrex,

@@ -10,9 +10,9 @@ defmodule UserApi.MixProject do
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
       elixir: "~> 1.5",
-      elixirc_paths: elixirc_paths(Mix.env),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers,
-      start_permanent: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
   end
@@ -29,7 +29,7 @@ defmodule UserApi.MixProject do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
   #
@@ -37,7 +37,6 @@ defmodule UserApi.MixProject do
   defp deps do
     [
       {:phoenix, github: "phoenixframework/phoenix", override: true},
-      {:media_storage, git: "git@github.com:reconizer/ex_media_storage", tag: "0.1"},
       {:session, in_umbrella: true},
       {:contract, in_umbrella: true},
       {:domain, in_umbrella: true},
@@ -49,7 +48,8 @@ defmodule UserApi.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:timex, "~> 3.2"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:media_storage, git: "git@github.com:reconizer/ex_media_storage", tag: "0.2"}
     ]
   end
 

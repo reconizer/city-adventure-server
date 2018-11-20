@@ -1,5 +1,7 @@
 use Mix.Config
 
+config :logger, level: :info
+
 config :infrastructure, Infrastructure.Repository,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",

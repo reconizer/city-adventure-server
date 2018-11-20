@@ -7,7 +7,8 @@ defmodule Infrastructure.Repository.Models.Adventure do
   alias Infrastructure.Repository.Models.{
     Point,
     Image,
-    UserAdventure
+    UserAdventure,
+    Creator
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -26,6 +27,7 @@ defmodule Infrastructure.Repository.Models.Adventure do
 
     timestamps()
 
+    belongs_to :creator, Creator
     has_many :points, Point
     has_many :images, Image
     has_many :user_adventures, UserAdventure
