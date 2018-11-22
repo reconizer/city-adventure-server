@@ -14,6 +14,7 @@ defmodule Infrastructure.Repository.Models.UserPoint do
 
   schema "user_points" do
     field :completed, :boolean
+    
     timestamps()
 
     belongs_to :point, Point, primary_key: true
@@ -25,7 +26,7 @@ defmodule Infrastructure.Repository.Models.UserPoint do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(user_id point_id)a
+  @params ~w(user_id point_id completed)a
   @required_params ~w(point_id user_id)a
 
   def changeset(model, params \\ %{}) do

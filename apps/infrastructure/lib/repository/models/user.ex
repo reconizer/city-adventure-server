@@ -5,7 +5,9 @@ defmodule Infrastructure.Repository.Models.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias Infrastructure.Repository.Models.{
-    Ranking
+    Ranking,
+    UserPoint,
+    UserAdventure
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -19,6 +21,8 @@ defmodule Infrastructure.Repository.Models.User do
     timestamps()
 
     has_many :rankings, Ranking
+    has_many :user_points, UserPoint
+    has_many :user_adventures, UserAdventure
   end
 
   def build(params) do

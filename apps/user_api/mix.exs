@@ -44,8 +44,10 @@ defmodule UserApi.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:plug_cowboy, "~> 1.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
+      {:timex, "~> 3.2"},
       {:cowboy, "~> 1.0"},
       {:media_storage, git: "git@github.com:reconizer/ex_media_storage", tag: "0.2"}
     ]
