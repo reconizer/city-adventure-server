@@ -1,5 +1,4 @@
 defmodule Infrastructure.Repository.Models.Point do
-
   @type t :: %__MODULE__{}
 
   use Ecto.Schema
@@ -41,5 +40,4 @@ defmodule Infrastructure.Repository.Models.Point do
     |> validate_required(@required_params)
     |> foreign_key_constraint(:adventure_id)
   end
-
 end

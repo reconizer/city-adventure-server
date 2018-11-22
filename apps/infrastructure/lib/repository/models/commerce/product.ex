@@ -19,7 +19,7 @@ defmodule Infrastructure.Repository.Models.Commerce.Product do
     field(:apple_product_id)
 
     has_one(:transferable_product, Commerce.TransferableProduct)
-    has_one(:product, through: :transferable_product)
+    has_one(:product, through: [:transferable_product, :product])
 
     timestamps()
   end

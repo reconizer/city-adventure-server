@@ -6,7 +6,7 @@ defmodule Contract.Adventure.Listing do
   @primary_key false
 
   embedded_schema do
-    field :position, Geo.Point
+    field(:position, Geo.PostGIS.Geometry)
   end
 
   @params ~w(position)a
@@ -17,18 +17,19 @@ defmodule Contract.Adventure.Listing do
     |> Position.position_cast()
     |> changeset()
     |> case do
-      %{valid?: true} = result -> 
-        {:ok, result
-              |> apply_changes()
-        }
-      result -> {:error, result.errors} 
+      %{valid?: true} = result ->
+        {:ok,
+         result
+         |> apply_changes()}
+
+      result ->
+        {:error, result.errors}
     end
   end
 
-  def changeset(params, model \\ %__MODULE__{}) do 
+  def changeset(params, model \\ %__MODULE__{}) do
     model
     |> cast(params, @params)
     |> validate_required(@required_params)
   end
-
 end
