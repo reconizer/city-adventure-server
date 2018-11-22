@@ -29,7 +29,7 @@ defmodule Domain.MixProject do
       {:joken, "~> 1.5"},
       {:comeonin, "~> 4.1"},
       {:bcrypt_elixir, "~> 0.12"},
-      {:ex_machina, "~> 2.2", only: :test}
+      {:ex_machina, "~> 2.2.2", only: :test}
     ]
   end
 end
