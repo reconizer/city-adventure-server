@@ -21,8 +21,8 @@ defmodule UserApiWeb.AdventureView do
       difficulty_level: adventure.difficulty_level,
       image_url: asset_url(adventure.asset),
       gallery: generate_gallery(adventure.images),
-      top_five: adventure.top_five,
-      current_user_ranking: adventure.owner_ranking,
+      top_five: adventure.top_five |> Enum.map(&render_ranking/1),
+      current_user_ranking: render_ranking(adventure.owner_ranking),
       current_user_rating: adventure.owner_rating
     }
   end
@@ -59,8 +59,8 @@ defmodule UserApiWeb.AdventureView do
     end)
   end
 
-  defp render_owner_ranking(%{user_id: nil}), do: nil
-  defp render_owner_ranking(owner_ranking) do
+  defp render_ranking(nil), do: nil
+  defp render_ranking(owner_ranking) do
     %{
       completion_time: owner_ranking.completion_time,
       nick: owner_ranking.nick,

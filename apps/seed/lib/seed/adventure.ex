@@ -5,6 +5,7 @@ defmodule Seed.Adventure do
   def seed() do
     Multi.new()
     |> Multi.insert(:creator_image, build_creator_image())
+    |> Multi.insert_all(:users, Models.User, build_users(), returning: true)
     |> Multi.merge(fn %{creator_image: image} -> 
       Multi.new()
       |> Multi.insert(:creator, build_creator(image))
@@ -33,16 +34,58 @@ defmodule Seed.Adventure do
     |> Multi.insert_all(:images, Models.Image, preper_image(assets, adventure), returning: true)
   end
 
-  defp create_points(%{adventure: adventure}) do
+  defp create_points(%{adventure: adventure, users: {_, users}}) do
     %{points: points, clues: clues, answers: answers, assets: assets} = build_points(adventure.id)
     Multi.new()
     |> Multi.insert_all(:points, Models.Point, points, returning: true)
+    |> Multi.insert_all(:user_adventure, Models.UserAdventure, build_user_adventure(adventure, users), returning: true)
+    |> Multi.insert_all(:ranking, Models.Ranking, build_ranking(adventure, users), returning: true)
+    |> Multi.insert_all(:rating, Models.AdventureRating, build_rating(adventure, users), returning: true)
     |> Multi.insert_all(:assets, Models.Asset, assets, returning: true)
     |> Multi.insert_all(:clues_inserted, Models.Clue, clues, returning: true)
     |> Multi.insert_all(:answers, Models.Answer, answers, returning: true)
     |> Multi.merge(fn %{assets: {_, assets}} ->
       Multi.new()
       |> Multi.run(:assets_send, fn _ -> send_assets(assets) end)
+    end)
+  end
+
+  defp build_user_adventure(adventure, users) do
+    users
+    |> Enum.map(fn user ->  
+      %{
+        adventure_id: adventure.id,
+        user_id: user.id,
+        completed: true,
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      }
+    end)
+  end
+
+  defp build_ranking(adventure, users) do
+    users
+    |> Enum.map(fn user ->  
+      %{
+        adventure_id: adventure.id,
+        user_id: user.id,
+        completion_time: Enum.random([~T[02:10:00.000000], ~T[02:11:00.000000], ~T[01:52:00.000000], ~T[02:34:00.000000]]),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      }
+    end)
+  end
+
+  defp build_rating(adventure, users) do
+    users
+    |> Enum.map(fn user ->  
+      %{
+        adventure_id: adventure.id,
+        user_id: user.id,
+        rating: Enum.random(1..5),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      }
     end)
   end
 
@@ -148,6 +191,59 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     })
+  end
+
+  defp build_users() do
+    [
+      %{
+        id: Ecto.UUID.generate(),
+        email: "martin@gmail.com",
+        nick: "martin",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "adam@gmail.com",
+        nick: "adam",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "luck@gmail.com",
+        nick: "luck",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "nick@gmail.com",
+        nick: "nick",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "simon@gmail.com",
+        nick: "simon",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "paul@gmail.com",
+        nick: "paul",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+    ]
   end
 
   defp build_points(adventure_id) do
