@@ -1,3 +1,5 @@
 use Mix.Config
 
-import_config "#{Mix.env()}.secret.exs"
+config :logger, level: :info
+config :infrastructure, :asset_bucket, ""
+import_config("#{Mix.env()}.secret.exs")

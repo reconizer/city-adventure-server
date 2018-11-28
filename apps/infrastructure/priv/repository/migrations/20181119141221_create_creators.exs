@@ -13,6 +13,7 @@ defmodule Infrastructure.Repository.Migrations.CreateCreators do
       add :zip_code, :text 
       add :email, :text, null: false 
       add :password_digest, :text, null: false
+      add :approved, :boolean, default: false
       timestamps()
     end
   end

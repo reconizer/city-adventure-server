@@ -5,7 +5,8 @@ defmodule Infrastructure.Repository.Models.Clue do
   use Ecto.Schema
   import Ecto.Changeset
   alias Infrastructure.Repository.Models.{
-    Point
+    Point,
+    Asset
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -19,6 +20,7 @@ defmodule Infrastructure.Repository.Models.Clue do
 
     timestamps()
 
+    belongs_to :asset, Asset
     belongs_to :point, Point
   end
 
@@ -26,8 +28,8 @@ defmodule Infrastructure.Repository.Models.Clue do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(point_id type sort tip description)a
-  @required_params ~w(point_id type sort)a
+  @params ~w(point_id type sort tip description asset_id)a
+  @required_params ~w(point_id type sort asset_id)a
 
   def changeset(model, params \\ %{}) do
     model

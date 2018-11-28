@@ -1,0 +1,14 @@
+use Mix.Config
+
+config :worker, :file_upload_queue_name, ""
+config :worker, :asset_bucket, ""
+
+config :ex_aws, :sqs,
+  access_key_id: "",
+  secret_access_key: "",
+  region: ""
+
+config :ex_aws, :s3,
+  access_key_id: "",
+  secret_access_key: "",
+  region: ""
