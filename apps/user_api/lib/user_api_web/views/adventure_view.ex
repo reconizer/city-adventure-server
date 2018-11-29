@@ -14,8 +14,8 @@ defmodule UserApiWeb.AdventureView do
       language: adventure.language,
       min_time: adventure.min_time,
       max_time: adventure.max_time,
-      rating: adventure.rating,
-      rating_count: render_rating(adventure.rating_count),
+      rating: parse_rating(adventure.rating),
+      rating_count: render_rating_count(adventure.rating_count),
       author_name: adventure.author_name,
       author_image_url: asset_url(adventure.author_asset),
       difficulty_level: adventure.difficulty_level,
@@ -69,6 +69,9 @@ defmodule UserApiWeb.AdventureView do
     }
   end
 
+  defp parse_rating(nil), do: nil
+  defp parse_rating(rating), do: Decimal.to_float(rating)
+
   defp render_start_points(%{position: %{coordinates: {lng, lat}}} = adventure) do
     %{
       adventure_id: adventure.adventure_id,
@@ -83,7 +86,7 @@ defmodule UserApiWeb.AdventureView do
     }
   end
 
-  defp render_rating(nil), do: 0
-  defp render_rating(rating), do: rating
+  defp render_rating_count(nil), do: 0
+  defp render_rating_count(rating), do: rating
 
 end
