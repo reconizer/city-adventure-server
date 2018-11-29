@@ -1,4 +1,4 @@
-defmodule Contract.Adventure.Ranking do
+defmodule Contract.Paginate do
   use Ecto.Schema
   use Contract
   import Ecto.Changeset
@@ -6,16 +6,15 @@ defmodule Contract.Adventure.Ranking do
   @primary_key false
 
   embedded_schema do
-    field :id, Ecto.UUID
+    field :page, :integer, default: 1
+    field :limit, :integer, default: 10
   end
 
-  @params ~w(id)a
-  @required_params ~w(id)a
+  @params ~w(page limit)a
 
   def changeset(contract, params) do 
     contract
     |> cast(params, @params)
-    |> validate_required(@required_params)
   end
 
 end

@@ -1,4 +1,4 @@
-defmodule Contract.Adventure.Ranking do
+defmodule Contract.Adventure.CurrentUserRanking do
   use Ecto.Schema
   use Contract
   import Ecto.Changeset
