@@ -29,6 +29,10 @@ defmodule UserApiWeb.Router do
       get "/:adventure_id", ClueController, :index
       get "/point/:adventure_id/:point_id", ClueController, :list_for_point
     end
+
+    scope "/points" do
+      post "/check_position", PointController, :resolve_position_point
+    end
     
   end
 

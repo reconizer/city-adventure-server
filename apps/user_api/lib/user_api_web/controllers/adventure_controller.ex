@@ -70,7 +70,7 @@ defmodule UserApiWeb.AdventureController do
       {:ok, validate_params} <- context 
                                 |> Contract.Adventure.Summary.validate(),
       {:ok, ranking} <- validate_params
-                        |> RankingProjection.top_ten_ranking(context["current_user"])
+                        |> RankingProjection.top_ten_ranking()
     do
       session
       |> Session.update_context(%{"ranking" => ranking})

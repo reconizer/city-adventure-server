@@ -460,58 +460,10 @@ defmodule Seed.Adventure do
 
     answers = [
       %{
-        type: "location",
+        type: "password",
         point_id: fontanna.id,
         sort: 0,
-        details: %{position: %{lat: 53.010747, lng: 18.599850}},
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
-      },
-      %{
-        type: "text",
-        point_id: fontanna.id,
-        sort: 1,
-        details: %{text: "sword of destiny"},
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
-      },
-      %{
-        type: "location",
-        point_id: kopernik.id,
-        sort: 0,
-        details: %{position: %{lat: 53.010301, lng: 18.604964}},
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
-      },
-      %{
-        type: "location",
-        point_id: brama.id,
-        sort: 0,
-        details: %{position: %{lat: 53.008486, lng: 18.608978}},
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
-      },
-      %{
-        type: "location",
-        point_id: filutek.id,
-        sort: 0,
-        details: %{position: %{lat: 53.011100, lng: 18.604505}},
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
-      },
-      %{
-        type: "location",
-        point_id: smok.id,
-        sort: 0,
-        details: %{position: %{lat: 53.010770, lng: 18.608834}},
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
-      },
-      %{
-        type: "location",
-        point_id: kura.id,
-        sort: 0,
-        details: %{position: %{lat: 53.01218, lng: 18.60433}},
+        details: %{password: "sword of destiny",  password_type: "text"},
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
       }
