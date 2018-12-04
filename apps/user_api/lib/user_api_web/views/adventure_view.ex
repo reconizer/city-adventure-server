@@ -30,7 +30,7 @@ defmodule UserApiWeb.AdventureView do
   def render("start.json", %{session: %Session{context: %{"adventure" => %{start_point: %{position: %{coordinates: {lng, lat}}} = start_point}}} = _session}) do
     %{
       adventure_id: start_point.adventure_id,
-      id: start_point.id,
+      start_point_id: start_point.id,
       position: %{
         lat: lat,
         lng: lng
