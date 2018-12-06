@@ -5,7 +5,8 @@ defmodule Infrastructure.Repository.Models.Creator do
   import Ecto.Changeset
 
   alias Infrastructure.Repository.Models.{
-    Adventure
+    Adventure,
+    Commerce
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -26,6 +27,8 @@ defmodule Infrastructure.Repository.Models.Creator do
     timestamps()
 
     has_many(:adventures, Adventure)
+    has_one(:creator_account, Commerce.CreatorAccount)
+    has_one(:account, through: [:creator_account, :account])
   end
 
   def build(params) do

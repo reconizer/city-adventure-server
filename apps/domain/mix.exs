@@ -27,7 +27,8 @@ defmodule Domain.MixProject do
     do: [
       "lib",
       # Domain fixtures
-      "test/adventure/fixtures"
+      "test/adventure/fixtures",
+      "test/commerce/fixtures"
     ]
 
   defp elixirc_paths(_), do: ["lib"]

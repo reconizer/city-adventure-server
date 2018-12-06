@@ -18,7 +18,7 @@ defmodule Infrastructure.Repository.Models.Commerce.Currency do
     timestamps()
 
     has_one(:transferable_currency, Commerce.TransferableCurrency)
-    has_one(:transferable, through: :transferable_currency)
+    has_one(:transferable, through: [:transferable_currency, :transferable])
   end
 
   def changeset(model, params) do

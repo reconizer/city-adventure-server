@@ -10,10 +10,12 @@ defmodule Infrastructure.Repository.Models.Commerce.TransferableProduct do
   @foreign_key_type :binary_id
   @schema_prefix "commerce"
 
-  @fields ~w(id inserted_at updated_at)a
-  @required_fields ~w()a
+  @fields ~w(id product_id transferable_id inserted_at updated_at)a
+  @required_fields ~w(id product_id transferable_id inserted_at updated_at)a
 
   schema "transferable_products" do
+    belongs_to(:product, Commerce.Product)
+    belongs_to(:transferable, Commerce.Transferable)
     timestamps()
   end
 

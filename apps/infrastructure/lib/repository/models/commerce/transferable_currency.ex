@@ -10,10 +10,13 @@ defmodule Infrastructure.Repository.Models.Commerce.TransferableCurrency do
   @foreign_key_type :binary_id
   @schema_prefix "commerce"
 
-  @fields ~w(id inserted_at updated_at)a
-  @required_fields ~w()a
+  @fields ~w(id currency_id transferable_id inserted_at updated_at)a
+  @required_fields ~w(id currency_id transferable_id inserted_at updated_at)a
 
   schema "transferable_currencies" do
+    belongs_to(:transferable, Commerce.Transferable)
+    belongs_to(:currency, Commerce.Currency)
+
     timestamps()
   end
 

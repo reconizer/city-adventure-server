@@ -2,6 +2,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
   use Ecto.Migration
 
   @transactions [
+    :create_creators,
     :create_transferables,
     :create_currencies,
     :create_accounts,
@@ -11,6 +12,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
     :create_transferable_adventures,
     :create_user_accounts,
     :create_shop_accounts,
+    :create_creator_accounts,
     :create_transferable_products,
     :create_transfers,
     :create_orders,
@@ -35,10 +37,30 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
     end)
   end
 
+  def create_creators(:up) do
+    create table(:creators, primary_key: false) do
+      add(:id, :uuid, primary_key: true)
+
+      timestamps()
+    end
+
+    alter table(:adventures) do
+      add(:creator_id, references(:creators, type: :uuid), null: false)
+    end
+  end
+
+  def create_creators(:down) do
+    alter table(:adventures) do
+      remove(:creator_id)
+    end
+
+    drop(table(:creators))
+  end
+
   def create_transferables(:up) do
     create table(:transferables, prefix: :commerce, primary_key: false) do
       add(:id, :uuid, primary_key: true)
-      timestamps
+      timestamps()
     end
   end
 
@@ -50,7 +72,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
     create table(:currencies, prefix: :commerce, primary_key: false) do
       add(:id, :uuid, primary_key: true)
       add(:name, :string, null: false)
-      timestamps
+      timestamps()
     end
   end
 
@@ -61,7 +83,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
   def create_accounts(:up) do
     create table(:accounts, prefix: :commerce, primary_key: false) do
       add(:id, :uuid, primary_key: true)
-      timestamps
+      timestamps()
     end
   end
 
@@ -73,7 +95,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
     create table(:shops, prefix: :commerce, primary_key: false) do
       add(:id, :uuid, primary_key: true)
       add(:type, :text, null: false)
-      timestamps
+      timestamps()
     end
   end
 
@@ -88,7 +110,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
       add(:google_product_id, :text, null: false)
       add(:apple_product_id, :text, null: false)
 
-      timestamps
+      timestamps()
     end
   end
 
@@ -102,7 +124,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
       add(:currency_id, references(:currencies, type: :uuid), null: false)
       add(:transferable_id, references(:transferables, type: :uuid), null: false)
 
-      timestamps
+      timestamps()
     end
 
     create(index(:transferable_currencies, [:currency_id], prefix: :commerce))
@@ -118,9 +140,9 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
     create table(:transferable_adventures, prefix: :commerce, primary_key: false) do
       add(:id, :uuid, primary_key: true)
       add(:adventure_id, :uuid, null: false)
-      add(:transferable_id, references(:accounts, type: :uuid), null: false)
+      add(:transferable_id, references(:transferables, type: :uuid), null: false)
 
-      timestamps
+      timestamps()
     end
 
     create(index(:transferable_adventures, [:transferable_id], prefix: :commerce))
@@ -144,7 +166,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
       add(:user_id, :uuid, null: false)
       add(:account_id, references(:accounts, type: :uuid), null: false)
 
-      timestamps
+      timestamps()
     end
 
     create(index(:user_accounts, [:user_id], prefix: :commerce))
@@ -160,12 +182,34 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
     drop(table(:user_accounts, prefix: :commerce))
   end
 
+  def create_creator_accounts(:up) do
+    create table(:creator_accounts, prefix: :commerce, primary_key: false) do
+      add(:id, :uuid, primary_key: true)
+      add(:creator_id, :uuid, null: false)
+      add(:account_id, references(:accounts, type: :uuid), null: false)
+
+      timestamps()
+    end
+
+    create(index(:creator_accounts, [:creator_id], prefix: :commerce))
+    create(index(:creator_accounts, [:account_id], prefix: :commerce))
+    create(index(:creator_accounts, [:creator_id, :account_id], prefix: :commerce))
+
+    flush()
+
+    execute("ALTER TABLE commerce.creator_accounts ADD CONSTRAINT creator_accounts_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES creators(id)")
+  end
+
+  def create_creator_accounts(:down) do
+    drop(table(:creator_accounts, prefix: :commerce))
+  end
+
   def create_shop_accounts(:up) do
     create table(:shop_accounts, prefix: :commerce, primary_key: false) do
       add(:id, :uuid, primary_key: true)
       add(:shop_id, references(:shops, type: :uuid), null: false)
       add(:account_id, references(:accounts, type: :uuid), null: false)
-      timestamps
+      timestamps()
     end
 
     create(index(:shop_accounts, [:shop_id], prefix: :commerce))
@@ -183,7 +227,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
 
       add(:transferable_id, references(:transferables, type: :uuid), null: false)
       add(:product_id, references(:products, type: :uuid), null: false)
-      timestamps
+      timestamps()
     end
 
     create(index(:transferable_products, [:transferable_id], prefix: :commerce))
@@ -202,7 +246,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
       add(:to_account_id, references(:accounts, type: :uuid), null: false)
       add(:transferable_id, references(:transferables, type: :uuid), null: false)
       add(:transferable_amount, :integer, null: false)
-      timestamps
+      timestamps()
     end
 
     create(index(:transfers, [:from_account_id], prefix: :commerce))
@@ -219,7 +263,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
   def create_orders(:up) do
     create table(:orders, prefix: :commerce, primary_key: false) do
       add(:id, :uuid, primary_key: true)
-      timestamps
+      timestamps()
     end
   end
 
@@ -232,7 +276,7 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
       add(:id, :uuid, primary_key: true)
       add(:order_id, references(:orders, type: :uuid), null: false)
       add(:transfer_id, references(:transfers, type: :uuid), null: false)
-      timestamps
+      timestamps()
     end
 
     create(index(:order_transfers, [:order_id], prefix: :commerce))

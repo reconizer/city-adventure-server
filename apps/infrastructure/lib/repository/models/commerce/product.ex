@@ -10,8 +10,8 @@ defmodule Infrastructure.Repository.Models.Commerce.Product do
   @foreign_key_type :binary_id
   @schema_prefix "commerce"
 
-  @fields ~w(id inserted_at updated_at)a
-  @required_fields ~w()a
+  @fields ~w(id name google_product_id apple_product_id inserted_at updated_at)a
+  @required_fields ~w(id name inserted_at updated_at)a
 
   schema "products" do
     field(:name, :string)
@@ -19,7 +19,7 @@ defmodule Infrastructure.Repository.Models.Commerce.Product do
     field(:apple_product_id)
 
     has_one(:transferable_product, Commerce.TransferableProduct)
-    has_one(:product, through: [:transferable_product, :product])
+    has_one(:transferable, through: [:transferable_product, :transferable])
 
     timestamps()
   end

@@ -21,9 +21,6 @@ erl_crash.dump
 
 .elixir_ls/
 .vscode/
-<<<<<<< HEAD
-
 
 **/config/*.secret.exs
-=======
->>>>>>> origin/dev-deployment
+.tool-versions

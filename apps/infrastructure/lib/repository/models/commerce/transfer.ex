@@ -10,10 +10,15 @@ defmodule Infrastructure.Repository.Models.Commerce.Transfer do
   @foreign_key_type :binary_id
   @schema_prefix "commerce"
 
-  @fields ~w(id inserted_at updated_at)a
-  @required_fields ~w()a
+  @fields ~w(id from_account_id to_account_id transferable_id transferable_amount inserted_at updated_at)a
+  @required_fields ~w(id from_account_id to_account_id transferable_id transferable_amount inserted_at updated_at)a
 
   schema "transfers" do
+    belongs_to(:from_account, Commerce.Account)
+    belongs_to(:to_account, Commerce.Account)
+    belongs_to(:transferable, Commerce.Transferable)
+
+    field(:transferable_amount, :integer)
     timestamps()
   end
 

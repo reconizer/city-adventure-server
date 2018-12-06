@@ -18,9 +18,12 @@ defmodule Infrastructure.Repository.Models.Commerce.Account do
     has_one(:shop_account, Commerce.ShopAccount)
     has_one(:creator_account, Commerce.CreatorAccount)
 
-    has_one(:user, through: :user_account)
-    has_one(:shop, through: :shop_account)
-    has_one(:creator, through: :creator_account)
+    has_one(:user, through: [:user_account, :user])
+    has_one(:shop, through: [:shop_account, :shop])
+    has_one(:creator, through: [:creator_account, :creator])
+
+    has_many(:outgoing_transfers, Commerce.Transfer, foreign_key: :from_account_id)
+    has_many(:incoming_transfers, Commerce.Transfer, foreign_key: :to_account_id)
 
     timestamps()
   end
