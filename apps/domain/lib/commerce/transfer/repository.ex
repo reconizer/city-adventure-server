@@ -5,79 +5,69 @@ defmodule Domain.Commerce.Transfer.Repository do
   alias Infrastructure.Repository.Models.Commerce
   import Ecto.Query
 
-  # def get(transfer_id) do
-  #   fetch_transfer(transfer_id)
-  #   |> fetch_accounts()
-  # end
+  @spec get(any()) :: Domain.Commerce.Transfer.t()
+  def get(transfer_id) do
+    order =
+      Commerce.Order
+      |> preload(:transfers)
+      |> Repo.get(transfer_id)
 
-  # def fetch_transfer(transfer_id) do
-  #   order =
-  #     Commerce.Order
-  #     |> preload(order_transfers: :transfers)
-  #     |> Repo.get(transfer_id)
+    transfer =
+      order
+      |> build_transfer
 
-  #   transfer = build_transfer(order)
+    account_ids =
+      order.transfers
+      |> Enum.flat_map(fn transfer ->
+        [transfer.from_account_id, transfer.to_account_id]
+      end)
+      |> Enum.uniq()
 
-  #   order.transfers
-  #   |> Enum.map(&build_transfer_item/1)
-  #   |> set(transfer, :items)
-  # end
+    accounts = fetch_accounts(account_ids)
 
-  # def fetch_accounts(transfer) do
-  #   transfer.items
-  #   |> Enum.flat_map(fn item ->
-  #     [item.from_account_id, item.to_account_id]
-  #   end)
-  #   |> Enum.filter(& &1)
-  #   |> case do
-  #     account_ids ->
-  #       Commerce.Account
-  #       |> where([account], account.id in ^account_ids)
-  #       |> join(:left, [account], transfer in Commerce.Transfer, on: transfer.from_account_id == account.id or transfer.to_account_id == account.id)
-  #       |> group_by([account, transfer], [account.id, transfer.transferable_id])
-  #       |> select([account, transfer], %{
-  #         id: account.id,
-  #         transferable_id: transfer.transferable_id,
-  #         balance_in: fragment("sum(?) filter (where ? = ?)", transfer.transferable_amount, transfer.to_account_id, account.id),
-  #         balance_out: fragment("sum(?) filter (where ? = ?)", transfer.transferable_amount, transfer.from_account_id, account.id)
-  #       })
-  #       |> Enum.group_by(& &1.account_id, fn account_balance ->
-  #         %{
-  #           transferable_id: account_balance.transferable_id,
-  #           balance: account_balance.balance_in - account_balance.balance_out
-  #         }
-  #       end)
-  #       |> Enum.map(&build_account/1)
-  #   end
-  #   |> set(transfer, :accounts)
-  # end
+    transactions =
+      order.transfers
+      |> Enum.map(fn transaction ->
+        %Transfer.Transaction{
+          from_account_id: transaction.from_account_id,
+          to_account_id: transaction.to_account_id,
+          transferable_id: transaction.transferable_id,
+          transferable_amount: transaction.transferable_amount
+        }
+      end)
 
-  # def build_account({account_id, balances}) do
-  #   %Transfer.Account{
-  #     id: account_id,
-  #     balances: balances |> Enum.map(&{&1.transferable_id, &1.balance})
-  #   }
-  # end
+    %{transfer | accounts: accounts, transactions: transactions}
+  end
 
-  # def build_transfer(order_model) do
-  #   %Transfer{
-  #     id: order_model.id
-  #   }
-  # end
+  def fetch_accounts(account_ids) do
+    Commerce.Account
+    |> where([account], account.id in ^account_ids)
+    |> join(:left, [account], transfer in Commerce.Transfer, on: transfer.from_account_id == account.id or transfer.to_account_id == account.id)
+    |> group_by([account, transfer], [account.id, transfer.transferable_id])
+    |> select([account, transfer], %{
+      id: account.id,
+      transferable_id: transfer.transferable_id,
+      balance_in: fragment("coalesce(sum(coalesce(?, 0)) filter (where ? = ?), 0)", transfer.transferable_amount, transfer.to_account_id, account.id),
+      balance_out: fragment("coalesce(sum(coalesce(?, 0)) filter (where ? = ?), 0)", transfer.transferable_amount, transfer.from_account_id, account.id)
+    })
+    |> Repo.all()
+    |> Enum.group_by(& &1.id, fn account_balance ->
+      {
+        account_balance.transferable_id,
+        account_balance.balance_in - account_balance.balance_out
+      }
+    end)
+    |> Enum.map(fn {account_id, account_balances} ->
+      account_balances
+      |> Enum.reduce(%Transfer.Account{id: account_id}, fn {transferable_id, balance}, account ->
+        account |> Transfer.Account.add!(transferable_id, balance)
+      end)
+    end)
+  end
 
-  # def build_transfer_item(transfer_model) do
-  #   %Transfer.Item{
-  #     id: transfer_model.id,
-  #     from_account_id: transfer_model.from_account_id,
-  #     to_account_id: transfer_model.to_account_id,
-  #     transferable_id: transfer_model.transferable_id,
-  #     transferable_amount: transfer_model.transferable_amount,
-  #     created_at: transfer_model.inserted_at
-  #   }
-  # end
-
-  # def set(value, object, key) do
-  #   object
-  #   |> Map.put(key, value)
-  # end
+  def build_transfer(order_model) do
+    %Transfer{
+      id: order_model.id
+    }
+  end
 end

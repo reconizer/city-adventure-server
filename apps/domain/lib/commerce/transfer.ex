@@ -1,6 +1,7 @@
 defmodule Domain.Commerce.Transfer do
   alias Domain.Commerce.Transfer
   use Ecto.Schema
+  use Domain.Event, "Commerce.Transfer"
   import Ecto.Changeset
 
   @type t :: %__MODULE__{}
@@ -10,6 +11,7 @@ defmodule Domain.Commerce.Transfer do
     embeds_many(:transactions, Transfer.Transaction)
     embeds_many(:pending_transactions, Transfer.Transaction)
     embeds_many(:accounts, Transfer.Account)
+    embeds_many(:events, Domain.Event)
   end
 
   @fields []
@@ -21,6 +23,29 @@ defmodule Domain.Commerce.Transfer do
     |> cast(params, @fields)
     |> validate_required(@required_fields)
     |> cast_assoc(:items)
+  end
+
+  @spec add_account(Transfer.t(), Transfer.Account.t()) :: {:ok, Transfer.t()}
+  def add_account(transfer, account) do
+    transfer
+    |> get_account(account.id)
+    |> case do
+      :error ->
+        {:ok, %{transfer | accounts: transfer.accounts ++ [account]}}
+
+      {:ok, found_account} ->
+        accounts = transfer.accounts -- [found_account]
+        {:ok, %{transfer | accounts: accounts ++ [account]}}
+    end
+  end
+
+  @spec add_account!(Transfer.t(), Transfer.Account.t()) :: Transfer.t()
+  def add_account!(transfer, account) do
+    transfer
+    |> add_account(account)
+    |> case do
+      {:ok, transfer} -> transfer
+    end
   end
 
   @spec get_account(Transfer.t(), Ecto.UUID.t()) :: :error | {:ok, Transfer.Account.t()}
@@ -39,6 +64,39 @@ defmodule Domain.Commerce.Transfer do
     |> get_account(account_id)
     |> case do
       {:ok, item} -> item
+    end
+  end
+
+  @spec add_transaction(Transfer.t(), Transfer.Transaction.t()) :: {:ok, Transfer.t()}
+  def add_transaction(transfer, transaction) do
+    transfer
+    |> get_transaction(transaction.id)
+    |> case do
+      :error ->
+        transfer =
+          %{transfer | transactions: transfer.transactions ++ [transaction]}
+          |> emit("TransactionAdded", %{
+            id: transaction.id,
+            from_account_id: transaction.from_account_id,
+            to_account_id: transaction.to_account_id,
+            transferable_id: transaction.transferable_id,
+            transferable_amount: transaction.transferable_amount,
+            created_at: NaiveDateTime.utc_now()
+          })
+
+        {:ok, transfer}
+
+      _ ->
+        {:ok, transfer}
+    end
+  end
+
+  @spec add_transaction!(Transfer.t(), Transfer.Transaction.t()) :: Transfer.t()
+  def add_transaction!(transfer, transaction) do
+    transfer
+    |> add_transaction(transaction)
+    |> case do
+      {:ok, transaction} -> transaction
     end
   end
 
@@ -61,6 +119,55 @@ defmodule Domain.Commerce.Transfer do
     end
   end
 
+  @spec remove_transaction(Transfer.t(), Ecto.UUID.t()) :: {:ok, Transfer.t()}
+  def remove_transaction(transfer, transaction_id) do
+    transfer
+    |> get_transaction(transaction_id)
+    |> case do
+      :error ->
+        {:ok, transfer}
+
+      {:ok, transaction} ->
+        transfer =
+          %{transfer | transactions: transfer.transactions -- [transaction]}
+          |> emit("TransactionRemoved", %{
+            id: transaction.id,
+            created_at: NaiveDateTime.utc_now()
+          })
+
+        {:ok, transfer}
+    end
+  end
+
+  @spec remove_transaction!(Transfer.t(), Ecto.UUID.t()) :: Transfer.t()
+  def remove_transaction!(transfer, transaction_id) do
+    transfer
+    |> remove_transaction(transaction_id)
+    |> case do
+      {:ok, transfer} -> transfer
+    end
+  end
+
+  @spec add_pending_transaction(Transfer.t(), Transfer.Transaction.t()) :: {:ok, Transfer.t()}
+  def add_pending_transaction(transfer, transaction) do
+    transfer.pending_transactions
+    |> Enum.find(&(&1.id == transaction.id))
+    |> case do
+      nil -> {:ok, %{transfer | pending_transactions: transfer.pending_transactions ++ [transaction]}}
+      _ -> {:ok, transfer}
+    end
+  end
+
+  @spec add_pending_transaction!(Transfer.t(), Transfer.Transaction.t()) :: Transfer.t()
+  def add_pending_transaction!(transfer, transaction) do
+    transfer
+    |> add_pending_transaction(transaction)
+    |> case do
+      {:ok, transfer} -> transfer
+    end
+  end
+
+  @spec get_pending_transaction(Transfer.t(), Ecto.UUID.t()) :: :error | {:ok, Transfer.Transaction.t()}
   def get_pending_transaction(%Transfer{} = transfer, transaction_id) do
     transfer.pending_transactions
     |> Enum.find(&(&1.id == transaction_id))
@@ -70,6 +177,7 @@ defmodule Domain.Commerce.Transfer do
     end
   end
 
+  @spec get_pending_transaction!(Transfer.t(), Ecto.UUID.t()) :: Transfer.Transaction.t()
   def get_pending_transaction!(%Transfer{} = transfer, transaction_id) do
     transfer
     |> get_pending_transaction(transaction_id)
@@ -78,56 +186,7 @@ defmodule Domain.Commerce.Transfer do
     end
   end
 
-  def add_to_transfer(%Transfer{} = transfer, from_account, to_account, transferable, transferable_amount) do
-    transaction = %Transfer.Transaction{
-      id: Infrastructure.Repository.Models.uuid(),
-      from_account_id: from_account.id,
-      to_account_id: to_account.id,
-      transferable_id: transferable.id,
-      transferable_amount: transferable_amount,
-      created_at: NaiveDateTime.utc_now()
-    }
-
-    transfer
-    |> add_account!(from_account)
-    |> add_account!(to_account)
-    |> add_pending_transaction!(transaction)
-  end
-
-  def add_transaction(transfer, transaction) do
-    transfer
-    |> get_transaction(transaction.id)
-    |> case do
-      :error -> {:ok, %{transfer | transactions: [transaction | transfer.transactions]}}
-      _ -> {:ok, transfer}
-    end
-  end
-
-  def add_transaction!(transfer, transaction) do
-    transfer
-    |> add_transaction(transaction)
-    |> case do
-      {:ok, transaction} -> transaction
-    end
-  end
-
-  def remove_transaction(transfer, transaction_id) do
-    transfer
-    |> get_transaction(transaction_id)
-    |> case do
-      :error -> {:ok, transfer}
-      {:ok, transaction} -> {:ok, %{transfer | transactions: transfer.transactions -- [transaction]}}
-    end
-  end
-
-  def remove_transaction!(transfer, transaction_id) do
-    transfer
-    |> remove_transaction(transaction_id)
-    |> case do
-      {:ok, transfer} -> transfer
-    end
-  end
-
+  @spec remove_pending_transaction(Transfer.t(), Ecto.UUID.t()) :: {:ok, Transfer.t()}
   def remove_pending_transaction(transfer, transaction_id) do
     transfer
     |> get_pending_transaction(transaction_id)
@@ -137,6 +196,7 @@ defmodule Domain.Commerce.Transfer do
     end
   end
 
+  @spec remove_pending_transaction!(Transfer.t(), Ecto.UUID.t()) :: Transfer.t()
   def remove_pending_transaction!(transfer, transaction_id) do
     transfer
     |> remove_pending_transaction(transaction_id)
@@ -145,43 +205,9 @@ defmodule Domain.Commerce.Transfer do
     end
   end
 
-  def add_pending_transaction(transfer, transaction) do
-    transfer.pending_transactions
-    |> Enum.find(&(&1.id == transaction.id))
-    |> case do
-      nil -> {:ok, %{transfer | pending_transactions: [transaction | transfer.pending_transactions]}}
-      _ -> {:ok, transfer}
-    end
-  end
-
-  def add_pending_transaction!(transfer, transaction) do
-    transfer
-    |> add_pending_transaction(transaction)
-    |> case do
-      {:ok, transfer} -> transfer
-    end
-  end
-
-  def add_account(transfer, account) do
-    transfer
-    |> get_account(account.id)
-    |> case do
-      :error -> {:ok, %{transfer | accounts: [account | transfer.accounts]}}
-      _ -> {:ok, transfer}
-    end
-  end
-
-  def add_account!(transfer, account) do
-    transfer
-    |> add_account(account)
-    |> case do
-      {:ok, transfer} -> transfer
-    end
-  end
-
+  @spec commit(Transfer.t()) :: {:ok, Transfer.t()} | {:error, {Transfer.t(), :not_enough_funds, Transfer.Transaction.t()}}
   def commit(transfer) do
     transfer.pending_transactions
-    |> Enum.reverse()
     |> Enum.reduce_while({:ok, transfer}, fn pending_transaction, {:ok, transfer} ->
       with from_account <- transfer |> get_account!(pending_transaction.from_account_id),
            to_account <- transfer |> get_account!(pending_transaction.to_account_id) do
@@ -206,5 +232,22 @@ defmodule Domain.Commerce.Transfer do
         end
       end
     end)
+  end
+
+  @spec add_to_transfer(Transfer.t(), Transfer.Account.t(), Transfer.Account.t(), Transfer.Transferable.t(), non_neg_integer()) :: Transfer.t()
+  def add_to_transfer(%Transfer{} = transfer, from_account, to_account, transferable, transferable_amount) do
+    transaction = %Transfer.Transaction{
+      id: Infrastructure.Repository.Models.uuid(),
+      from_account_id: from_account.id,
+      to_account_id: to_account.id,
+      transferable_id: transferable.id,
+      transferable_amount: transferable_amount,
+      created_at: NaiveDateTime.utc_now()
+    }
+
+    transfer
+    |> add_account!(from_account)
+    |> add_account!(to_account)
+    |> add_pending_transaction!(transaction)
   end
 end

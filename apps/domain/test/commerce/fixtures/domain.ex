@@ -10,7 +10,7 @@ defmodule Domain.Commerce.Fixtures.Domain do
     |> struct!(params)
   end
 
-  def build_item(params \\ %{}) do
+  def build_transaction(params \\ %{}) do
     %Commerce.Transfer.Transaction{}
     |> struct!(params)
   end

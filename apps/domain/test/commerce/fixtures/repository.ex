@@ -98,7 +98,6 @@ defmodule Domain.Commerce.Fixtures.Repository do
   end
 
   def transferable_adventure(params \\ %{}) do
-
     %Models.Commerce.TransferableAdventure{}
     |> struct(params)
   end
