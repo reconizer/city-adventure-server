@@ -1,4 +1,4 @@
-defmodule Contract.Adventure.PointPosition do
+defmodule Contract.Adventure.PointResolve do
   use Ecto.Schema
   use Contract
   import Ecto.Changeset
@@ -10,9 +10,11 @@ defmodule Contract.Adventure.PointPosition do
     field :adventure_id, Ecto.UUID
     field :point_id, Ecto.UUID
     field :position, Geo.PostGIS.Geometry
+    field :answer_text, :string
+    field :answer_type, :string
   end
 
-  @params ~w(position point_id adventure_id)a
+  @params ~w(position point_id adventure_id answer_text answer_type)a
   @required_params ~w(position point_id adventure_id)a
 
   def changeset(contract, params) do 

@@ -41,6 +41,13 @@ defmodule UserApiWeb.Router do
     
     post "/", AuthController, :login
   end
+  
+
+  scope "/api/ping", UserApiWeb do
+    pipe_through :api 
+    
+    get "/", PingController, :ping
+  end
 
   # Other scopes may use custom stacks.
   # scope "/api", UserApiWeb do

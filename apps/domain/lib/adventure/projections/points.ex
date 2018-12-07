@@ -3,7 +3,7 @@ defmodule Domain.Adventure.Projections.Points do
   alias Infrastructure.Repository
   use Infrastructure.Repository.Models
 
-  def get_completed_points(%{adventure_id: adventure_id}, %Contract.User.Profile{id: owner_id}) do
+  def get_completed_points(%{adventure_id: adventure_id}, %{id: owner_id}) do
     result = from(point in Models.Point,
       join: user_point in Models.UserPoint, on: [user_id: ^owner_id, point_id: point.id],
       left_join: parent_point in Models.Point, on: [id: point.parent_point_id, adventure_id: ^adventure_id],

@@ -35,7 +35,6 @@ defmodule Infrastructure.Repository.Models.Ranking do
     |> validate_required(@required_params)
     |> foreign_key_constraint(:adventure_id)
     |> foreign_key_constraint(:user_id)
-    |> IO.inspect()
   end
 
 end
