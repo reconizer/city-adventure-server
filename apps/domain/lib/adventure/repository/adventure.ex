@@ -27,6 +27,19 @@ defmodule Domain.Adventure.Repository.Adventure do
     |> Models.UserPoint.build()
   end
 
+  def complete_adventure(adventure) do
+    adventure
+    |> Ecto.Changeset.change(%{completed: true})
+    |> Repository.update()
+  end
+
+  # defp parse_event(%Complete{} = event, multi) do
+  #   multi
+  #   |> Ecto.Multi.update(:update_adventure, %Models.Adventure{id: event.id} |> Models.Adventure.changeset(%{
+  #     completed: event.completed
+  #   }), force: true)
+  # end
+
   defp build_user_adventure(%{adventure_id: id}, user_id) do
     %{
       adventure_id: id,

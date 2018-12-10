@@ -20,6 +20,17 @@ defmodule Domain.Adventure.Repository.Point do
     end
   end
 
+  def check_last_point(point) do
+    from(next_point in Models.Point,
+      where: next_point.parent_point_id == ^point.id
+    )
+    |> Repository.one()
+    |> case do
+      nil -> true
+      _result -> false  
+    end
+  end
+
   def join_user_to_point(params, answers, user) do
     check_user_point(params, user)
     |> case do

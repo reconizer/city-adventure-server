@@ -2,7 +2,7 @@ defmodule Domain.Adventure.Service.ResolvePoint do
   alias Domain.Adventure.Repository.Point, as: PointRepository
   alias Domain.Adventure.Repository.Answer, as: AnswerRepository
 
-  def resolve_point(params, answers, user) do
+  def resolve_point(params, answers, user, last) do
     user_point = PointRepository.join_user_to_point(params, answers, user)
     result = AnswerRepository.resolve_clue(params, answers)
     result

@@ -32,17 +32,18 @@ defmodule UserApiWeb.PointController do
                     |> PointRepository.check_point_position(),
     {:ok, answers} <- point
                       |> PointRepository.get_answers(),
+    last <- point |> PointRepository.check_last_point(),
     {:ok, true} <- answers |> AnswerRepository.check_answer_and_time(),
     {:ok, answer_type} <- answers |> AnswerRepository.find_answer_type()
     do
       validate_params
-      |> ServiceResolvePoint.resolve_point(answers, context["current_user"])
+      |> ServiceResolvePoint.resolve_point(answers, context["current_user"], last)
       |> case do
         {:error, result} -> 
           session |> Session.add_error(result)
         {:ok, user_point} ->
           session
-          |> Session.update_context(%{"point" => point, "user_point" => user_point, "answer_type" => answer_type})
+          |> Session.update_context(%{"last_point" => last, "point" => point, "user_point" => user_point, "answer_type" => answer_type})
       end
     else
       %Session{valid?: false} ->
