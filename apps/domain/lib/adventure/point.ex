@@ -1,7 +1,8 @@
 defmodule Domain.Adventure.Point do
   alias Domain.Adventure.{
     Point,
-    Clue
+    Clue,
+    Answer
   }
   use Ecto.Schema
   import Ecto.Changeset
@@ -16,9 +17,10 @@ defmodule Domain.Adventure.Point do
     field(:parent_point_id, Ecto.UUID)
     field(:adventure_id, Ecto.UUID)
     embeds_many(:clues, Clue)
+    embeds_many(:answers, Answer)
   end
 
-  @fields [:position, :show, :radius, :parent_point_id, :adventure_id]
+  @fields [:position, :show, :radius, :parent_point_id, :adventure_id, :id]
   @required_fields @fields
 
   @spec changeset(Point.t(), map()) :: Ecto.Changeset.t()
