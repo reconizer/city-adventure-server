@@ -1,5 +1,5 @@
-defmodule Domain.Adventure.Point do
-  alias Domain.Adventure.{
+defmodule Domain.UserAdventure.Point do
+  alias Domain.UserAdventure.{
     Point,
     Clue,
     Answer

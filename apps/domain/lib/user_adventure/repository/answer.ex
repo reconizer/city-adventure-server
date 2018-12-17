@@ -1,4 +1,4 @@
-defmodule Domain.Adventure.Repository.Answer do
+defmodule Domain.UserAdventure.Repository.Answer do
   @moduledoc """
   Repository start adventure
   """

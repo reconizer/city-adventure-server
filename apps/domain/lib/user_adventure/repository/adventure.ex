@@ -1,4 +1,4 @@
-defmodule Domain.Adventure.Repository.Adventure do
+defmodule Domain.UserAdventure.Repository.Adventure do
   @moduledoc """
   Repository start adventure
   """
@@ -6,18 +6,23 @@ defmodule Domain.Adventure.Repository.Adventure do
   import Ecto.Query
   alias Infrastructure.Repository
   alias Ecto.Multi
-  alias Domain.Adventure.{
+  alias Domain.UserAdventure.{
     Adventure,
     Point,
     Answer,
-    Clue
+    Clue,
+    UserPoint
   }
 
-  def get(adventure_id) do
+  def get(adventure_id, %{id: user_id}) do
     Models.Adventure
-    |> preload(:points)
+    |> join(:left, [adventure], points in assoc(adventure, :points))
+    |> join(:left, [adventure, points], user_points in assoc(points, :user_points))
+    |> preload([adventure, points, user_points], [:points, points: points])
     |> preload([points: :clues])
     |> preload([points: :answers])
+    |> where([adventure, points, user_points], user_points.id == ^user_id)
+    |> preload([adventure, points, user_points], [:user_points, user_points: user_points])
     |> Repository.get(adventure_id)
     |> load_adventure()
   end
@@ -90,13 +95,6 @@ defmodule Domain.Adventure.Repository.Adventure do
   def load_adventure(nil), do: nil
   def load_adventure(model) do
     %Adventure{
-      id: model.id,
-      name: model.name,
-      description: model.description,
-      min_time: model.min_time,
-      max_time: model.max_time,
-      difficulty_level: model.difficulty_level,
-      language: model.language,
       points: model.points |> Enum.map(&load_points/1)
     }
   end
@@ -137,7 +135,7 @@ defmodule Domain.Adventure.Repository.Adventure do
   end
 
   def load_user_points(user_point) do
-    %UserPoints{
+    %UserPoint{
       position: user_point.position,
       completed: user_point.completed,
       user_id: user_point.user_id,

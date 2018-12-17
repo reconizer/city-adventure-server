@@ -40,7 +40,8 @@ defmodule Domain.MixProject do
       {:comeonin, "~> 4.1"},
       {:bcrypt_elixir, "~> 0.12"},
       {:ex_machina, "~> 2.2", only: :test},
-      {:faker, "~> 0.11"}
+      {:faker, "~> 0.11"},
+      {:geocalc, "~> 0.5"}
     ]
   end
 end

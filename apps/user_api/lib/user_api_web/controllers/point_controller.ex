@@ -1,9 +1,10 @@
 defmodule UserApiWeb.PointController do
   use UserApiWeb, :controller
+  alias Domain.UserAdventure.Adventure, as: AdventureDomain
   alias Domain.Adventure.Projections.Points, as: PointProjection
-  alias Domain.Adventure.Repository.Point, as: PointRepository
-  alias Domain.Adventure.Repository.Answer, as: AnswerRepository
-  alias Domain.Adventure.Service.ResolvePoint, as: ServiceResolvePoint
+  alias Domain.UserAdventure.Repository.Point, as: PointRepository
+  alias Domain.UserAdventure.Repository.Answer, as: AnswerRepository
+  alias Domain.UserAdventure.Service.ResolvePoint, as: ServiceResolvePoint
 
   def completed_points(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
@@ -28,22 +29,21 @@ defmodule UserApiWeb.PointController do
     with %Session{valid?: true} <- session,
     {:ok, validate_params} <- context
                               |> Contract.Adventure.PointResolve.validate(),
-    {:ok, point} <- validate_params
-                    |> PointRepository.check_point_position(),
-    {:ok, answers} <- point
-                      |> PointRepository.get_answers(),
-    last <- point |> PointRepository.check_last_point(),
-    {:ok, true} <- answers |> AnswerRepository.check_answer_and_time(),
-    {:ok, answer_type} <- answers |> AnswerRepository.find_answer_type()
+    {:ok, adventure} <- validate_params
+                        |> ServiceResolvePoint.get_adventure(),
+    {:ok, _point} <- adventure
+                     |> AdventureDomain.check_point_position(validate_params),
+    {:ok, _} <- adventure
+                |> AdventureDomain.check_answer_and_time(validate_params)
     do
-      validate_params
-      |> ServiceResolvePoint.resolve_point(answers, context["current_user"], last)
+      adventure
+      |> ServiceResolvePoint.resolve_point(validate_params)
       |> case do
         {:error, result} -> 
           session |> Session.add_error(result)
-        {:ok, user_point} ->
+        {:ok, adventure} ->
           session
-          |> Session.update_context(%{"last_point" => last, "point" => point, "user_point" => user_point, "answer_type" => answer_type})
+          |> Session.update_context(%{"adventure" => adventure})
       end
     else
       %Session{valid?: false} ->

@@ -1,4 +1,5 @@
 defmodule Domain.Event do
+  alias Infrastructure.Repository
   defmacro __using__(aggregate) do
     quote do
       def emit(aggregate_struct, event_name, event_data) do
@@ -15,12 +16,10 @@ defmodule Domain.Event do
 
       def save(aggregate_struct) do
         aggregate_struct.events
-        |> Enum.reverse()
-        |> Enum.reduce(Ecto.Multi.new(), &parse_event/2)
         |> Repository.transaction()
         |> case do
           {:ok, _} -> {:ok, %{aggregate_struct | events: []}}
-          {:error, _, _, _} = error -> handle_error(error)
+          {:error, _, _, _} = error -> error
         end
       end
     end

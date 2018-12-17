@@ -1,5 +1,5 @@
-defmodule Domain.Adventure.Answer do
-  alias Domain.Adventure.Answer
+defmodule Domain.UserAdventure.Clue do
+  alias Domain.UserAdventure.Clue
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,16 +7,18 @@ defmodule Domain.Adventure.Answer do
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
-    field(:sort, :integer)
+    field(:description, :string)
     field(:type, :string)
-    field(:details, :map)
+    field(:tip, :boolean)
+    field(:sort, :integer)
     field(:point_id, Ecto.UUID)
+    field(:asset_id, Ecto.UUID)
   end
 
-  @fields [:details, :type, :sort, :point_id, :id]
+  @fields [:description, :tip, :type, :sort, :point_id, :asset_id, :id]
   @required_fields @fields
 
-  @spec changeset(Answer.t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Clue.t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do
     struct
     |> cast(params, @fields)

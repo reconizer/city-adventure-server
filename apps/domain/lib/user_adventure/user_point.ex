@@ -1,5 +1,5 @@
-defmodule Domain.Adventure.UserPoint do
-  alias Domain.Adventure.{
+defmodule Domain.UserAdventure.UserPoint do
+  alias Domain.UserAdventure.{
     UserPoint
   }
   use Ecto.Schema
@@ -11,6 +11,8 @@ defmodule Domain.Adventure.UserPoint do
   embedded_schema do
     field(:user_id, Ecto.UUID)
     field(:point_id, Ecto.UUID)
+    field(:completed, :boolean)
+    field(:position, Geo.PostGIS.Geometry)
   end
 
   @fields [:user_id, :point_id]
