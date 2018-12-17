@@ -2,7 +2,8 @@ defmodule Domain.UserAdventure.Point do
   alias Domain.UserAdventure.{
     Point,
     Clue,
-    Answer
+    Answer,
+    UserPoint
   }
   use Ecto.Schema
   import Ecto.Changeset

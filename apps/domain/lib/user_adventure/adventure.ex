@@ -2,6 +2,7 @@ defmodule Domain.UserAdventure.Adventure do
   alias Domain.UserAdventure.{
     Adventure,
     Point,
+    UserAdventure,
     UserPoint
   }
   use Ecto.Schema
@@ -14,8 +15,11 @@ defmodule Domain.UserAdventure.Adventure do
   embedded_schema do
     field(:answer_type, :string)
     field(:point_completed, :boolean)
+    field(:adventure_completed, :boolean)
+    field(:completed, :boolean)
     embeds_many(:points, Point)
     embeds_many(:user_points, UserPoint)
+    embeds_one(:user_adventure, UserAdventure)
     embeds_many(:events, Domain.Event)
   end
 
@@ -84,6 +88,24 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
+  def completed_adventure(adventure) do
+    adventure.adventure_completed
+    |> case do
+      false -> adventure
+      true -> adventure =
+        adventure
+        |> emit("AdventureCompleted", 
+          adventure
+          |> Map.put(:completed, true)
+        )
+        {:ok, adventure}
+    end
+  end
+
+  def create_ranking(adventure) do
+    adventure.points
+  end
+
   def add_user_point(adventure, params) do
     user_point = %{user_id: params.user_id, point_id: params.point_id}
     adventure
@@ -99,8 +121,13 @@ defmodule Domain.UserAdventure.Adventure do
             completed: adventure |> point_completed(params)
           })
         {:ok, adventure}
-
-      _ ->
+      result ->
+        adventure =
+          adventure
+          |> emit("UserPointUpdated", 
+            result
+            |> Map.put(:completed, adventure |> point_completed(params))
+          )
         {:ok, adventure}
     end
   end
@@ -111,8 +138,12 @@ defmodule Domain.UserAdventure.Adventure do
       point.parent_point_id == parent_point.id
     end)
     |> case do
-      [] -> true
-      _result -> false  
+      [] -> 
+        adventure
+        |> Map.put(:completed, true)
+      _result -> 
+        adventure
+        |> Map.put(:completed, false)
     end
   end
 

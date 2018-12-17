@@ -11,31 +11,23 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     Point,
     Answer,
     Clue,
-    UserPoint
+    UserPoint,
+    UserAdventure
   }
 
   def get(adventure_id, %{id: user_id}) do
     Models.Adventure
     |> join(:left, [adventure], points in assoc(adventure, :points))
     |> join(:left, [adventure, points], user_points in assoc(points, :user_points))
-    |> preload([adventure, points, user_points], [:points, points: points])
+    |> join(:left, [adventure, points, user_points], user_adventures in assoc(adventure, :user_adventures))
+    |> where([adventure, points, user_points, user_adventures], user_points.user_id == ^user_id)
+    |> where([adventure, points, user_points, user_adventures], user_adventures.user_id == ^user_id)
+    |> preload([adventure, points, user_points, user_adventures], [user_points: user_points])
+    |> preload([adventure, points, user_points, user_adventures], [user_adventures: user_adventures])
     |> preload([points: :clues])
     |> preload([points: :answers])
-    |> where([adventure, points, user_points], user_points.id == ^user_id)
-    |> preload([adventure, points, user_points], [:user_points, user_points: user_points])
     |> Repository.get(adventure_id)
     |> load_adventure()
-  end
-
-  def get_user_points(adventure, %{id: user_id}) do
-    user_points = from(user_point in Models.UserPoint,
-      join: point in Models.Point, on: [id: user_point.point_id],
-      join: user in Models.User, on: [id: user_point.user_id],
-      where: point.adventure_id == ^adventure.id,
-      where: user.id == ^user_id
-    )
-    |> Repository.all()
-    %{adventure | user_points: user_points}
   end
 
   def start_adventure(%{adventure_id: adventure_id} = params, %Contract.User.Profile{id: id}) do
@@ -95,7 +87,9 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   def load_adventure(nil), do: nil
   def load_adventure(model) do
     %Adventure{
-      points: model.points |> Enum.map(&load_points/1)
+      points: model.points |> Enum.map(&load_points/1),
+      user_adventure: model.user_adventures |> List.first |> load_user_adventure(),
+      user_points: model.user_points |> Enum.map(&load_user_points/1)
     }
   end
 
@@ -140,6 +134,15 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       completed: user_point.completed,
       user_id: user_point.user_id,
       point_id: user_point.point_id
+    }
+  end
+
+  def load_user_adventure(nil), do: nil
+  def load_user_adventure(user_adventure) do
+    %UserAdventure{
+      completed: user_adventure.completed,
+      user_id: user_adventure.user_id,
+      adventure_id: user_adventure.adventure_id
     }
   end
 

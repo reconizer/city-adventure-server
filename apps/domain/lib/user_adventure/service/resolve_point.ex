@@ -7,6 +7,7 @@ defmodule Domain.UserAdventure.Service.ResolvePoint do
     adventure 
     |> Adventure.add_user_point(params)
     |> Adventure.find_answer_type(params)
+    |> Adventure.completed_adventure()
     # result = AnswerRepository.resolve_clue(params, answers)
     # result
     # |> case do
@@ -20,8 +21,8 @@ defmodule Domain.UserAdventure.Service.ResolvePoint do
     # end
   end
 
-  def get_adventure(%{adventure_id: adventure_id}) do
-    AdventureRepository.get(adventure_id) 
+  def get_adventure(%{adventure_id: adventure_id}, user) do
+    AdventureRepository.get(adventure_id, user) 
     |> case do
       nil -> {:error, {:adventure, "not_founds"}}
       result -> {:ok, result}
