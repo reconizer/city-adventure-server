@@ -102,8 +102,32 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  def create_ranking(adventure) do
-    adventure.points
+  def create_ranking(adventure, %{point_id: point_id}) do
+    adventure.adventure_completed
+    |> case do
+      false -> 
+        {:ok, adventure}
+      true ->
+        start_point = adventure.points 
+        |> Enum.filter(fn point -> 
+          point.parent_point_id == nil
+        end)
+        user_point_start = adventure.user_points |> Enum.filter(fn user_point -> 
+          user_point.point_id == start_point.point_id
+        end)
+        user_point_end = adventure.user_points
+        |> Enum.filter(fn user_point -> 
+          user_point.point_id == point_id 
+        end)
+        completion_time = NaiveDateTime.diff(user_point_end.updated_at, user_point_start.inserted_at, :hours)
+        adventure = adventure 
+        |> emit("RankingCreated", %{
+          user_id: user_point_start.user_id,
+          adventure_id: adventure.id,
+          completion_time: completion_time
+        })
+      {:ok, adventure}
+    end
   end
 
   def add_user_point(adventure, params) do
@@ -140,10 +164,10 @@ defmodule Domain.UserAdventure.Adventure do
     |> case do
       [] -> 
         adventure
-        |> Map.put(:completed, true)
+        |> Map.put(:adventure_completed, true)
       _result -> 
         adventure
-        |> Map.put(:completed, false)
+        |> Map.put(:adventure_completed, false)
     end
   end
 

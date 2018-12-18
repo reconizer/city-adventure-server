@@ -8,17 +8,7 @@ defmodule Domain.UserAdventure.Service.ResolvePoint do
     |> Adventure.add_user_point(params)
     |> Adventure.find_answer_type(params)
     |> Adventure.completed_adventure()
-    # result = AnswerRepository.resolve_clue(params, answers)
-    # result
-    # |> case do
-    #   {:ok, :answer_correct} ->
-    #     user_point
-    #     |> PointRepository.update_point_as_completed()
-    #   {:error, :wrong_answer} ->
-    #     {:error, {:answer, "invalid"}}
-    #   {:ok, :no_answer} ->
-    #     {:ok, user_point} 
-    # end
+    |> Adventure.create_ranking(params)
   end
 
   def get_adventure(%{adventure_id: adventure_id}, user) do

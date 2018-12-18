@@ -19,6 +19,8 @@ defmodule Domain.UserAdventure.Point do
     field(:adventure_id, Ecto.UUID)
     embeds_many(:clues, Clue)
     embeds_many(:answers, Answer)
+
+    timestamps()
   end
 
   @fields [:position, :show, :radius, :parent_point_id, :adventure_id, :id]

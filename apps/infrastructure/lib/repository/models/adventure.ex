@@ -33,6 +33,7 @@ defmodule Infrastructure.Repository.Models.Adventure do
     has_many :points, Point
     has_many :images, Image
     has_many :user_adventures, UserAdventure
+    has_many :user_points, through: [:points, :user_points]
   end
 
   def build(params) do

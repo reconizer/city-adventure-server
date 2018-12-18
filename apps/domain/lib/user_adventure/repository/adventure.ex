@@ -99,6 +99,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       position: point.position,
       show: point.show, 
       radius: point.radius,
+      inserted_at: point.inserted_at,
       parent_point_id: point.parent_point_id,
       adventure_id: point.adventure_id,
       answers: point.answers |> Enum.map(&load_answers/1),
@@ -129,11 +130,14 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   end
 
   def load_user_points(user_point) do
+    IO.inspect user_point
     %UserPoint{
       position: user_point.position,
       completed: user_point.completed,
       user_id: user_point.user_id,
-      point_id: user_point.point_id
+      point_id: user_point.point_id,
+      inserted_at: user_point.inserted_at,
+      updated_at: user_point.updated_at
     }
   end
 

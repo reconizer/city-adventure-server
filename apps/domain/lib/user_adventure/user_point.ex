@@ -13,6 +13,8 @@ defmodule Domain.UserAdventure.UserPoint do
     field(:point_id, Ecto.UUID)
     field(:completed, :boolean)
     field(:position, Geo.PostGIS.Geometry)
+
+    timestamps()
   end
 
   @fields [:user_id, :point_id]
