@@ -130,7 +130,6 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   end
 
   def load_user_points(user_point) do
-    IO.inspect user_point
     %UserPoint{
       position: user_point.position,
       completed: user_point.completed,

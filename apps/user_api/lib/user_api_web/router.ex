@@ -31,7 +31,7 @@ defmodule UserApiWeb.Router do
     end
 
     scope "/points" do
-      post "/check_position", PointController, :resolve_position_point
+      post "/resolve_point", PointController, :resolve_position_point
     end
     
   end

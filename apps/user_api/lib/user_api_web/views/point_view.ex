@@ -6,7 +6,7 @@ defmodule UserApiWeb.PointView do
     |> Enum.map(&render_points/1)
   end
 
-  def render("resolve_point_position.json", %{session: %Session{context: %{"last_point" => last_point, "point" => %{position: %{coordinates: {lng, lat}}} = point, "user_point" => user_point, "answer_type" => type}} = _session}) do
+  def render("resolve_point_position.json", %{session: %Session{context: %{"adventure" => adventure}} = _session}) do
     %{
       position: %{
         lat: lat,
