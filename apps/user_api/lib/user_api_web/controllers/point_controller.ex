@@ -1,6 +1,7 @@
 defmodule UserApiWeb.PointController do
   use UserApiWeb, :controller
   alias Domain.UserAdventure.Adventure, as: AdventureDomain
+  alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
   alias Domain.Adventure.Projections.Points, as: PointProjection
   alias Domain.Adventure.Repository.Point, as: PointRepository
   alias Domain.Adventure.Repository.Answer, as: AnswerRepository
@@ -30,14 +31,14 @@ defmodule UserApiWeb.PointController do
     {:ok, validate_params} <- context
                               |> Contract.Adventure.PointResolve.validate(),
     {:ok, adventure} <- validate_params
-                        |> ServiceResolvePoint.get_adventure(context["current_user"]),
+                        |> AdventureRepository.get(context["current_user"]),
     {:ok, _point} <- adventure
                      |> AdventureDomain.check_point_position(validate_params),
     {:ok, _} <- adventure
                 |> AdventureDomain.check_answer_and_time(validate_params)
     do
       adventure
-      |> ServiceResolvePoint.resolve_point(validate_params, context["current_user"])
+      |> AdventureDomain.resolve_point(validate_params, context["current_user"])
       |> case do
         {:error, result} -> 
           session |> Session.add_error(result)

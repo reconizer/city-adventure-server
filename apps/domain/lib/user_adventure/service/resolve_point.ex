@@ -5,8 +5,8 @@ defmodule Domain.UserAdventure.Service.ResolvePoint do
 
   def resolve_point(adventure, params, user) do
     adventure 
+    |> Adventure.set_answer_type()
     |> Adventure.add_user_point(params, user)
-    |> Adventure.set_answer_type(params)
     |> Adventure.completed_adventure()
     |> Adventure.create_ranking(params)
   end

@@ -15,7 +15,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     UserAdventure
   }
 
-  def get(adventure_id, %{id: user_id}) do
+  def get(%{adventure_id: adventure_id}, %{id: user_id}) do
     Models.Adventure
     |> join(:left, [adventure], points in assoc(adventure, :points))
     |> join(:left, [adventure, points], user_points in assoc(points, :user_points))
@@ -27,7 +27,10 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> preload([points: :clues])
     |> preload([points: :answers])
     |> Repository.get(adventure_id)
-    |> load_adventure()
+    |> case do
+      nil -> {:error, {:adventure, "not_founds"}}
+      result -> {:ok, result |> load_adventure()}
+    end
   end
 
   def start_adventure(%{adventure_id: adventure_id} = params, %Contract.User.Profile{id: id}) do
@@ -56,13 +59,6 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> Repository.update()
   end
 
-  # defp parse_event(%Complete{} = event, multi) do
-  #   multi
-  #   |> Ecto.Multi.update(:update_adventure, %Models.Adventure{id: event.id} |> Models.Adventure.changeset(%{
-  #     completed: event.completed
-  #   }), force: true)
-  # end
-
   defp build_user_adventure(%{adventure_id: id}, user_id) do
     %{
       adventure_id: id,
@@ -84,7 +80,6 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     end
   end
 
-  def load_adventure(nil), do: nil
   def load_adventure(model) do
     %Adventure{
       points: model.points |> Enum.map(&load_points/1),

@@ -13,9 +13,7 @@ defmodule Domain.UserAdventure.Adventure do
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
-    field(:answer_type, :string)
-    field(:point_completed, :boolean)
-    field(:adventure_completed, :boolean, default: false)
+    field(:current_point_id, Ecto.UUID)
     field(:completed, :boolean)
     embeds_many(:points, Point)
     embeds_many(:user_points, UserPoint)
@@ -32,6 +30,15 @@ defmodule Domain.UserAdventure.Adventure do
     |> cast(params, @fields)
     |> validate_required(@required_fields)
     |> cast_assoc(:points)
+  end
+
+  def resolve_point(adventure, params, user) do
+    adventure
+    |> set_current_point_id(params)
+    |> set_answer_type_and_last_point()
+    |> add_user_point(params, user)
+    |> completed_adventure()
+    |> create_ranking()
   end
 
   def check_point_position(%Adventure{} = adventure, %{point_id: point_id, position: %{coordinates: {lng, lat}}}) do
@@ -67,29 +74,27 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
   
-  def set_answer_type(%Adventure{} = adventure, %{point_id: point_id}) do
+  defp set_answer_type_and_last_point(%Adventure{} = adventure) do
+    points = adventure
+    |> Map.get(:points)
+    |> Enum.map(fn point ->
+      point
+      |> Point.set_answer_type()
+      |> Point.set_last_point(adventure.points)
+    end)
     adventure
-    |> get_answers(point_id)
-    |> case do
-      [] -> adventure
-      result ->
-        result
-        |> Enum.filter(fn answer -> 
-          answer.type == "password"
-        end)
-        |> List.first()
-        |> case do
-          nil ->
-            adventure
-          %{details: %{"password_type" => type}} ->
-            adventure
-            |> Map.put(:answer_type, type)
-        end
-    end
+    |> Map.put(:points, points)
   end
 
-  def completed_adventure(adventure) do
-    adventure.adventure_completed
+  defp completed_adventure(adventure) do
+    last_point = adventure
+    |> get_point(adventure.current_point_id)
+    |> Map.get(:last_point)
+    user_point_completed = 
+    adventure
+    |> Map.get(:user_points)
+
+    last_point and user_point_completed
     |> case do
       false -> adventure
       true -> adventure =
@@ -102,8 +107,8 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  def create_ranking(adventure, %{point_id: point_id}) do
-    adventure.adventure_completed
+  defp create_ranking(adventure) do
+    adventure.completed
     |> case do
       false -> 
         {:ok, adventure}
@@ -119,7 +124,7 @@ defmodule Domain.UserAdventure.Adventure do
         |> List.first()
         user_point_end = adventure.user_points
         |> Enum.filter(fn user_point -> 
-          user_point.point_id == point_id 
+          user_point.point_id == adventure.current_point_id
         end)
         |> List.first()
         completion_time = NaiveDateTime.diff(user_point_end.updated_at, user_point_start.inserted_at, :hours)
@@ -133,8 +138,8 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  def add_user_point(adventure, params, user) do
-    user_point = %{user_id: user.id, point_id: params.point_id}
+  defp add_user_point(adventure, params, user) do
+    user_point = %{user_id: user.id, point_id: adventure.current_point_id, completed: adventure |> point_completed(params)}
     adventure
     |> get_user_point(user_point)
     |> case do
@@ -144,29 +149,14 @@ defmodule Domain.UserAdventure.Adventure do
           user_id: user_point.user_id,
           point_id: user_point.point_id,
           created_at: NaiveDateTime.utc_now(),
-          completed: adventure |> point_completed(params)
+          completed: user_point.completed
         })
       result ->
         adventure
         |> emit("UserPointUpdated", 
           result
-          |> Map.put(:completed, adventure |> point_completed(params))
+          |> Map.put(:completed, user_point.completed)
         )
-    end
-  end
-
-  def check_last_point(%Adventure{} = adventure, parent_point) do
-    adventure.points
-    |> Enum.filter(fn point -> 
-      point.parent_point_id == parent_point.id
-    end)
-    |> case do
-      [] -> 
-        adventure
-        |> Map.put(:adventure_completed, true)
-      _result -> 
-        adventure
-        |> Map.put(:adventure_completed, false)
     end
   end
 
@@ -214,6 +204,11 @@ defmodule Domain.UserAdventure.Adventure do
       result ->
         result
     end
+  end
+
+  defp set_current_point_id(%Adventure{} = adventure, %{point_id: point_id}) do
+    adventure
+    |> Map.put(:current_point_id, point_id)
   end
 
 end

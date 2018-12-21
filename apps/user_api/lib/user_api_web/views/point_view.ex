@@ -8,14 +8,14 @@ defmodule UserApiWeb.PointView do
 
   def render("resolve_point_position.json", %{session: %Session{context: %{"adventure" => adventure}} = _session}) do
     %{
-      position: %{
-        lat: lat,
-        lng: lng
-      },
-      completed: user_point.completed,
-      radius: point.radius,
-      answer_type: type,
-      last_point: last_point
+      # position: %{
+      #   lat: lat,
+      #   lng: lng
+      # },
+      # completed: user_point.completed,
+      # radius: point.radius,
+      # answer_type: type,
+      # last_point: last_point
     }
   end
 
