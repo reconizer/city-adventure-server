@@ -102,6 +102,7 @@ defmodule Domain.UserAdventure.Adventure do
       false -> adventure
       true -> adventure =
         adventure
+        |> Map.put(:completed, true)
         |> emit("AdventureCompleted", 
           adventure
           |> Map.put(:completed, true)
