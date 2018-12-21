@@ -71,4 +71,8 @@ defmodule Domain.UserAdventure.Point do
     end
   end
 
+  def check_last_point(%Point{} = point) do
+    point.last_point
+  end
+
 end

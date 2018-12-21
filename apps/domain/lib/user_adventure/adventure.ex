@@ -87,13 +87,16 @@ defmodule Domain.UserAdventure.Adventure do
   end
 
   defp completed_adventure(adventure) do
-    last_point = adventure
-    |> get_point(adventure.current_point_id)
-    |> Map.get(:last_point)
-    user_point_completed = 
-    adventure
+    last_point = adventure |> get_point!(adventure.current_point_id) |> Point.check_last_point()
+    user_point_completed = adventure
     |> Map.get(:user_points)
-
+    |> Enum.find(fn point -> 
+      point.point_id == adventure.current_point_id
+    end)
+    |> case do
+      nil -> false
+      result -> result.completed
+    end
     last_point and user_point_completed
     |> case do
       false -> adventure
@@ -114,19 +117,16 @@ defmodule Domain.UserAdventure.Adventure do
         {:ok, adventure}
       true ->
         start_point = adventure.points 
-        |> Enum.filter(fn point -> 
+        |> Enum.find(fn point -> 
           point.parent_point_id == nil
         end)
-        |> List.first()
-        user_point_start = adventure.user_points |> Enum.filter(fn user_point -> 
+        user_point_start = adventure.user_points |> Enum.find(fn user_point -> 
           user_point.point_id == start_point.point_id
         end)
-        |> List.first()
         user_point_end = adventure.user_points
-        |> Enum.filter(fn user_point -> 
+        |> Enum.find(fn user_point -> 
           user_point.point_id == adventure.current_point_id
         end)
-        |> List.first()
         completion_time = NaiveDateTime.diff(user_point_end.updated_at, user_point_start.inserted_at, :hours)
         adventure = adventure 
         |> emit("RankingCreated", %{
@@ -152,7 +152,17 @@ defmodule Domain.UserAdventure.Adventure do
           completed: user_point.completed
         })
       result ->
+        user_points = adventure.user_points
+        |> Enum.map(fn user_point -> 
+          cond do
+            user_point == result ->
+              result
+              |> Map.put(:completed, user_point.completed)
+            false -> user_point
+          end
+        end)
         adventure
+        |> Map.put(:user_points, user_points)
         |> emit("UserPointUpdated", 
           result
           |> Map.put(:completed, user_point.completed)
@@ -187,18 +197,16 @@ defmodule Domain.UserAdventure.Adventure do
   defp get_point(%Adventure{} = adventure, point_id), do: {:ok, adventure |> get_point!(point_id)}
   defp get_point!(%Adventure{} = adventure, point_id) do
     adventure.points
-    |> Enum.filter(fn point -> 
+    |> Enum.find(fn point -> 
       point.id == point_id
     end)
-    |> List.first
   end 
 
   defp get_user_point(%Adventure{} = adventure, user_point) do
     adventure.user_points
-    |> Enum.filter(fn point -> 
+    |> Enum.find(fn point -> 
       point.point_id == user_point.point_id and point.user_id == user_point.user_id
     end)
-    |> List.first()
     |> case do
       nil -> :error
       result ->
