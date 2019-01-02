@@ -38,16 +38,16 @@ defmodule Domain.UserAdventure.Point do
 
   def set_last_point(%Point{} = point, points) do
     points
-    |> Enum.filter(fn p -> 
+    |> Enum.find(fn p -> 
       p.parent_point_id == point.id
     end)
     |> case do
-      [] ->
+      nil ->
         point
         |> Map.put(:last_point, true) 
       _result -> 
         point
-        |> Map.put(:last_point, true) 
+        |> Map.put(:last_point, false) 
     end
   end
 

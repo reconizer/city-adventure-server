@@ -3,9 +3,6 @@ defmodule UserApiWeb.PointController do
   alias Domain.UserAdventure.Adventure, as: AdventureDomain
   alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
   alias Domain.Adventure.Projections.Points, as: PointProjection
-  alias Domain.Adventure.Repository.Point, as: PointRepository
-  alias Domain.Adventure.Repository.Answer, as: AnswerRepository
-  alias Domain.UserAdventure.Service.ResolvePoint, as: ServiceResolvePoint
 
   def completed_points(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,

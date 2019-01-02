@@ -18,9 +18,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   def get(%{adventure_id: adventure_id}, %{id: user_id}) do
     Models.Adventure
     |> join(:left, [adventure], points in assoc(adventure, :points))
-    |> join(:left, [adventure, points], user_points in assoc(points, :user_points))
+    |> join(:left, [adventure, points], user_points in assoc(points, :user_points), user_points.user_id == ^user_id)
     |> join(:left, [adventure, points, user_points], user_adventures in assoc(adventure, :user_adventures))
-    |> where([adventure, points, user_points, user_adventures], user_points.user_id == ^user_id)
     |> where([adventure, points, user_points, user_adventures], user_adventures.user_id == ^user_id)
     |> preload([adventure, points, user_points, user_adventures], [user_points: user_points])
     |> preload([adventure, points, user_points, user_adventures], [user_adventures: user_adventures])

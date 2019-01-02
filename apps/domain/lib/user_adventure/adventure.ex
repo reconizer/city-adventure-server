@@ -14,7 +14,7 @@ defmodule Domain.UserAdventure.Adventure do
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
     field(:current_point_id, Ecto.UUID)
-    field(:completed, :boolean)
+    field(:completed, :boolean, default: false)
     embeds_many(:points, Point)
     embeds_many(:user_points, UserPoint)
     embeds_one(:user_adventure, UserAdventure)
@@ -99,15 +99,15 @@ defmodule Domain.UserAdventure.Adventure do
     end
     last_point and user_point_completed
     |> case do
-      false -> adventure
-      true -> adventure =
+      false -> 
+        adventure
+      true ->
         adventure
         |> Map.put(:completed, true)
         |> emit("AdventureCompleted", 
           adventure
           |> Map.put(:completed, true)
         )
-        {:ok, adventure}
     end
   end
 
