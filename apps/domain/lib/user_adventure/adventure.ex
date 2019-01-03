@@ -87,19 +87,11 @@ defmodule Domain.UserAdventure.Adventure do
   end
 
   defp completed_adventure(adventure) do
-    last_point = adventure |> get_point!(adventure.current_point_id) |> Point.check_last_point()
-    user_point_completed = adventure
-    |> Map.get(:user_points)
-    |> Enum.find(fn point -> 
-      point.point_id == adventure.current_point_id
-    end)
+    adventure 
+    |> check_point_completed()
+    |> check_last_point(adventure)  
     |> case do
-      nil -> false
-      result -> result.completed
-    end
-    last_point and user_point_completed
-    |> case do
-      false -> 
+      false ->
         adventure
       true ->
         adventure
@@ -218,6 +210,23 @@ defmodule Domain.UserAdventure.Adventure do
   defp set_current_point_id(%Adventure{} = adventure, %{point_id: point_id}) do
     adventure
     |> Map.put(:current_point_id, point_id)
+  end
+
+  defp check_last_point(false, _adventure), do: false
+  defp check_last_point(true, adventure) do
+    adventure |> get_point!(adventure.current_point_id) |> Point.check_last_point()
+  end
+
+  defp check_point_completed(adventure) do
+    adventure
+    |> Map.get(:user_points)
+    |> Enum.find(fn point -> 
+      point.point_id == adventure.current_point_id
+    end)
+    |> case do
+      nil -> false
+      result -> result.completed
+    end
   end
 
 end

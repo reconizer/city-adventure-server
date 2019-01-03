@@ -14,7 +14,7 @@ defmodule Domain.Adventure.Projections.Points do
         completed: user_point.completed
       },
       where: point.adventure_id == ^adventure_id,
-      where: user_point.completed == true or (user_point.completed == false and parent_point_user.completed == true and point.show == true)
+      where: user_point.completed == true or (user_point.completed == false and parent_point_user.completed == true or point.show == true)
     )
     |> Repository.all()
     {:ok, result}
