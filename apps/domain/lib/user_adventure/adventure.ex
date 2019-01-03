@@ -114,13 +114,13 @@ defmodule Domain.UserAdventure.Adventure do
           point.parent_point_id == nil
         end)
         user_point_start = adventure.user_points |> Enum.find(fn user_point -> 
-          user_point.point_id == start_point.point_id
+          user_point.point_id == start_point.id
         end)
         user_point_end = adventure.user_points
         |> Enum.find(fn user_point -> 
           user_point.point_id == adventure.current_point_id
         end)
-        completion_time = NaiveDateTime.diff(user_point_end.updated_at, user_point_start.inserted_at, :hours)
+        completion_time = NaiveDateTime.diff(user_point_end.updated_at, user_point_start.inserted_at, :second)
         adventure = adventure 
         |> emit("RankingCreated", %{
           user_id: user_point_start.user_id,
@@ -132,7 +132,7 @@ defmodule Domain.UserAdventure.Adventure do
   end
 
   defp add_user_point(adventure, params, user) do
-    user_point = %{user_id: user.id, point_id: adventure.current_point_id, completed: adventure |> point_completed(params)}
+    user_point = %{user_id: user.id, point_id: adventure.current_point_id, completed: adventure |> point_completed(params), created_at: NaiveDateTime.utc_now(), updated_at: NaiveDateTime.utc_now()}
     adventure
     |> get_user_point(user_point)
     |> case do
