@@ -1,8 +1,17 @@
 defmodule Domain.Event do
   defmacro __using__(aggregate) do
     quote do
+      import Domain.Event, only: [aggregate_fields: 0]
+
+      def emit!(aggregate_struct, event_name, event_data) do
+        emit(aggregate_struct, event_name, event_data)
+        |> case do
+          {:ok, aggregate} -> aggregate
+        end
+      end
+
       def emit(aggregate_struct, event_name, event_data) do
-        event = %{
+        event = %Domain.Event{
           aggregate_id: aggregate_struct.id,
           aggregate_name: unquote(aggregate),
           name: event_name,
@@ -10,8 +19,30 @@ defmodule Domain.Event do
           created_at: NaiveDateTime.utc_now()
         }
 
-        %{aggregate_struct | events: aggregate_struct.events ++ [event]}
+        event
+        |> Domain.EventHandler.emit()
+        |> case do
+          {:ok, operations} ->
+            aggregate_struct
+            |> case do
+              %{operations: nil} ->
+                {:ok, %{aggregate_struct | operations: operations, events: aggregate_struct.events ++ [event]}}
+
+              %{operations: current_operations} ->
+                {:ok, %{aggregate_struct | operations: current_operations |> Ecto.Multi.append(operations), events: aggregate_struct.events ++ [event]}}
+            end
+
+          {:error, _} = error ->
+            error
+        end
       end
+    end
+  end
+
+  defmacro aggregate_fields() do
+    quote do
+      Ecto.Schema.embeds_many(:events, Domain.Event)
+      Ecto.Schema.field(:operations, {:array, Ecto.Multi})
     end
   end
 

@@ -11,7 +11,8 @@ defmodule Domain.Commerce.Transfer do
     embeds_many(:transactions, Transfer.Transaction)
     embeds_many(:pending_transactions, Transfer.Transaction)
     embeds_many(:accounts, Transfer.Account)
-    embeds_many(:events, Domain.Event)
+
+    aggregate_fields()
   end
 
   @fields []
@@ -75,7 +76,7 @@ defmodule Domain.Commerce.Transfer do
       :error ->
         transfer =
           %{transfer | transactions: transfer.transactions ++ [transaction]}
-          |> emit("TransactionAdded", %{
+          |> emit!("TransactionAdded", %{
             id: transaction.id,
             from_account_id: transaction.from_account_id,
             to_account_id: transaction.to_account_id,
@@ -130,7 +131,7 @@ defmodule Domain.Commerce.Transfer do
       {:ok, transaction} ->
         transfer =
           %{transfer | transactions: transfer.transactions -- [transaction]}
-          |> emit("TransactionRemoved", %{
+          |> emit!("TransactionRemoved", %{
             id: transaction.id,
             created_at: NaiveDateTime.utc_now()
           })

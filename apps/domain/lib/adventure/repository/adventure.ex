@@ -12,8 +12,8 @@ defmodule Domain.Adventure.Repository.Adventure do
     |> Multi.run(:start_point, fn _ -> get_start_point(adventure_id) end)
     |> Multi.insert(:user_adventure, build_user_adventure(params, id), returning: true)
     |> Multi.merge(fn %{start_point: start_point} ->
-      Multi.new
-      |> Multi.insert(:user_point, build_user_point(start_point, id)) 
+      Multi.new()
+      |> Multi.insert(:user_point, build_user_point(start_point, id))
     end)
     |> Infrastructure.Repository.transaction()
   end
@@ -39,7 +39,7 @@ defmodule Domain.Adventure.Repository.Adventure do
   defp get_start_point(adventure_id) do
     from(point in Models.Point,
       where: is_nil(point.parent_point_id),
-      where: point.adventure_id == ^adventure_id 
+      where: point.adventure_id == ^adventure_id
     )
     |> Repository.one()
     |> case do
@@ -47,5 +47,4 @@ defmodule Domain.Adventure.Repository.Adventure do
       result -> {:ok, result}
     end
   end
-
 end
