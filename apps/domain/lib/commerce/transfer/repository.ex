@@ -1,4 +1,6 @@
 defmodule Domain.Commerce.Transfer.Repository do
+  use Domain.Repository
+
   alias Domain.Commerce.Transfer
   alias Infrastructure.Repository, as: Repo
   alias Infrastructure.Repository.Models
@@ -60,7 +62,7 @@ defmodule Domain.Commerce.Transfer.Repository do
     |> Enum.map(fn {account_id, account_balances} ->
       account_balances
       |> Enum.reduce(%Transfer.Account{id: account_id}, fn {transferable_id, balance}, account ->
-        account |> Transfer.Account.add!(transferable_id, balance)
+        account |> Transfer.Account.add!(balance, transferable_id)
       end)
     end)
   end

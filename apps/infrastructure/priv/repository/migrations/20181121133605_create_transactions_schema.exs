@@ -2,7 +2,6 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
   use Ecto.Migration
 
   @transactions [
-    :create_creators,
     :create_transferables,
     :create_currencies,
     :create_accounts,
@@ -35,26 +34,6 @@ defmodule Infrastructure.Repository.Migrations.CreateTransactionsSchema do
     |> Enum.map(fn transaction ->
       apply(__MODULE__, transaction, [direction()])
     end)
-  end
-
-  def create_creators(:up) do
-    create table(:creators, primary_key: false) do
-      add(:id, :uuid, primary_key: true)
-
-      timestamps()
-    end
-
-    alter table(:adventures) do
-      add(:creator_id, references(:creators, type: :uuid), null: false)
-    end
-  end
-
-  def create_creators(:down) do
-    alter table(:adventures) do
-      remove(:creator_id)
-    end
-
-    drop(table(:creators))
   end
 
   def create_transferables(:up) do

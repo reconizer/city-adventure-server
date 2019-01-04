@@ -43,7 +43,7 @@ defmodule Domain.Commerce.TransferTest do
       })
 
     %{
-      transfer: %Transfer{},
+      transfer: %Transfer{id: uuid()},
       from_account: from_account,
       to_account: to_account,
       currency_transferable: currency_transferable,

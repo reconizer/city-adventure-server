@@ -16,7 +16,6 @@ defmodule Infrastructure.Api.Google.ProductPayment do
       {:error, _} = error -> error
     end
     |> parse
-    |> IO.inspect()
     |> build_product
   end
 

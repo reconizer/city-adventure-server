@@ -1,9 +1,10 @@
 defmodule Domain.Commerce.Transfer.EventHandler do
   use Domain.EventHandler
+  import Ecto.Query
   alias Infrastructure.Repository
   alias Infrastructure.Repository.Models.Commerce, as: CommerceModels
 
-  def process(multi, %Domain.Event{aggregate_name: "Transfer", name: "TransactionAdded"} = event) do
+  def process(multi, %Domain.Event{aggregate_name: "Commerce.Transfer", name: "TransactionAdded"} = event) do
     event.data
     |> case do
       %{
@@ -22,7 +23,8 @@ defmodule Domain.Commerce.Transfer.EventHandler do
             to_account_id: to_account_id,
             transferable_id: transferable_id,
             transferable_amount: transferable_amount,
-            created_at: created_at
+            inserted_at: created_at,
+            updated_at: created_at
           })
 
         multi
@@ -33,7 +35,7 @@ defmodule Domain.Commerce.Transfer.EventHandler do
     end
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Transfer", name: "TransactionRemoved"} = event) do
+  def process(multi, %Domain.Event{aggregate_name: "Commerce.Transfer", name: "TransactionRemoved"} = event) do
     event.data
     |> case do
       %{
@@ -41,10 +43,10 @@ defmodule Domain.Commerce.Transfer.EventHandler do
       } ->
         transaction =
           CommerceModels.Transfer
-          |> Repository.get(id)
+          |> where([transfer], transfer.id == ^id)
 
         multi
-        |> Ecto.Multi.delete({event.id, id}, transaction)
+        |> Ecto.Multi.delete_all({event.id, id}, transaction)
 
       _ ->
         multi

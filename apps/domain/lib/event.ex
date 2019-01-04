@@ -12,6 +12,7 @@ defmodule Domain.Event do
 
       def emit(aggregate_struct, event_name, event_data) do
         event = %Domain.Event{
+          id: Ecto.UUID.generate(),
           aggregate_id: aggregate_struct.id,
           aggregate_name: unquote(aggregate),
           name: event_name,
@@ -22,14 +23,14 @@ defmodule Domain.Event do
         event
         |> Domain.EventHandler.emit()
         |> case do
-          {:ok, operations} ->
+          {:ok, multi} ->
             aggregate_struct
             |> case do
               %{operations: nil} ->
-                {:ok, %{aggregate_struct | operations: operations, events: aggregate_struct.events ++ [event]}}
+                {:ok, %{aggregate_struct | operations: multi, events: aggregate_struct.events ++ [event]}}
 
               %{operations: current_operations} ->
-                {:ok, %{aggregate_struct | operations: current_operations |> Ecto.Multi.append(operations), events: aggregate_struct.events ++ [event]}}
+                {:ok, %{aggregate_struct | operations: current_operations |> Ecto.Multi.append(multi), events: aggregate_struct.events ++ [event]}}
             end
 
           {:error, _} = error ->
@@ -42,7 +43,7 @@ defmodule Domain.Event do
   defmacro aggregate_fields() do
     quote do
       Ecto.Schema.embeds_many(:events, Domain.Event)
-      Ecto.Schema.field(:operations, {:array, Ecto.Multi})
+      Ecto.Schema.field(:operations, {:array, Ecto.Multi}, default: Ecto.Multi.new())
     end
   end
 

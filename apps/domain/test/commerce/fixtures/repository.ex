@@ -71,7 +71,11 @@ defmodule Domain.Commerce.Fixtures.Repository do
   end
 
   def creator(params \\ %{}) do
-    %Models.Creator{}
+    %Models.Creator{
+      name: Faker.Commerce.product_name(),
+      email: Faker.Internet.email(),
+      password_digest: "testtest"
+    }
     |> struct(params)
   end
 
