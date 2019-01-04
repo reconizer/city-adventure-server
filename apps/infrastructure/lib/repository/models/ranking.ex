@@ -1,9 +1,9 @@
 defmodule Infrastructure.Repository.Models.Ranking do
-
   @type t :: %__MODULE__{}
 
   use Ecto.Schema
   import Ecto.Changeset
+
   alias Infrastructure.Repository.Models.{
     Adventure,
     User
@@ -13,13 +13,12 @@ defmodule Infrastructure.Repository.Models.Ranking do
   @foreign_key_type :binary_id
 
   schema "rankings" do
-    field :completion_time, :time
+    field(:completion_time, :time)
 
     timestamps()
 
-    belongs_to :adventure, Adventure, primary_key: true
-    belongs_to :user, User, primary_key: true
-
+    belongs_to(:adventure, Adventure, primary_key: true)
+    belongs_to(:user, User, primary_key: true)
   end
 
   def build(params) do
@@ -35,7 +34,5 @@ defmodule Infrastructure.Repository.Models.Ranking do
     |> validate_required(@required_params)
     |> foreign_key_constraint(:adventure_id)
     |> foreign_key_constraint(:user_id)
-    |> IO.inspect()
   end
-
 end

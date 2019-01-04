@@ -24,11 +24,12 @@ defmodule Domain.MixProject do
   end
 
   defp elixirc_paths(:test),
-  do: [
-    "lib",
-    # Domain fixtures
-    "test/adventure/fixtures"
-  ]
+    do: [
+      "lib",
+      # Domain fixtures
+      "test/adventure/fixtures",
+      "test/commerce/fixtures"
+    ]
 
   defp elixirc_paths(_), do: ["lib"]
 
@@ -39,7 +40,7 @@ defmodule Domain.MixProject do
       {:joken, "~> 1.5"},
       {:comeonin, "~> 4.1"},
       {:bcrypt_elixir, "~> 0.12"},
-      {:ex_machina, "~> 2.2", only: :test},
+      {:ex_machina, "~> 2.2.2", only: :test},
       {:faker, "~> 0.11"}
     ]
   end

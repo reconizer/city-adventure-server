@@ -1,9 +1,9 @@
 defmodule Infrastructure.Repository.Models.Creator do
-
   @type t :: %__MODULE__{}
 
   use Ecto.Schema
   import Ecto.Changeset
+
   alias Infrastructure.Repository.Models.{
     Adventure,
     Asset
@@ -13,21 +13,21 @@ defmodule Infrastructure.Repository.Models.Creator do
   @foreign_key_type :binary_id
 
   schema "creators" do
-    field :description, :string
-    field :name, :string
-    field :address1, :string
-    field :address2, :string
-    field :city, :string
-    field :country, :string
-    field :email, :string
-    field :password_digest, :string
-    field :zip_code, :string
-    field :approved, :boolean
+    field(:description, :string)
+    field(:name, :string)
+    field(:address1, :string)
+    field(:address2, :string)
+    field(:city, :string)
+    field(:country, :string)
+    field(:email, :string)
+    field(:password_digest, :string)
+    field(:zip_code, :string)
+    field(:approved, :boolean)
 
     timestamps()
 
-    has_many :adventures, Adventure
-    belongs_to :asset, Asset
+    has_many(:adventures, Adventure)
+    belongs_to(:asset, Asset)
   end
 
   def build(params) do
@@ -41,7 +41,5 @@ defmodule Infrastructure.Repository.Models.Creator do
     model
     |> cast(params, @params)
     |> validate_required(@required_params)
-    
   end
-
 end
