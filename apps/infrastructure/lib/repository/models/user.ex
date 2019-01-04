@@ -7,7 +7,8 @@ defmodule Infrastructure.Repository.Models.User do
   alias Infrastructure.Repository.Models.{
     Ranking,
     UserPoint,
-    UserAdventure
+    UserAdventure,
+    Avatar
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -20,6 +21,7 @@ defmodule Infrastructure.Repository.Models.User do
     
     timestamps()
 
+    has_one :avatar, Avatar
     has_many :rankings, Ranking
     has_many :user_points, UserPoint
     has_many :user_adventures, UserAdventure

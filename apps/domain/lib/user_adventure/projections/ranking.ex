@@ -27,7 +27,17 @@ defmodule Domain.Adventure.Projections.Ranking do
   defp ranking_query(adventure_id) do
     from(user_ranking in Models.UserRanking,
       where: user_ranking.adventure_id == ^adventure_id,
-      group_by: [user_ranking.user_id, user_ranking.position, user_ranking.nick, user_ranking.completion_time, user_ranking.adventure_id],
+      left_join: avatar in Models.Avatar, on: [user_id: user_ranking.user_id],
+      left_join: asset in Models.Asset, on: [id: avatar.asset_id],
+      select: %{
+        position: user_ranking.position,
+        user_id: user_ranking.user_id,
+        nick: user_ranking.nick,
+        completion_time: user_ranking.completion_time,
+        adventure_id: user_ranking.adventure_id,
+        asset: asset 
+      },
+      group_by: [user_ranking.user_id, user_ranking.position, user_ranking.nick, user_ranking.completion_time, user_ranking.adventure_id, asset.id],
       order_by: [asc: user_ranking.position]
     )
   end

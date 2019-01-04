@@ -4,23 +4,26 @@ defmodule Seed.Adventure do
   
   def seed() do
     Multi.new()
+    |> Multi.insert(:user_avatar, build_user_avatar())
     |> Multi.insert(:creator_image, build_creator_image())
     |> Multi.insert_all(:users, Models.User, build_users(), returning: true)
-    |> Multi.merge(fn %{creator_image: image} -> 
+    |> Multi.merge(fn %{creator_image: image, user_avatar: avatar, users: {_, users}} -> 
       Multi.new()
       |> Multi.insert(:creator, build_creator(image))
+      |> Multi.insert_all(:users_add_avatar, Models.Avatar, build_avatars(users, avatar))
     end)
     |> Multi.insert(:adventure_image, build_adventure_image())
     |> Multi.insert_all(:gallery, Models.Asset, build_gallery(), returning: true)
-    |> Multi.merge(fn %{creator: creator, creator_image: creator_image, adventure_image: image, gallery: {_, gallery}} -> 
+    |> Multi.merge(fn %{creator: creator, user_avatar: user_avatar, creator_image: creator_image, adventure_image: image, gallery: {_, gallery}} -> 
       Multi.new()
       |> Multi.insert(:adventure, build_adventure(creator, image))
       |> Multi.merge(fn (adventure) -> 
         create_adventure_image(adventure, gallery)
       end)
-      |> Multi.merge(fn (adventure) ->
+      |> Multi.merge(fn (_adventure) ->
         gallery = [image | gallery]
         gallery = [creator_image | gallery]
+        gallery = [user_avatar | gallery]
         Multi.new()
         |> Multi.run(:send_assets, fn _ -> send_assets(gallery) end)
       end)
@@ -50,6 +53,18 @@ defmodule Seed.Adventure do
     end)
   end
 
+  defp build_avatars(users, asset) do
+    users
+    |> Enum.map(fn user ->  
+      %{
+        asset_id: asset.id,
+        user_id: user.id,
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      }
+    end)
+  end
+  
   defp build_user_adventure(adventure, users) do
     users
     |> Enum.map(fn user ->  
@@ -61,6 +76,17 @@ defmodule Seed.Adventure do
         updated_at: NaiveDateTime.utc_now()
       }
     end)
+  end
+
+  defp build_user_avatar() do
+    Models.Asset.build(%{
+      id: Ecto.UUID.generate(),
+      type: "avatar",
+      extension: "jpg",
+      name: "avatar",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    })  
   end
 
   defp build_ranking(adventure, users) do
