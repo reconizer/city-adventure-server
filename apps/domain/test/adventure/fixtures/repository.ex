@@ -11,6 +11,20 @@ defmodule Domain.Adventure.Fixtures.Repository do
     }
   end
 
+  def creator_factory do
+    %Models.Creator{
+      name: Faker.Name.name(),
+      description: Faker.Lorem.Shakespeare.hamlet(),
+      approved: true,
+      address1: Faker.Address.En.street_address(),
+      city: Faker.Address.En.city(),
+      country: Faker.Address.En.country(),
+      email: Faker.Internet.free_email(),
+      password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+      zip_code: Faker.Address.En.zip_code()
+    }
+  end
+
   def adventure_factory do
     %Models.Adventure{
       description: Faker.Lorem.Shakespeare.hamlet(),
@@ -21,7 +35,16 @@ defmodule Domain.Adventure.Fixtures.Repository do
       max_time: "06:00:00",
       name: Faker.Name.name,
       published: true,
-      show: false
+      show: false,
+      creator: build(:creator)
+    }
+  end
+
+  def adventure_rating_factory do
+    %Models.AdventureRating{
+      user: build(:user),
+      adventure: build(:adventure),
+      rating: Enum.random(1..5)
     }
   end
 

@@ -4,47 +4,163 @@ defmodule Seed.Adventure do
   
   def seed() do
     Multi.new()
-    |> Multi.insert(:adventure, build_adventure())
-    |> Multi.merge(&create_points(&1[:adventure]))
+    |> Multi.insert(:creator_image, build_creator_image())
+    |> Multi.insert_all(:users, Models.User, build_users(), returning: true)
+    |> Multi.merge(fn %{creator_image: image} -> 
+      Multi.new()
+      |> Multi.insert(:creator, build_creator(image))
+    end)
+    |> Multi.insert(:adventure_image, build_adventure_image())
+    |> Multi.insert_all(:gallery, Models.Asset, build_gallery(), returning: true)
+    |> Multi.merge(fn %{creator: creator, creator_image: creator_image, adventure_image: image, gallery: {_, gallery}} -> 
+      Multi.new()
+      |> Multi.insert(:adventure, build_adventure(creator, image))
+      |> Multi.merge(fn (adventure) -> 
+        create_adventure_image(adventure, gallery)
+      end)
+      |> Multi.merge(fn (adventure) ->
+        gallery = [image | gallery]
+        gallery = [creator_image | gallery]
+        Multi.new()
+        |> Multi.run(:send_assets, fn _ -> send_assets(gallery) end)
+      end)
+    end)
+    |> Multi.merge(&create_points/1)
     |> Infrastructure.Repository.transaction()
   end
 
-  defp create_points(adventure) do
-    %{points: points, clues: clues, answers: answers} = build_points(adventure.id)
+  defp create_adventure_image(%{adventure: adventure}, assets) do
+    Multi.new()
+    |> Multi.insert_all(:images, Models.Image, preper_image(assets, adventure), returning: true)
+  end
+
+  defp create_points(%{adventure: adventure, users: {_, users}}) do
+    %{points: points, clues: clues, answers: answers, assets: assets} = build_points(adventure.id)
     Multi.new()
     |> Multi.insert_all(:points, Models.Point, points, returning: true)
-    |> Multi.insert_all(:clues_inserted, Models.Clue, prepare_clues(clues), returning: true)
+    |> Multi.insert_all(:user_adventure, Models.UserAdventure, build_user_adventure(adventure, users), returning: true)
+    |> Multi.insert_all(:ranking, Models.Ranking, build_ranking(adventure, users), returning: true)
+    |> Multi.insert_all(:rating, Models.AdventureRating, build_rating(adventure, users), returning: true)
+    |> Multi.insert_all(:assets, Models.Asset, assets, returning: true)
+    |> Multi.insert_all(:clues_inserted, Models.Clue, clues, returning: true)
     |> Multi.insert_all(:answers, Models.Answer, answers, returning: true)
-    |> Multi.merge(fn _adventure ->
+    |> Multi.merge(fn %{assets: {_, assets}} ->
       Multi.new()
-      |> Multi.run(:assets_send, fn _ -> send_assets(clues) end)
+      |> Multi.run(:assets_send, fn _ -> send_assets(assets) end)
     end)
   end
 
-  defp prepare_clues(clues) do
-    clues
-    |> Enum.map(fn clue -> 
-      clue
-      |> Map.delete(:file)
+  defp build_user_adventure(adventure, users) do
+    users
+    |> Enum.map(fn user ->  
+      %{
+        adventure_id: adventure.id,
+        user_id: user.id,
+        completed: true,
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      }
     end)
-  end 
-
-  defp send_assets(clues) do
-    clues
-    |> Enum.filter(fn clue ->
-      clue.file != nil
-    end)
-    |> Enum.map(fn clue ->
-      file_path = Path.join(["apps/seed/lib/helpers", clue.file])
-      upload_url = Path.join([clue.point_id, clue.id, clue.file])
-      send_assets_to_s3(upload_url, file_path)
-    end)
-    {:ok, clues}
   end
 
-  defp build_adventure do
+  defp build_ranking(adventure, users) do
+    users
+    |> Enum.map(fn user ->  
+      %{
+        adventure_id: adventure.id,
+        user_id: user.id,
+        completion_time: Enum.random([~T[02:10:00.000000], ~T[02:11:00.000000], ~T[01:52:00.000000], ~T[02:34:00.000000]]),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      }
+    end)
+  end
+
+  defp build_rating(adventure, users) do
+    users
+    |> Enum.map(fn user ->  
+      %{
+        adventure_id: adventure.id,
+        user_id: user.id,
+        rating: Enum.random(1..5),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      }
+    end)
+  end
+
+  defp preper_image(assets, adventure) do
+    assets
+    |> Enum.map(fn(asset) -> 
+      %{
+        asset_id: asset.id,
+        adventure_id: adventure.id,
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      }
+    end)
+  end
+
+  defp build_creator_image() do
+    Models.Asset.build(%{
+      id: Ecto.UUID.generate(),
+      type: "image",
+      extension: "png",
+      name: "creator",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    })  
+  end
+
+  defp build_gallery() do
+    tor1 = %{
+      id: Ecto.UUID.generate(),
+      type: "image",
+      extension: "jpg",
+      name: "tor1",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+    tor2 = %{
+      id: Ecto.UUID.generate(),
+      type: "image",
+      extension: "jpg",
+      name: "tor2",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+    [tor1, tor2]
+  end
+
+  defp send_asset(asset) do
+    file_path = Path.join([Application.app_dir(:seed), "priv", "helpers", Enum.join([asset.name, asset.extension], ".")])
+    upload_url = Path.join([asset.type, asset.id, "original.#{asset.extension}"])
+    send_assets_to_s3(upload_url, file_path)
+  end
+
+  defp send_assets(assets) do
+    assets
+    |> Enum.map(fn asset ->
+      asset
+      |> send_asset()
+    end)
+    {:ok, assets}
+  end
+
+  defp build_adventure_image() do
+    Models.Asset.build(%{
+      id: Ecto.UUID.generate(),
+      type: "image",
+      extension: "jpg",
+      name: "tor3",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    })
+  end
+
+  defp build_adventure(creator, image) do
     Models.Adventure.build(%{
-      description: "Wyrusz w fascynującą wyprawę po starówce Toruńskiej",
+      description: "Wyrusz w fascynującą wyprawę po Toruńskiej starówce",
       name: "śladami Kopernika",
       difficulty_level: 3,
       published: true,
@@ -53,9 +169,81 @@ defmodule Seed.Adventure do
       code: "1234",
       min_time: "03:00:00",
       max_time: "09:00:00",
+      creator_id: creator.id,
+      asset_id: image.id,
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     })
+  end
+
+  defp build_creator(image) do
+    Models.Creator.build(%{
+      description: "Moje przygody są najlepsze",
+      name: "AdventureBuilder",
+      approved: true,
+      address1: "Szeroka 9",
+      city: "Toruń",
+      country: "POL",
+      asset_id: image.id,
+      email: "builder@adventure.com",
+      password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+      zip_code: "87-100",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    })
+  end
+
+  defp build_users() do
+    [
+      %{
+        id: Ecto.UUID.generate(),
+        email: "martin@gmail.com",
+        nick: "martin",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "adam@gmail.com",
+        nick: "adam",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "luck@gmail.com",
+        nick: "luck",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "nick@gmail.com",
+        nick: "nick",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "simon@gmail.com",
+        nick: "simon",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+      %{
+        id: Ecto.UUID.generate(),
+        email: "paul@gmail.com",
+        nick: "paul",
+        password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
+        inserted_at: NaiveDateTime.utc_now(),
+        updated_at: NaiveDateTime.utc_now()
+      },
+    ]
   end
 
   defp build_points(adventure_id) do
@@ -129,6 +317,57 @@ defmodule Seed.Adventure do
       updated_at: NaiveDateTime.utc_now()
     }
 
+    witcher = %{
+      id: Ecto.UUID.generate(),
+      type: "clue_audio",
+      extension: "mp3",
+      name: "witcher",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+    img_1 = %{
+      id: Ecto.UUID.generate(),
+      type: "clue_image",
+      extension: "jpg",
+      name: "img_1",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+    img_2 = %{
+      id: Ecto.UUID.generate(),
+      type: "clue_image",
+      extension: "jpg",
+      name: "img_2",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+    img_3 = %{
+      id: Ecto.UUID.generate(),
+      type: "clue_image",
+      extension: "jpg",
+      name: "img_3",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+    clock = %{
+      id: Ecto.UUID.generate(),
+      type: "clue_image",
+      extension: "png",
+      name: "clock",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+    panorama = %{
+      id: Ecto.UUID.generate(),
+      type: "clue_image",
+      extension: "png",
+      name: "panorama",
+      inserted_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+    
+    assets = [witcher, img_1, img_2, img_3, clock, panorama]
+
     clues = [
       %{
         id: Ecto.UUID.generate(),
@@ -137,7 +376,6 @@ defmodule Seed.Adventure do
         sort: 0,
         point_id: osiolek.id,
         tip: false,
-        file: nil,
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
       },
@@ -148,7 +386,7 @@ defmodule Seed.Adventure do
         sort: 1,
         point_id: osiolek.id,
         tip: false,
-        file: "witcher.mp3",
+        asset_id: witcher.id,
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
       },
@@ -159,7 +397,6 @@ defmodule Seed.Adventure do
         sort: 0,
         point_id: fontanna.id,
         tip: false,
-        file: nil,
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
       },
@@ -170,7 +407,7 @@ defmodule Seed.Adventure do
         sort: 0,
         point_id: filutek.id,
         tip: false,
-        file: "img_1.jpg",
+        asset_id: img_1.id,
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
       },
@@ -181,7 +418,7 @@ defmodule Seed.Adventure do
         sort: 0,
         point_id: smok.id,
         tip: false,
-        file: "img_2.jpg",
+        asset_id: img_2.id,
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
       }, 
@@ -192,7 +429,7 @@ defmodule Seed.Adventure do
         sort: 0,
         point_id: kura.id,
         tip: false,
-        file: "img_3.jpg",
+        asset_id: img_3.id,
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
       },
@@ -203,7 +440,7 @@ defmodule Seed.Adventure do
         sort: 0,
         point_id: kopernik.id,
         tip: false,
-        file: "clock.png",
+        asset_id: clock.id,
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
       },
@@ -214,7 +451,7 @@ defmodule Seed.Adventure do
         sort: 1,
         point_id: kopernik.id,
         tip: false,
-        file: "panorama.png",
+        asset_id: panorama.id,
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
       }
@@ -279,7 +516,7 @@ defmodule Seed.Adventure do
         updated_at: NaiveDateTime.utc_now()
       }
     ]
-    %{points: points, clues: clues, answers: answers}
+    %{points: points, clues: clues, answers: answers, assets: assets}
   end
 
   defp send_assets_to_s3(upload_url, file_path) do

@@ -7,7 +7,7 @@ defmodule Worker.FileUpload.Handler.ClueImageConversion do
   alias Infrastructure.Repository.Models.AssetConversion
 
   @bucket Application.get_env(:worker, :asset_bucket)
-  @available_conversions ["800x600"]
+  @available_conversions []
 
   def process(%{body: %{"Records" => [_s3_event]}} = event, queue_name) do
     event
