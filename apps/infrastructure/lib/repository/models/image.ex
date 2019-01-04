@@ -5,7 +5,8 @@ defmodule Infrastructure.Repository.Models.Image do
   use Ecto.Schema
   import Ecto.Changeset
   alias Infrastructure.Repository.Models.{
-    Adventure
+    Adventure,
+    Asset
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -15,13 +16,14 @@ defmodule Infrastructure.Repository.Models.Image do
     timestamps()
 
     belongs_to :adventure, Adventure
+    belongs_to :asset, Asset
   end
 
   def build(params) do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(adventure_id)a
+  @params ~w(adventure_id asset_id)a
   @required_params ~w(adventure_id)a
 
   def changeset(model, params \\ %{}) do

@@ -11,7 +11,7 @@ config :infrastructure, Infrastructure.Repository,
   types: Infrastructure.Repository.PostgresTypes
 
 config :infrastructure,
-  asset_bucket: "assets-martin"
+  asset_bucket: "assets-martin-gameinn-2"
 
 config :ex_aws, :s3,
   access_key_id: "AKIAJL6JC5RDYNQCFITA",
