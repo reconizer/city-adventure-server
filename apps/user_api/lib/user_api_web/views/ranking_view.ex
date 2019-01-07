@@ -17,7 +17,7 @@ defmodule UserApiWeb.RankingView do
       position: ranking.position,
       nick: ranking.nick,
       completion_time: ranking.completion_time,
-      avatar_url:  asset_url(ranking.asset)
+      avatar_url: asset_url(ranking.asset)
     }
   end
 

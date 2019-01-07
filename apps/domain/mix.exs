@@ -24,11 +24,12 @@ defmodule Domain.MixProject do
   end
 
   defp elixirc_paths(:test),
-  do: [
-    "lib",
-    # Domain fixtures
-    "test/adventure/fixtures"
-  ]
+    do: [
+      "lib",
+      # Domain fixtures
+      "test/adventure/fixtures",
+      "test/commerce/fixtures"
+    ]
 
   defp elixirc_paths(_), do: ["lib"]
 

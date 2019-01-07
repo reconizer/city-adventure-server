@@ -52,7 +52,6 @@ defmodule Worker.FileUpload.Handler.AssetUpload do
       asset ->
         asset
         |> Asset.changeset(%{
-          name: asset_event.file_name,
           extension: asset_event.extension,
           uploaded: true,
           updated_at: NaiveDateTime.utc_now()

@@ -34,7 +34,7 @@ defmodule UserApiWeb.ClueView do
       type: clue.type,
       description: clue.description,
       point_id: clue.point_id,
-      asset_url: asset_url(asset),
+      original_asset_url: asset_url(asset),
       conversion_urls: conversions |> Enum.map(&generate_conversion/1)
     }
   end

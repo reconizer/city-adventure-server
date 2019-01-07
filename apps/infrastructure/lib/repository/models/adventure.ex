@@ -1,9 +1,9 @@
 defmodule Infrastructure.Repository.Models.Adventure do
-
   @type t :: %__MODULE__{}
 
   use Ecto.Schema
   import Ecto.Changeset
+
   alias Infrastructure.Repository.Models.{
     Point,
     Asset,
@@ -16,15 +16,15 @@ defmodule Infrastructure.Repository.Models.Adventure do
   @foreign_key_type :binary_id
 
   schema "adventures" do
-    field :description, :string
-    field :code, :string
-    field :language, :string
-    field :difficulty_level, :integer
-    field :min_time, :time
-    field :max_time, :time
-    field :name, :string
-    field :published, :boolean
-    field :show, :boolean
+    field(:description, :string)
+    field(:code, :string)
+    field(:language, :string)
+    field(:difficulty_level, :integer)
+    field(:min_time, :time)
+    field(:max_time, :time)
+    field(:name, :string)
+    field(:published, :boolean)
+    field(:show, :boolean)
 
     timestamps()
 
@@ -50,5 +50,4 @@ defmodule Infrastructure.Repository.Models.Adventure do
     |> validate_number(:difficulty_level, greater_than_or_equal_to: 1)
     |> validate_number(:difficulty_level, less_than_or_equal_to: 3)
   end
-
 end

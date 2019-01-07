@@ -46,7 +46,8 @@ defmodule UserApiWeb.AdventureView do
         user_id: r.user_id,
         position: r.position,
         nick: r.nick,
-        completion_time: r.completion_time
+        completion_time: r.completion_time,
+        avatar_url: asset_url(r.asset)
       }
     end)
   end
@@ -77,6 +78,7 @@ defmodule UserApiWeb.AdventureView do
       adventure_id: adventure.adventure_id,
       completed: adventure.completed,
       paid: adventure.paid,
+      purchased: adventure.purchased,
       position: %{
         lat: lat,
         lng: lng
