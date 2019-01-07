@@ -27,7 +27,7 @@ defmodule Infrastructure.Repository.Models.Asset do
     has_one :adventure, Adventure
     has_one :image, Image
     has_one :creator, Creator
-    has_one :avatar, Avatar
+    has_many :avatars, Avatar
     has_many :asset_conversions, AssetConversion
   end
 
