@@ -1,6 +1,6 @@
 defmodule UserApiWeb.ClueController do
   use UserApiWeb, :controller
-  alias Domain.Adventure.Projections.Clues, as: CluesProjection
+  alias Domain.UserAdventure.Projections.Clues, as: CluesProjection
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,

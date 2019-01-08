@@ -1,4 +1,4 @@
-defmodule Domain.Adventure.Projections.Listing do
+defmodule Domain.UserAdventure.Projections.Listing do
   @moduledoc """
   Projection of adventure start points
   """

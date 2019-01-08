@@ -1,4 +1,4 @@
-defmodule Domain.Adventure.Projections.Clues do
+defmodule Domain.UserAdventure.Projections.Clues do
   @moduledoc """
   Projection clues for adventure
   """

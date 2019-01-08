@@ -6,7 +6,7 @@ defmodule Domain.UserAdventure.Adventure do
     UserPoint
   }
   use Ecto.Schema
-  use Domain.Event, "Adventure"
+  use Domain.Event, "UserAdventure"
   import Ecto.Changeset
 
   @type t :: %__MODULE__{}
@@ -18,7 +18,8 @@ defmodule Domain.UserAdventure.Adventure do
     embeds_many(:points, Point)
     embeds_many(:user_points, UserPoint)
     embeds_one(:user_adventure, UserAdventure)
-    embeds_many(:events, Domain.Event)
+
+    aggregate_fields()
   end
 
   @fields [:name, :description, :min_time, :max_time, :difficulty_level, :language, :id]
@@ -96,7 +97,7 @@ defmodule Domain.UserAdventure.Adventure do
       true ->
         adventure
         |> Map.put(:completed, true)
-        |> emit("AdventureCompleted", 
+        |> emit!("AdventureCompleted", 
           adventure
           |> Map.put(:completed, true)
         )
@@ -122,7 +123,7 @@ defmodule Domain.UserAdventure.Adventure do
         end)
         completion_time = NaiveDateTime.diff(user_point_end.updated_at, user_point_start.inserted_at, :second)
         adventure = adventure 
-        |> emit("RankingCreated", %{
+        |> emit!("RankingCreated", %{
           user_id: user_point_start.user_id,
           adventure_id: adventure.id,
           completion_time: completion_time
@@ -138,7 +139,7 @@ defmodule Domain.UserAdventure.Adventure do
     |> case do
       :error ->
         %{adventure | user_points: adventure.user_points ++ [user_point]}
-        |> emit("UserPointAdded", %{
+        |> emit!("UserPointAdded", %{
           user_id: user_point.user_id,
           point_id: user_point.point_id,
           created_at: NaiveDateTime.utc_now(),
@@ -156,7 +157,7 @@ defmodule Domain.UserAdventure.Adventure do
         end)
         adventure
         |> Map.put(:user_points, user_points)
-        |> emit("UserPointUpdated", 
+        |> emit!("UserPointUpdated", 
           result
           |> Map.put(:completed, user_point.completed)
         )
@@ -187,7 +188,6 @@ defmodule Domain.UserAdventure.Adventure do
     |> Map.get(:answers)
   end
 
-  defp get_point(%Adventure{} = adventure, point_id), do: {:ok, adventure |> get_point!(point_id)}
   defp get_point!(%Adventure{} = adventure, point_id) do
     adventure.points
     |> Enum.find(fn point -> 

@@ -2,7 +2,7 @@ defmodule UserApiWeb.PointController do
   use UserApiWeb, :controller
   alias Domain.UserAdventure.Adventure, as: AdventureDomain
   alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
-  alias Domain.Adventure.Projections.Points, as: PointProjection
+  alias Domain.UserAdventure.Projections.Points, as: PointProjection
 
   def completed_points(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
@@ -40,6 +40,8 @@ defmodule UserApiWeb.PointController do
         {:error, result} -> 
           session |> Session.add_error(result)
         {:ok, adventure} ->
+          adventure
+          |> AdventureRepository.save()
           session
           |> Session.update_context(%{"adventure" => adventure})
       end

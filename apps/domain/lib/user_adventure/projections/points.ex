@@ -1,4 +1,4 @@
-defmodule Domain.Adventure.Projections.Points do
+defmodule Domain.UserAdventure.Projections.Points do
   import Ecto.Query
   alias Infrastructure.Repository
   use Infrastructure.Repository.Models

@@ -8,7 +8,7 @@ defmodule Infrastructure.Repository.Models.User do
     Ranking,
     UserPoint,
     UserAdventure,
-    Avatar
+    Avatar,
     Commerce
   }
 

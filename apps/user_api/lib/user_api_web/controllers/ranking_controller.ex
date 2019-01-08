@@ -1,6 +1,6 @@
 defmodule UserApiWeb.RankingController do
   use UserApiWeb, :controller
-  alias Domain.Adventure.Projections.Ranking, as: RankingProjection
+  alias Domain.UserAdventure.Projections.Ranking, as: RankingProjection
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,

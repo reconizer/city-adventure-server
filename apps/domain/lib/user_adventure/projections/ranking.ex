@@ -1,4 +1,4 @@
-defmodule Domain.Adventure.Projections.Ranking do
+defmodule Domain.UserAdventure.Projections.Ranking do
   import Ecto.Query
   alias Infrastructure.Repository
   use Infrastructure.Repository.Models
