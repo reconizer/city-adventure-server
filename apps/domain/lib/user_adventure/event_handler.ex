@@ -6,7 +6,6 @@ defmodule Domain.UserAdventure.EventHandler do
   ]
 
   def process(multi, event) do
-    IO.inspect "process"
     @handlers
     |> Enum.reduce(multi, fn handler, multi ->
       handler.process(multi, event)
