@@ -2,6 +2,7 @@ use Mix.Config
 
 config :worker, :file_upload_queue_name, ""
 config :worker, :asset_bucket, ""
+config :worker, :conversion_queue_name, ""
 
 config :ex_aws, :sqs,
   access_key_id: "",

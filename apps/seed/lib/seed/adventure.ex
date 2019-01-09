@@ -1,28 +1,29 @@
 defmodule Seed.Adventure do
   use Infrastructure.Repository.Models
   alias Ecto.Multi
-  
+
   def seed() do
     Multi.new()
     |> Multi.insert(:creator_image, build_creator_image())
     |> Multi.insert_all(:users, Models.User, build_users(), returning: true)
-    |> Multi.merge(fn %{creator_image: image} -> 
+    |> Multi.merge(fn %{creator_image: image} ->
       Multi.new()
       |> Multi.insert(:creator, build_creator(image))
     end)
     |> Multi.insert(:adventure_image, build_adventure_image())
     |> Multi.insert_all(:gallery, Models.Asset, build_gallery(), returning: true)
-    |> Multi.merge(fn %{creator: creator, creator_image: creator_image, adventure_image: image, gallery: {_, gallery}} -> 
+    |> Multi.merge(fn %{creator: creator, creator_image: creator_image, adventure_image: image, gallery: {_, gallery}} ->
       Multi.new()
       |> Multi.insert(:adventure, build_adventure(creator, image))
-      |> Multi.merge(fn (adventure) -> 
+      |> Multi.merge(fn adventure ->
         create_adventure_image(adventure, gallery)
       end)
-      |> Multi.merge(fn (adventure) ->
+      |> Multi.merge(fn _adventure ->
         gallery = [image | gallery]
         gallery = [creator_image | gallery]
+
         Multi.new()
-        |> Multi.run(:send_assets, fn _ -> send_assets(gallery) end)
+        |> Multi.run(:send_assets, fn _, _ -> send_assets(gallery) end)
       end)
     end)
     |> Multi.merge(&create_points/1)
@@ -36,6 +37,7 @@ defmodule Seed.Adventure do
 
   defp create_points(%{adventure: adventure, users: {_, users}}) do
     %{points: points, clues: clues, answers: answers, assets: assets} = build_points(adventure.id)
+
     Multi.new()
     |> Multi.insert_all(:points, Models.Point, points, returning: true)
     |> Multi.insert_all(:user_adventure, Models.UserAdventure, build_user_adventure(adventure, users), returning: true)
@@ -46,13 +48,13 @@ defmodule Seed.Adventure do
     |> Multi.insert_all(:answers, Models.Answer, answers, returning: true)
     |> Multi.merge(fn %{assets: {_, assets}} ->
       Multi.new()
-      |> Multi.run(:assets_send, fn _ -> send_assets(assets) end)
+      |> Multi.run(:assets_send, fn _, _ -> send_assets(assets) end)
     end)
   end
 
   defp build_user_adventure(adventure, users) do
     users
-    |> Enum.map(fn user ->  
+    |> Enum.map(fn user ->
       %{
         adventure_id: adventure.id,
         user_id: user.id,
@@ -65,7 +67,7 @@ defmodule Seed.Adventure do
 
   defp build_ranking(adventure, users) do
     users
-    |> Enum.map(fn user ->  
+    |> Enum.map(fn user ->
       %{
         adventure_id: adventure.id,
         user_id: user.id,
@@ -78,7 +80,7 @@ defmodule Seed.Adventure do
 
   defp build_rating(adventure, users) do
     users
-    |> Enum.map(fn user ->  
+    |> Enum.map(fn user ->
       %{
         adventure_id: adventure.id,
         user_id: user.id,
@@ -91,7 +93,7 @@ defmodule Seed.Adventure do
 
   defp preper_image(assets, adventure) do
     assets
-    |> Enum.map(fn(asset) -> 
+    |> Enum.map(fn asset ->
       %{
         asset_id: asset.id,
         adventure_id: adventure.id,
@@ -109,7 +111,7 @@ defmodule Seed.Adventure do
       name: "creator",
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
-    })  
+    })
   end
 
   defp build_gallery() do
@@ -121,6 +123,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     tor2 = %{
       id: Ecto.UUID.generate(),
       type: "image",
@@ -129,6 +132,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     [tor1, tor2]
   end
 
@@ -144,6 +148,7 @@ defmodule Seed.Adventure do
       asset
       |> send_asset()
     end)
+
     {:ok, assets}
   end
 
@@ -242,12 +247,13 @@ defmodule Seed.Adventure do
         password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
-      },
+      }
     ]
   end
 
   defp build_points(adventure_id) do
-    osiolek = %{show: true,
+    osiolek = %{
+      show: true,
       position: %Geo.Point{coordinates: {18.605192, 53.010279}, srid: 4326},
       adventure_id: adventure_id,
       parent_point_id: nil,
@@ -256,6 +262,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     fontanna = %{
       show: false,
       position: %Geo.Point{coordinates: {18.599850, 53.010747}, srid: 4326},
@@ -266,6 +273,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     filutek = %{
       show: false,
       position: %Geo.Point{coordinates: {18.604505, 53.011100}, srid: 4326},
@@ -276,6 +284,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     smok = %{
       show: false,
       position: %Geo.Point{coordinates: {18.608834, 53.010770}, srid: 4326},
@@ -286,6 +295,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     kura = %{
       show: false,
       position: %Geo.Point{coordinates: {18.60433, 53.01218}, srid: 4326},
@@ -296,6 +306,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     kopernik = %{
       show: false,
       position: %Geo.Point{coordinates: {18.604964, 53.010301}, srid: 4326},
@@ -306,6 +317,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     brama = %{
       show: false,
       position: %Geo.Point{coordinates: {18.608978, 53.008486}, srid: 4326},
@@ -325,6 +337,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     img_1 = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
@@ -333,6 +346,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     img_2 = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
@@ -341,6 +355,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     img_3 = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
@@ -349,6 +364,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     clock = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
@@ -357,6 +373,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
+
     panorama = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
@@ -365,7 +382,7 @@ defmodule Seed.Adventure do
       inserted_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
-    
+
     assets = [witcher, img_1, img_2, img_3, clock, panorama]
 
     clues = [
@@ -421,7 +438,7 @@ defmodule Seed.Adventure do
         asset_id: img_2.id,
         inserted_at: NaiveDateTime.utc_now(),
         updated_at: NaiveDateTime.utc_now()
-      }, 
+      },
       %{
         id: Ecto.UUID.generate(),
         description: nil,
@@ -456,6 +473,7 @@ defmodule Seed.Adventure do
         updated_at: NaiveDateTime.utc_now()
       }
     ]
+
     points = [osiolek, fontanna, filutek, smok, kura, kopernik, brama]
 
     answers = [
@@ -516,6 +534,7 @@ defmodule Seed.Adventure do
         updated_at: NaiveDateTime.utc_now()
       }
     ]
+
     %{points: points, clues: clues, answers: answers, assets: assets}
   end
 
@@ -523,11 +542,10 @@ defmodule Seed.Adventure do
     file_path
     |> ExAws.S3.Upload.stream_file()
     |> ExAws.S3.upload(asset_bucket(), upload_url)
-    |> ExAws.request!
+    |> ExAws.request!()
   end
 
   defp asset_bucket do
     Application.fetch_env!(:infrastructure, :asset_bucket)
   end
-
 end

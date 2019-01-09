@@ -32,7 +32,7 @@ defmodule Infrastructure.MixProject do
       {:gettext, "~> 0.11"},
       {:poison, "~> 3.0"},
       {:httpoison, "~> 1.4"},
-      {:geo_postgis, "~> 2.0"}
+      {:geo_postgis, "~> 3.0"}
     ]
   end
 end

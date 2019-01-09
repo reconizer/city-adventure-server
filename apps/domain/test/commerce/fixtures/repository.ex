@@ -2,7 +2,6 @@ defmodule Domain.Commerce.Fixtures.Repository do
   #  use ExMachina.Ecto, repo: Infrastructure.Repository
   use Infrastructure.Repository.Models
 
-  import Ecto.Query
   alias Ecto.Multi
   alias Infrastructure.Repository
 
