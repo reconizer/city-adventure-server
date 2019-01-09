@@ -15,7 +15,7 @@ defmodule Domain.UserAdventure.Projections.Ranking do
   def top_ten_ranking(%{id: adventure_id}) do
     result =
       ranking_query(adventure_id)
-      |> limit(11)
+      |> limit(10)
       |> Repository.all()
 
     {:ok, result}

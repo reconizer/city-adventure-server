@@ -11,16 +11,20 @@ defmodule Domain.UserAdventure.EventHandlers.Adventure do
     |> case do
       %{
         id: id,
-        completed: completed
+        completed: completed,
+        user_adventure: %{
+          user_id: user_id
+        } 
       } ->
-        adventure =
-          from(adventure in Models.Adventure,
-            where: adventure.id == ^id
+        user_adventure =
+          from(user_adventure in Models.UserAdventure,
+            where: user_adventure.adventure_id == ^id,
+            where: user_adventure.user_id == ^user_id
           )
           |> Repository.one()
-          |> Models.Adventure.changeset(%{completed: completed})
+          |> Models.UserAdventure.changeset(%{completed: completed})
         multi
-        |> Ecto.Multi.update({event.id, event.name}, adventure)
+        |> Ecto.Multi.update({event.id, event.name}, user_adventure)
       _ ->
         multi
     end
@@ -84,13 +88,11 @@ defmodule Domain.UserAdventure.EventHandlers.Adventure do
         updated_at: updated_at
       } -> 
         user_point = 
-          %Models.UserPoint{point_id: point_id, 
-            user_id: user_id, 
-            position: position, 
-            inserted_at: inserted_at, 
-            updated_at: updated_at,
-            completed: false
-          }
+          from(user_point in Models.UserPoint,
+            where: user_point.user_id == ^user_id,
+            where: user_point.point_id == ^point_id 
+          )
+          |> Repository.one()
           |> Models.UserPoint.changeset(%{completed: completed, updated_at: NaiveDateTime.utc_now()})
         multi
         |> Ecto.Multi.update({event.id, user_id, point_id, event.name}, user_point)

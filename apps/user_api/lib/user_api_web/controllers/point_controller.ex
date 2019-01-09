@@ -31,6 +31,10 @@ defmodule UserApiWeb.PointController do
                         |> AdventureRepository.get(context["current_user"]),
     {:ok, _point} <- adventure
                      |> AdventureDomain.check_point_position(validate_params),
+    {:ok, _adventure} <- adventure
+                         |> AdventureDomain.check_adventure_completed(),
+    {:ok, _adventure} <- adventure
+                         |> AdventureDomain.check_point_completed(validate_params),
     {:ok, _} <- adventure
                 |> AdventureDomain.check_answer_and_time(validate_params)
     do

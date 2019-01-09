@@ -56,6 +56,33 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
+  def check_adventure_completed(%Adventure{} = adventure) do
+    adventure
+    |> Map.get(:completed)
+    |> case do
+      false -> {:ok, adventure}
+      true -> {:error, {:adventure, "alredy completed"}}
+    end
+  end
+
+  def check_point_completed(%Adventure{} = adventure, %{point_id: point_id}) do
+    adventure
+    |> Map.get(:user_points)
+    |> Enum.find(fn(user_point) -> 
+      user_point.point_id == point_id
+    end)
+    |> case do
+      nil -> {:ok, adventure}
+      result ->
+        result
+        |> Map.get(:completed)
+        |> case do
+          true -> {:error, {:point, "alredy completed"}}
+          false -> {:ok, adventure}
+        end
+    end
+  end
+
   def check_answer_and_time(%Adventure{} = adventure, %{point_id: point_id}) do
     adventure
     |> get_answers(point_id)
@@ -147,12 +174,12 @@ defmodule Domain.UserAdventure.Adventure do
         })
       result ->
         user_points = adventure.user_points
-        |> Enum.map(fn user_point -> 
+        |> Enum.map(fn user_p ->
           cond do
-            user_point == result ->
+            user_p == result ->
               result
               |> Map.put(:completed, user_point.completed)
-            false -> user_point
+            true -> user_p
           end
         end)
         adventure
