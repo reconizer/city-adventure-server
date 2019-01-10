@@ -125,8 +125,7 @@ defmodule Domain.UserAdventure.Adventure do
         adventure
         |> Map.put(:completed, true)
         |> emit!("AdventureCompleted", 
-          adventure
-          |> Map.put(:completed, true)
+          %{completed: true, user_id: adventure.user_adventure.user_id}
         )
     end
   end

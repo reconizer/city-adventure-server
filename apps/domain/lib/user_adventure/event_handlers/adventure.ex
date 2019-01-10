@@ -10,15 +10,12 @@ defmodule Domain.UserAdventure.EventHandlers.Adventure do
     event.data
     |> case do
       %{
-        id: id,
         completed: completed,
-        user_adventure: %{
-          user_id: user_id
-        } 
+        user_id: user_id
       } ->
         user_adventure =
           from(user_adventure in Models.UserAdventure,
-            where: user_adventure.adventure_id == ^id,
+            where: user_adventure.adventure_id == ^event.aggregate_id,
             where: user_adventure.user_id == ^user_id
           )
           |> Repository.one()
@@ -66,7 +63,7 @@ defmodule Domain.UserAdventure.EventHandlers.Adventure do
         %Models.Ranking{}
         |> Models.Ranking.changeset(%{
           adventure_id: adventure_id,
-          completion_time: completion_time,
+          completion_time: completion_time |> :calendar.seconds_to_time |> Time.from_erl!,
           user_id: user_id  
         })
         multi
@@ -83,9 +80,7 @@ defmodule Domain.UserAdventure.EventHandlers.Adventure do
         completed: completed,
         point_id: point_id,
         user_id: user_id,
-        position: position,
-        inserted_at: inserted_at,
-        updated_at: updated_at
+        position: position
       } -> 
         user_point = 
           from(user_point in Models.UserPoint,
