@@ -20,4 +20,20 @@ defmodule Domain.UserAdventure.Projections.Points do
     {:ok, result}
   end
 
+  def get_completed_points_with_clues(%{adventure_id: adventure_id}, %{id: user_id}) do
+    result = from(point in Models.Point,
+      join: user_points in assoc(point, :user_points),
+      left_join: clues in assoc(point, :clues),
+      left_join: asset in assoc(clues, :asset),
+      left_join: asset_conversions in assoc(asset, :asset_conversions), 
+      preload: [:user_points],
+      preload: [clues: {clues, asset: {asset, asset_conversions: asset_conversions}}],
+      where: user_points.completed == true,
+      where: user_points.user_id == ^user_id,
+      where: point.adventure_id == ^adventure_id
+    )
+    |> Repository.all()
+    {:ok, result}
+  end
+
 end
