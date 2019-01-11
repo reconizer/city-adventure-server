@@ -9,7 +9,6 @@ defmodule UserApiWeb.ClueController do
                                 |> Contract.Adventure.ClueListing.validate(),
       {:ok, discovered_clues} <- validate_params
                                  |> PointsProjection.get_completed_points_with_clues(context["current_user"])
-                                #  |> CluesProjection.get_discovered_clues_for_adventure(context["current_user"])
     do
       session
       |> Session.update_context(%{"clues" => discovered_clues})
@@ -39,7 +38,7 @@ defmodule UserApiWeb.ClueController do
         session
         |> Session.add_error(reason)
     end
-    |> present(conn, UserApiWeb.ClueView, "index.json")
+    |> present(conn, UserApiWeb.ClueView, "list_for_point.json")
   end
 
 end

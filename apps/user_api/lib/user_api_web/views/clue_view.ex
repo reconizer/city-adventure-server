@@ -3,40 +3,47 @@ defmodule UserApiWeb.ClueView do
 
   def render("index.json", %{session: %Session{context: %{"clues" => clues}} = _session}) do
     clues
+    |> Enum.map(&render_point/1)
+  end
+
+  def render("list_for_point.json", %{session: %Session{context: %{"clues" => clues}} = _session}) do
+    clues
     |> Enum.map(&render_clues/1)
   end
 
-  defp render_clues(%{point: %{user_points: user_points}, asset_id: nil} = clue) do
+  defp render_point(point) do
+    %{
+      point_id: point.id,
+      discovery_timestamp: point.user_points |> generate_clue_date(),
+      clues: point.clues |> Enum.map(&render_clues/1)
+    }
+  end
+
+  defp render_clues(%{asset_id: nil} = clue) do
     %{
       id: clue.id,
       type: clue.type,
-      discovery_timestamp: user_points |> generate_clue_date(),
       description: clue.description,
-      point_id: clue.point_id,
       original_asset_url: nil,
       conversion_urls: []   
     }
   end
 
-  defp render_clues(%{point: %{user_points: user_points}, asset: %{asset_conversions: []} = asset} = clue) do
+  defp render_clues(%{asset: %{asset_conversions: []} = asset} = clue) do
     %{
       id: clue.id,
       type: clue.type,
-      discovery_timestamp: user_points |> generate_clue_date(),
       description: clue.description,
-      point_id: clue.point_id,
       original_asset_url: asset_url(asset),
       conversion_urls: []   
     }
   end
 
-  defp render_clues(%{point: %{user_points: user_points}, asset: %{asset_conversions: conversions} = asset} = clue) do
+  defp render_clues(%{asset: %{asset_conversions: conversions} = asset} = clue) do
     %{
       id: clue.id,
       type: clue.type,
-      discovery_timestamp: user_points |> generate_clue_date(),
       description: clue.description,
-      point_id: clue.point_id,
       original_asset_url: asset_url(asset),
       conversion_urls: conversions |> Enum.map(&generate_conversion/1)
     }

@@ -1,7 +1,7 @@
 defmodule Domain.Adventure.Projections.AdventureTest do
   use ExUnit.Case, async: true
   import Domain.Adventure.Fixtures.Repository
-  alias Domain.Adventure.Projections.Adventure
+  alias Domain.UserAdventure.Projections.Adventure
   alias Infrastructure.Repository
   
   setup do
