@@ -8,7 +8,8 @@ defmodule Infrastructure.Repository.Models.Asset do
     Adventure,
     Creator,
     AssetConversion,
-    Image
+    Image,
+    Avatar
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -26,6 +27,7 @@ defmodule Infrastructure.Repository.Models.Asset do
     has_one :adventure, Adventure
     has_one :image, Image
     has_one :creator, Creator
+    has_many :avatars, Avatar
     has_many :asset_conversions, AssetConversion
   end
 

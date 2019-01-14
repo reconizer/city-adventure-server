@@ -28,11 +28,12 @@ defmodule Infrastructure.Repository.Models.Adventure do
 
     timestamps()
 
-    belongs_to(:asset, Asset)
-    belongs_to(:creator, Creator)
-    has_many(:points, Point)
-    has_many(:images, Image)
-    has_many(:user_adventures, UserAdventure)
+    belongs_to :asset, Asset
+    belongs_to :creator, Creator
+    has_many :points, Point
+    has_many :images, Image
+    has_many :user_adventures, UserAdventure
+    has_many :user_points, through: [:points, :user_points]
   end
 
   def build(params) do
@@ -46,8 +47,6 @@ defmodule Infrastructure.Repository.Models.Adventure do
     model
     |> cast(params, @params)
     |> validate_required(@required_params)
-    # |> validate_number(:max_time, greater_than: :min_time)
-    # |> validate_number(:min_time, less_than: :max_time)
     |> validate_number(:difficulty_level, greater_than_or_equal_to: 1)
     |> validate_number(:difficulty_level, less_than_or_equal_to: 3)
   end

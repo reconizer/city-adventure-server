@@ -8,6 +8,7 @@ defmodule Infrastructure.Repository.Models.User do
     Ranking,
     UserPoint,
     UserAdventure,
+    Avatar,
     Commerce
   }
 
@@ -23,6 +24,7 @@ defmodule Infrastructure.Repository.Models.User do
 
     has_one(:user_account, Commerce.UserAccount)
     has_one(:account, through: [:user_account, :account])
+    has_one(:avatar, Avatar)
 
     has_many(:rankings, Ranking)
     has_many(:user_points, UserPoint)

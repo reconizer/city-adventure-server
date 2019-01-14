@@ -1,4 +1,4 @@
-defmodule Domain.Adventure.Projections.Clues do
+defmodule Domain.UserAdventure.Projections.Clues do
   @moduledoc """
   Projection clues for adventure
   """
@@ -14,10 +14,12 @@ defmodule Domain.Adventure.Projections.Clues do
 
   def get_discovered_clues_for_adventure(%{adventure_id: adventure_id}, %{id: user_id}) do
     result = from(clue in Models.Clue,
-      join: point in Models.Point, on: [id: clue.point_id],
-      join: user_point in Models.UserPoint, on: [point_id: point.id],
+      join: point in assoc(clue, :point),
+      join: user_point in assoc(point, :user_points),
       left_join: asset in assoc(clue, :asset),
       left_join: asset_conversions in assoc(asset, :asset_conversions), 
+      preload: [asset: {asset, asset_conversions: asset_conversions}], 
+      preload: [point: {point, user_points: user_point}],
       where: user_point.completed == true,
       where: user_point.user_id == ^user_id,
       where: point.adventure_id == ^adventure_id

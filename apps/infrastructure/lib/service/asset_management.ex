@@ -9,6 +9,10 @@ defmodule Infrastructure.Service.AssetManagement do
     download_url(type, id, name, extension)
   end
 
+  def download_url(%Asset{id: id, type: type, extension: extension, name: name, uploaded: false}) do
+    download_url(type, id, name, extension)
+  end
+
   def download_url(%AssetConversion{asset_id: id, type: type, extension: extension, name: name}) do
     download_url(type, id, name, extension)
   end

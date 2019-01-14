@@ -1,7 +1,7 @@
 defmodule Domain.Adventure.Projections.CluesTest do
   use ExUnit.Case, async: true
   import Domain.Adventure.Fixtures.Repository
-  alias Domain.Adventure.Projections.Clues
+  alias Domain.UserAdventure.Projections.Points
   alias Infrastructure.Repository
   
   setup do
@@ -27,13 +27,13 @@ defmodule Domain.Adventure.Projections.CluesTest do
     end
     
     test "return clues for start point", context do
-      result = Clues.get_discovered_clues_for_adventure(%{adventure_id: context[:adventure].id}, %{id: context[:user].id})
+      result = Points.get_completed_points_with_clues(%{adventure_id: context[:adventure].id}, %{id: context[:user].id})
       assert {:ok, array} = result
-      assert Enum.count(array) == 2
+      assert Enum.count(array) == 1
     end
 
     test "return empty array", context do
-      result = Clues.get_discovered_clues_for_adventure(%{adventure_id: context[:adventure].id}, %{id: Ecto.UUID.generate()})
+      result = Points.get_completed_points_with_clues(%{adventure_id: context[:adventure].id}, %{id: Ecto.UUID.generate()})
       assert {:ok, []} == result
     end
 

@@ -29,6 +29,10 @@ defmodule UserApiWeb.Router do
       get "/:adventure_id", ClueController, :index
       get "/point/:adventure_id/:point_id", ClueController, :list_for_point
     end
+
+    scope "/points" do
+      post "/resolve_point", PointController, :resolve_position_point
+    end
     
   end
 
@@ -36,6 +40,13 @@ defmodule UserApiWeb.Router do
     pipe_through :api 
     
     post "/", AuthController, :login
+  end
+  
+
+  scope "/api/ping", UserApiWeb do
+    pipe_through :api 
+    
+    get "/", PingController, :ping
   end
 
   # Other scopes may use custom stacks.

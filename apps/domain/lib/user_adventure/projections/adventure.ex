@@ -1,4 +1,4 @@
-defmodule Domain.Adventure.Projections.Adventure do
+defmodule Domain.UserAdventure.Projections.Adventure do
   @moduledoc """
   Projection of adventure information
   """
@@ -9,7 +9,7 @@ defmodule Domain.Adventure.Projections.Adventure do
 
   use Infrastructure.Repository.Models
   import Ecto.Query
-  alias Domain.Adventure.Projections.Adventure
+  alias Domain.UserAdventure.Projections.Adventure
   alias Infrastructure.Repository
 
   def get_adventure_by_id(%{id: adventure_id}, %{id: owner_id}) do

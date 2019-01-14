@@ -34,7 +34,7 @@ defmodule UserApiWeb.ClueControllerTest do
     test "return clues", %{conn: conn, adventure: adventure} do
       conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
       conn = get conn, "/api/clues/#{adventure.id}"
-      assert Enum.count(json_response(conn, 200)) == 9 
+      assert Enum.count(json_response(conn, 200)) == 3 
     end
     
     test "return empty array", %{conn: conn, adventure: _adventure} do

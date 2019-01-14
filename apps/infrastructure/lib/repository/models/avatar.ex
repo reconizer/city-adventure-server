@@ -1,41 +1,37 @@
-defmodule Infrastructure.Repository.Models.UserPoint do
+defmodule Infrastructure.Repository.Models.Avatar do
 
   @type t :: %__MODULE__{}
 
   use Ecto.Schema
   import Ecto.Changeset
   alias Infrastructure.Repository.Models.{
-    Point,
-    User
+    User,
+    Asset
   }
 
   @primary_key false
   @foreign_key_type :binary_id
 
-  schema "user_points" do
-    field :completed, :boolean
-    field :position, Geo.PostGIS.Geometry
-    
+  schema "avatars" do
     timestamps()
 
-    belongs_to :point, Point, primary_key: true
-    belongs_to :user, User, primary_key: true
-
+    belongs_to :user, User
+    belongs_to :asset, Asset
   end
 
   def build(params) do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(user_id point_id completed position)a
-  @required_params ~w(point_id user_id)a
+  @params ~w(user_id asset_id)a
+  @required_params ~w(user_id asset_id)a
 
   def changeset(model, params \\ %{}) do
     model
     |> cast(params, @params)
     |> validate_required(@required_params)
-    |> foreign_key_constraint(:point_id)
     |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:asset_id)
   end
 
 end

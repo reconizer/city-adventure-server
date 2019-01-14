@@ -4,7 +4,8 @@ use Mix.Config
 config :domain, :models, Infrastructure.Repository.Models
 
 config :domain, :event_handlers, [
-  Domain.Commerce.EventHandler
+  Domain.Commerce.EventHandler,
+  Domain.UserAdventure.EventHandlers.Adventure
 ]
 
 # This configuration is loaded before any dependency and is restricted
