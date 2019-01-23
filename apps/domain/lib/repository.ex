@@ -9,6 +9,14 @@ defmodule Domain.Repository do
         end
       end
 
+      def save({:error, _} = error) do
+        error
+      end
+
+      def save({:ok, aggregate}) do
+        save(aggregate)
+      end
+
       def save(aggregate) do
         alias Infrastructure.Repository
         alias Infrastructure.Repository.Models.Event

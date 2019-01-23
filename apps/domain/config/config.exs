@@ -5,7 +5,8 @@ config :domain, :models, Infrastructure.Repository.Models
 
 config :domain, :event_handlers, [
   Domain.Commerce.EventHandler,
-  Domain.UserAdventure.EventHandlers.Adventure
+  Domain.UserAdventure.EventHandlers.Adventure,
+  Domain.Creator.EventHandler
 ]
 
 # This configuration is loaded before any dependency and is restricted

@@ -1,5 +1,4 @@
 defmodule Domain.Commerce.Transfer.Account.Balance do
-  alias Domain.Commerce.Transfer.Account
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -1,5 +1,4 @@
 defmodule Domain.Commerce.Transfer.Transaction do
-  alias Domain.Commerce.Transfer
   use Ecto.Schema
   import Ecto.Changeset
 
