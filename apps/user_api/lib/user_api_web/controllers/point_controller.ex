@@ -6,16 +6,18 @@ defmodule UserApiWeb.PointController do
 
   def completed_points(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
-      {:ok, validate_params} <- context
-                                |> Contract.Adventure.CompletedPoints.validate(),
-      {:ok, points} <- validate_params
-                       |> PointProjection.get_completed_points(context["current_user"])
-    do
+         {:ok, validate_params} <-
+           context
+           |> Contract.Adventure.CompletedPoints.validate(),
+         {:ok, points} <-
+           validate_params
+           |> PointProjection.get_completed_points(context["current_user"]) do
       session
       |> Session.update_context(%{"completed_points" => points})
     else
       %Session{valid?: false} ->
         session
+
       {:error, reason} ->
         session
         |> Session.add_error(reason)
@@ -25,38 +27,43 @@ defmodule UserApiWeb.PointController do
 
   def resolve_position_point(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
-    {:ok, validate_params} <- context
-                              |> Contract.Adventure.PointResolve.validate(),
-    {:ok, adventure} <- validate_params
-                        |> AdventureRepository.get(context["current_user"]),
-    {:ok, _point} <- adventure
-                     |> AdventureDomain.check_point_position(validate_params),
-    {:ok, _adventure} <- adventure
-                         |> AdventureDomain.check_adventure_completed(),
-    {:ok, _adventure} <- adventure
-                         |> AdventureDomain.check_point_completed(validate_params),
-    {:ok, _} <- adventure
-                |> AdventureDomain.check_answer_and_time(validate_params)
-    do
+         {:ok, validate_params} <-
+           context
+           |> Contract.Adventure.PointResolve.validate(),
+         {:ok, adventure} <-
+           validate_params
+           |> AdventureRepository.get(context["current_user"]),
+         {:ok, _point} <-
+           adventure
+           |> AdventureDomain.check_point_position(validate_params),
+         {:ok, _adventure} <-
+           adventure
+           |> AdventureDomain.check_adventure_completed(),
+         {:ok, _adventure} <-
+           adventure
+           |> AdventureDomain.check_point_completed(validate_params),
+         {:ok, _} <- adventure |> AdventureDomain.check_answer_and_time(validate_params) do
       adventure
       |> AdventureDomain.resolve_point(validate_params, context["current_user"])
       |> case do
-        {:error, result} -> 
+        {:error, result} ->
           session |> Session.add_error(result)
+
         {:ok, adventure} ->
           adventure
           |> AdventureRepository.save()
+
           session
           |> Session.update_context(%{"adventure" => adventure})
       end
     else
       %Session{valid?: false} ->
         session
+
       {:error, reason} ->
         session
         |> Session.add_error(reason)
     end
     |> present(conn, UserApiWeb.PointView, "resolve_point_position.json")
-    end
-
+  end
 end

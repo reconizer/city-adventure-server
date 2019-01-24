@@ -28,20 +28,20 @@ defmodule Infrastructure.Repository.Models.Adventure do
 
     timestamps()
 
-    belongs_to :asset, Asset
-    belongs_to :creator, Creator
-    has_many :points, Point
-    has_many :images, Image
-    has_many :user_adventures, UserAdventure
-    has_many :user_points, through: [:points, :user_points]
+    belongs_to(:asset, Asset)
+    belongs_to(:creator, Creator)
+    has_many(:points, Point)
+    has_many(:images, Image)
+    has_many(:user_adventures, UserAdventure)
+    has_many(:user_points, through: [:points, :user_points])
   end
 
   def build(params) do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(description code language difficulty_level min_time max_time published show name creator_id asset_id)a
-  @required_params ~w(language description creator_id asset_id language difficulty_level name)a
+  @params ~w(id description code language difficulty_level min_time max_time published show name creator_id asset_id)a
+  @required_params ~w(name)a
 
   def changeset(model, params \\ %{}) do
     model

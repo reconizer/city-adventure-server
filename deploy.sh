@@ -15,7 +15,7 @@ mv ./_build/prod/rel/"$app_name" /tmp
 
 cd "/tmp"
 
-tar -zcvf "$app_name".tar.gz "$app_name"
+tar -zcf "$app_name".tar.gz "$app_name"
 
 scp -i "$key_path" /tmp/"$app_name".tar.gz $server:/home/ubuntu/"$app_name".tar.gz
 ssh -t -i "$key_path" "$server" << EOF

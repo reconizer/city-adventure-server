@@ -41,5 +41,6 @@ defmodule Infrastructure.Repository.Models.Creator do
     model
     |> cast(params, @params)
     |> validate_required(@required_params)
+    |> unique_constraint(:email)
   end
 end

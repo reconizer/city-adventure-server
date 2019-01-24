@@ -1,9 +1,9 @@
 use Mix.Config
 
 config :infrastructure, Infrastructure.Repository,
-  username: "developer",
-  password: "developer",
-  database: "gameinn_2",
+  username: "postgres",
+  password: "postgres",
+  database: "city_adventure",
   hostname: "localhost",
   port: 5433,
   pool_size: 10,

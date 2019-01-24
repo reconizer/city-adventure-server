@@ -1,7 +1,6 @@
 defmodule Domain.Commerce.Transfer.EventHandler do
   use Domain.EventHandler
   import Ecto.Query
-  alias Infrastructure.Repository
   alias Infrastructure.Repository.Models.Commerce, as: CommerceModels
 
   def process(multi, %Domain.Event{aggregate_name: "Commerce.Transfer", name: "TransactionAdded"} = event) do

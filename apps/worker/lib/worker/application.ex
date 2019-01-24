@@ -9,7 +9,7 @@ defmodule Worker.Application do
     queue_name = Application.get_env(:worker, :file_upload_queue_name)
 
     children = [
-      {Worker.FileUpload.Producer, queue_name}
+      # {Worker.FileUpload.Producer, queue_name}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
