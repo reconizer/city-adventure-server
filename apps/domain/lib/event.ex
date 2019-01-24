@@ -3,12 +3,18 @@ defmodule Domain.Event do
     quote do
       import Domain.Event, only: [aggregate_fields: 0]
 
+      def emit!({:ok, aggregate_struct}, event_name, event_data), do: emit!(aggregate_struct, event_name, event_data)
+      def emit!({:error, _} = error, _, _), do: error
+
       def emit!(aggregate_struct, event_name, event_data) do
         emit(aggregate_struct, event_name, event_data)
         |> case do
           {:ok, aggregate} -> aggregate
         end
       end
+
+      def emit({:ok, aggregate_struct}, event_name, event_data), do: emit(aggregate_struct, event_name, event_data)
+      def emit({:error, _} = error, _, _), do: error
 
       def emit(aggregate_struct, event_name, event_data) do
         event = %Domain.Event{

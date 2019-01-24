@@ -4,8 +4,10 @@ defmodule Infrastructure.Repository do
     adapter: Ecto.Adapters.Postgres
 
   @start_apps [
+    :logger,
     :postgrex,
     :ecto,
+    :ecto_sql,
     :ssl
   ]
 
@@ -23,7 +25,7 @@ defmodule Infrastructure.Repository do
 
     # Start the Repo(s) for myapp
     IO.puts("Starting repos..")
-    Enum.each(@repos, & &1.start_link(pool_size: 1))
+    Enum.each(@repos, & &1.start_link(pool_size: 2))
 
     # Run migrations
     IO.puts("Running migrations for #{@app}")

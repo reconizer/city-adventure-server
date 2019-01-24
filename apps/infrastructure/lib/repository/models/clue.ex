@@ -1,9 +1,9 @@
 defmodule Infrastructure.Repository.Models.Clue do
-
   @type t :: %__MODULE__{}
 
   use Ecto.Schema
   import Ecto.Changeset
+
   alias Infrastructure.Repository.Models.{
     Point,
     Asset
@@ -13,15 +13,15 @@ defmodule Infrastructure.Repository.Models.Clue do
   @foreign_key_type :binary_id
 
   schema "clues" do
-    field :type, :string
-    field :tip, :boolean
-    field :description, :string
-    field :sort, :integer
+    field(:type, :string)
+    field(:tip, :boolean)
+    field(:description, :string)
+    field(:sort, :integer)
 
     timestamps()
 
-    belongs_to :asset, Asset
-    belongs_to :point, Point
+    belongs_to(:asset, Asset)
+    belongs_to(:point, Point)
   end
 
   def build(params) do
@@ -29,7 +29,7 @@ defmodule Infrastructure.Repository.Models.Clue do
   end
 
   @params ~w(point_id type sort tip description asset_id)a
-  @required_params ~w(point_id type sort asset_id)a
+  @required_params ~w(point_id type sort)a
 
   def changeset(model, params \\ %{}) do
     model
@@ -37,5 +37,4 @@ defmodule Infrastructure.Repository.Models.Clue do
     |> validate_required(@required_params)
     |> foreign_key_constraint(:point_id)
   end
-
 end

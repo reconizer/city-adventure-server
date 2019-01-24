@@ -3,7 +3,6 @@ defmodule Domain.Commerce.Transfer.Repository do
 
   alias Domain.Commerce.Transfer
   alias Infrastructure.Repository, as: Repo
-  alias Infrastructure.Repository.Models
   alias Infrastructure.Repository.Models.Commerce
   import Ecto.Query
 
