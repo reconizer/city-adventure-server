@@ -22,5 +22,5 @@ erl_crash.dump
 .elixir_ls/
 .vscode/
 
-**/**/config/*.secret.exs
+apps/**/config/*.secret.exs
 .tool-versions
