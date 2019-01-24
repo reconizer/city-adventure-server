@@ -31,7 +31,7 @@ defmodule Domain.Creator.Adventure do
   @fields ~w(id name creator_id description language difficulty_level min_time max_time show)a
   @required_fields ~w(id name creator_id)a
 
-  @spec changeset(Transfer.t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do
     struct
     |> cast(params, @fields)

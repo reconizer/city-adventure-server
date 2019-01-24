@@ -1,5 +1,6 @@
 defmodule Domain.Creator.Service.Adventure do
   alias Domain.Creator.User
+  alias Domain.Creator.Adventure
   alias Domain.Creator.Repository.User, as: UserRepository
   alias Domain.Creator.Repository.Adventure, as: AdventureRepository
 
@@ -17,7 +18,7 @@ defmodule Domain.Creator.Service.Adventure do
     end
   end
 
-  @spec get_creator_adventure(any(), any()) :: {:error, :not_found} | {:ok, User.Adventure.t()}
+  @spec get_creator_adventure(any(), any()) :: {:error, :not_found} | {:ok, Adventure.t()}
   def get_creator_adventure(creator_id, adventure_id) do
     get_creator(creator_id)
     |> case do

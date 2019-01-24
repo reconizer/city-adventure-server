@@ -1,30 +1,11 @@
 defmodule CreatorApiWeb.ClueController do
   use CreatorApiWeb, :controller
 
+  alias CreatorApiWeb.ClueContract
   alias Domain.Creator
-  import Contract
 
   def create(conn, params) do
-    params
-    |> with_creator(conn)
-    |> cast(%{
-      adventure_id: Ecto.UUID,
-      creator_id: Ecto.UUID,
-      point_id: Ecto.UUID,
-      type: :string,
-      description: :string,
-      tip: :boolean
-    })
-    |> default(%{
-      tip: false
-    })
-    |> validate(%{
-      adventure_id: :required,
-      creator_id: :required,
-      point_id: :required,
-      type: :required,
-      description: :required
-    })
+    ClueContract.create(conn, params)
     |> case do
       {:ok, params} ->
         Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
@@ -44,22 +25,7 @@ defmodule CreatorApiWeb.ClueController do
   end
 
   def update(conn, params) do
-    params
-    |> with_creator(conn)
-    |> cast(%{
-      id: Ecto.UUID,
-      creator_id: Ecto.UUID,
-      adventure_id: Ecto.UUID,
-      point_id: Ecto.UUID,
-      type: :string,
-      description: :string,
-      tip: :boolean
-    })
-    |> validate(%{
-      id: :required,
-      creator_id: :required,
-      adventure_id: :required
-    })
+    ClueContract.update(conn, params)
     |> case do
       {:ok, params} ->
         Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
@@ -74,18 +40,7 @@ defmodule CreatorApiWeb.ClueController do
   end
 
   def delete(conn, params) do
-    params
-    |> with_creator(conn)
-    |> cast(%{
-      creator_id: Ecto.UUID,
-      id: Ecto.UUID,
-      adventure_id: Ecto.UUID
-    })
-    |> validate(%{
-      creator_id: :required,
-      id: :required,
-      adventure_id: :required
-    })
+    ClueContract.delete(conn, params)
     |> case do
       {:ok, params} ->
         Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
@@ -100,18 +55,7 @@ defmodule CreatorApiWeb.ClueController do
   end
 
   def reorder(conn, params) do
-    params
-    |> with_creator(conn)
-    |> cast(%{
-      creator_id: Ecto.UUID,
-      adventure_id: Ecto.UUID,
-      clue_order: {:array, CreatorApi.Type.ClueOrder}
-    })
-    |> validate(%{
-      creator_id: :required,
-      clue_order: :required,
-      adventure_id: :required
-    })
+    ClueContract.reorder(conn, params)
     |> case do
       {:ok, params} ->
         Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)

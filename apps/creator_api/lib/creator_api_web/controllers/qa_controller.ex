@@ -1,21 +1,12 @@
 defmodule CreatorApiWeb.QAController do
   use CreatorApiWeb, :controller
 
-  import Contract
+  alias CreatorApiWeb.QAContract
 
   def list(conn, params) do
-    params
-    |> with_creator(conn)
-    |> cast(%{
-      creator_id: Ecto.UUID,
-      adventure_id: Ecto.UUID
-    })
-    |> validate(%{
-      creator_id: :required,
-      adventure_id: :required
-    })
+    QAContract.list(conn, params)
     |> case do
-      {:ok, params} ->
+      {:ok, _params} ->
         conn
         |> resp(200, "OK")
 
@@ -26,20 +17,9 @@ defmodule CreatorApiWeb.QAController do
   end
 
   def create(conn, params) do
-    params
-    |> with_creator(conn)
-    |> cast(%{
-      creator_id: Ecto.UUID,
-      adventure_id: Ecto.UUID,
-      content: :string
-    })
-    |> validate(%{
-      creator_id: :required,
-      adventure_id: :required,
-      content: :string
-    })
+    QAContract.create(conn, params)
     |> case do
-      {:ok, params} ->
+      {:ok, _params} ->
         conn
         |> resp(200, "OK")
 

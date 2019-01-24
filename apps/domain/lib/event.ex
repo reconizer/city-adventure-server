@@ -17,6 +17,14 @@ defmodule Domain.Event do
       def emit({:error, _} = error, _, _), do: error
 
       def emit(aggregate_struct, event_name, event_data) do
+        event_data =
+          event_data
+          |> Enum.map(fn
+            {key, %Ecto.Changeset{} = value} -> {key, value |> Ecto.Changeset.apply_changes()}
+            other -> other
+          end)
+          |> Enum.into(%{})
+
         event = %Domain.Event{
           id: Ecto.UUID.generate(),
           aggregate_id: aggregate_struct.id,

@@ -1,6 +1,6 @@
 defmodule Domain.Creator.Adventure.Point do
   use Ecto.Schema
-  import Ecto.Changeset, only: [cast: 3, validate_required: 2, cast_embed: 2, apply_changes: 1, validate_change: 3, get_field: 2]
+  import Ecto.Changeset, only: [cast: 3, validate_required: 2, cast_embed: 2, cast_embed: 3, apply_changes: 1, validate_change: 3, get_field: 2]
 
   alias Domain.Creator.Adventure
 
@@ -13,9 +13,10 @@ defmodule Domain.Creator.Adventure.Point do
     field(:radius, :integer)
     field(:show, :boolean)
 
-    embeds_one(:position, Adventure.Position, on_replace: :delete)
+    embeds_one(:position, Adventure.Position)
     embeds_many(:clues, Adventure.Clue)
-    embeds_many(:answers, Adventure.Andwer)
+    embeds_one(:time_answer, Adventure.TimeAnswer)
+    embeds_one(:password_answer, Adventure.PasswordAnswer)
   end
 
   @fields ~w(id parent_point_id radius show)a
@@ -27,7 +28,8 @@ defmodule Domain.Creator.Adventure.Point do
     |> validate_required(@required_fields)
     |> validate_parent_point()
     |> cast_embed(:position)
-    |> cast_embed(:answers)
+    |> cast_embed(:time_answer)
+    |> cast_embed(:password_answer)
     |> cast_embed(:clues)
   end
 

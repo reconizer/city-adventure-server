@@ -28,8 +28,8 @@ defmodule Infrastructure.Repository.Models.Clue do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(point_id type sort tip description asset_id)a
-  @required_params ~w(point_id type sort)a
+  @params ~w(id point_id type sort tip description asset_id)a
+  @required_params ~w(id point_id type sort)a
 
   def changeset(model, params \\ %{}) do
     model

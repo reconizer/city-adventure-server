@@ -45,7 +45,7 @@ defmodule Domain.Creator.Repository.Adventure do
       radius: point_model.radius,
       show: point_model.show,
       position: build_position(point_model.position),
-      answers: Enum.map(point_model.answers, &build_answer/1),
+      # answers: Enum.map(point_model.answers, &build_answer/1),
       clues: Enum.map(point_model.clues, &build_clue/1) |> Enum.sort_by(&(-1 * &1.sort))
     }
   end
