@@ -28,6 +28,7 @@ defmodule CreatorApiWeb.Router do
       end
 
       scope "/clues" do
+        get("/:id", ClueController, :item)
         post("/", ClueController, :create)
         patch("/", ClueController, :update)
         delete("/", ClueController, :delete)
@@ -35,6 +36,7 @@ defmodule CreatorApiWeb.Router do
       end
 
       scope "/points" do
+        get("/:id", PointController, :item)
         post("/", PointController, :create)
         patch("/", PointController, :update)
         delete("/", PointController, :delete)

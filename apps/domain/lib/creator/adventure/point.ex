@@ -33,9 +33,9 @@ defmodule Domain.Creator.Adventure.Point do
     |> cast_embed(:clues)
   end
 
-  def new(%{parent_point_id: parent_point_id, radius: radius, show: show, lat: lat, lng: lng}) do
+  def new(%{id: id, parent_point_id: parent_point_id, radius: radius, show: show, lat: lat, lng: lng}) do
     %Adventure.Point{
-      id: Ecto.UUID.generate()
+      id: id
     }
     |> changeset(%{
       parent_point_id: parent_point_id,

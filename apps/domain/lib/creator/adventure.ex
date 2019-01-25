@@ -66,6 +66,7 @@ defmodule Domain.Creator.Adventure do
             name: adventure.name
           })
           |> add_point(%{
+            id: Ecto.UUID.generate(),
             parent_point_id: nil,
             radius: 10,
             show: true,

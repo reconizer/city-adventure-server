@@ -22,5 +22,13 @@ defmodule CreatorApiWeb.AdventureView do
 
   def render("list.json", %{list: list}) do
     list
+    |> Enum.map(&adventure_list_item/1)
+  end
+
+  def adventure_list_item(adventure) do
+    %{
+      id: adventure.id,
+      name: adventure.name
+    }
   end
 end

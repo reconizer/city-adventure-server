@@ -60,7 +60,8 @@ release :app do
       domain: :permanent,
       infrastructure: :permanent,
       session: :permanent,
-      user_api: :permanent
+      user_api: :permanent,
+      creator_api: :premanent
     ]
   )
 end
