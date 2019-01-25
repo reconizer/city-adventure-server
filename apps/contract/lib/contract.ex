@@ -51,7 +51,14 @@ defmodule Contract do
   end
 
   def cast(params, types) do
-    {%{}, types}
+    initial =
+      params
+      |> Enum.map(fn {key, _value} ->
+        {key |> String.to_existing_atom(), nil}
+      end)
+      |> Enum.into(%{})
+
+    {initial, types}
     |> Ecto.Changeset.cast(params, Map.keys(types))
     |> resolve_changeset
   end
@@ -70,8 +77,15 @@ defmodule Contract do
 
     keys = Map.merge(param_keys, validation_keys)
 
+    initial =
+      params
+      |> Enum.map(fn {key, _value} ->
+        {key, nil}
+      end)
+      |> Enum.into(%{})
+
     changeset =
-      {%{}, keys}
+      {initial, keys}
       |> Ecto.Changeset.cast(params, keys |> Map.keys())
 
     validations

@@ -7,7 +7,7 @@ defmodule CreatorApiWeb.PointView do
       parent_point_id: point.parent_point_id,
       radius: point.radius,
       show: point.show,
-      answers: point.answers,
+      # answers: point.answers,
       position: %{
         lat: point.position.lat,
         lng: point.position.lng

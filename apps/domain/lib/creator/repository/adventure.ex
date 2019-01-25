@@ -45,7 +45,8 @@ defmodule Domain.Creator.Repository.Adventure do
       radius: point_model.radius,
       show: point_model.show,
       position: build_position(point_model.position),
-      answers: Enum.map(point_model.answers, &build_answer/1),
+      time_answer: point_model.answers |> Enum.find(&(&1.type == "time")) |> build_time_answer,
+      password_answer: point_model.answers |> Enum.find(&(&1.type == "password")) |> build_password_answer,
       clues: Enum.map(point_model.clues, &build_clue/1) |> Enum.sort_by(&(-1 * &1.sort))
     }
   end
@@ -57,11 +58,21 @@ defmodule Domain.Creator.Repository.Adventure do
     }
   end
 
-  def build_answer(answer_model) do
-    %Creator.Adventure.Answer{
-      id: answer_model.id,
-      type: answer_model.type,
-      details: answer_model.details
+  def build_time_answer(nil), do: nil
+
+  def build_time_answer(answer_model) do
+    %Creator.Adventure.TimeAnswer{
+      start_time: answer_model.details |> Map.get("start_time"),
+      duration: answer_model.details |> Map.get("duration")
+    }
+  end
+
+  def build_password_answer(nil), do: nil
+
+  def build_password_answer(answer_model) do
+    %Creator.Adventure.PasswordAnswer{
+      type: answer_model.details |> Map.get("password_type"),
+      password: answer_model.details |> Map.get("password")
     }
   end
 

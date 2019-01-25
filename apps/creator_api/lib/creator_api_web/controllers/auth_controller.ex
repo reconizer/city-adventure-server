@@ -1,21 +1,14 @@
 defmodule CreatorApiWeb.AuthController do
   use CreatorApiWeb, :controller
 
-  import Contract
+  alias CreatorApiWeb.AuthContract
+  alias Domain.Creator
 
   def login(conn, params) do
-    params
-    |> cast(%{
-      email: :string,
-      password: :string
-    })
-    |> validate(%{
-      email: :required,
-      password: :required
-    })
+    AuthContract.login(conn, params)
     |> case do
       {:ok, params} ->
-        Domain.Creator.Repository.User.get_by_email_and_password(params.email, params.password)
+        Creator.Repository.User.get_by_email_and_password(params.email, params.password)
         |> case do
           {:ok, user} ->
             token = CreatorApi.Token.create(user.id)
@@ -35,20 +28,10 @@ defmodule CreatorApiWeb.AuthController do
   end
 
   def register(conn, params) do
-    params
-    |> cast(%{
-      email: :string,
-      password: :string,
-      name: :string
-    })
-    |> validate(%{
-      email: :required,
-      password: :required,
-      name: :required
-    })
+    AuthContract.register(conn, params)
     |> case do
       {:ok, params} ->
-        Domain.Creator.User.new(
+        Creator.User.new(
           %{
             email: params.email,
             name: params.name
@@ -57,7 +40,7 @@ defmodule CreatorApiWeb.AuthController do
         )
         |> case do
           {:ok, user} ->
-            Domain.Creator.Repository.User.save(user)
+            Creator.Repository.User.save(user)
             |> handle_repository_action(conn)
         end
 
@@ -68,5 +51,6 @@ defmodule CreatorApiWeb.AuthController do
   end
 
   def logout(conn, params) do
+    AuthContract.logout(conn, params)
   end
 end

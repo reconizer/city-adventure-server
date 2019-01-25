@@ -1,9 +1,9 @@
 defmodule Infrastructure.Repository.Models.Answer do
-
   @type t :: %__MODULE__{}
 
   use Ecto.Schema
   import Ecto.Changeset
+
   alias Infrastructure.Repository.Models.{
     Point
   }
@@ -12,21 +12,20 @@ defmodule Infrastructure.Repository.Models.Answer do
   @foreign_key_type :binary_id
 
   schema "answers" do
-    field :type, :string
-    field :details, :map
-    field :sort, :integer
+    field(:type, :string)
+    field(:details, :map)
 
     timestamps()
 
-    belongs_to :point, Point
+    belongs_to(:point, Point)
   end
 
   def build(params) do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(point_id type sort details)a
-  @required_params ~w(point_id type sort)a
+  @params ~w(point_id type details)a
+  @required_params ~w(point_id type)a
 
   def changeset(model, params \\ %{}) do
     model
@@ -34,5 +33,4 @@ defmodule Infrastructure.Repository.Models.Answer do
     |> validate_required(@required_params)
     |> foreign_key_constraint(:point_id)
   end
-
 end
