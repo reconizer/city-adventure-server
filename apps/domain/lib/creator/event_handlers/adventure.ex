@@ -68,66 +68,14 @@ defmodule Domain.Creator.EventHandlers.Adventure do
       end)
       |> Enum.into(%{})
 
-    multi =
-      updates
-      |> case do
-        %{time_answer: time_answer} -> time_answer
-        %{} -> :not_exists
-      end
-      |> case do
-        nil ->
-          answer =
-            Models.Answer
-            |> where([answer], answer.type == "time")
-            |> Repository.get_by(point_id: event.data.id)
-
-          multi
-          |> Ecto.Multi.delete({Ecto.UUID.generate(), event.name}, answer)
-
-        :not_exists ->
-          multi
-
-        time_answer ->
-          Models.Answer
-          |> where([answer], answer.type == "time")
-          |> Repository.get_by(point_id: event.data.id)
-          |> case do
-            nil ->
-              answer =
-                %Models.Answer{}
-                |> Models.Answer.changeset(%{
-                  point_id: event.data.id,
-                  type: "time",
-                  details: %{
-                    start_time: time_answer.start_time,
-                    duration: time_answer.duration
-                  }
-                })
-
-              multi
-              |> Ecto.Multi.insert({Ecto.UUID.generate(), event.name}, answer)
-
-            answer ->
-              answer =
-                answer
-                |> Models.Answer.changeset(%{
-                  details: %{
-                    start_time: time_answer.start_time,
-                    duration: time_answer.duration
-                  }
-                })
-
-              multi
-              |> Ecto.Multi.update({Ecto.UUID.generate(), event.name}, answer)
-          end
-      end
-
     point =
       Models.Point
       |> Repository.get(event.data.id)
       |> Models.Point.changeset(updates)
 
     multi
+    |> update_time_answer(updates, event.data.id)
+    |> update_password_answer(updates, event.data.id)
     |> Ecto.Multi.update({event.id, event.name}, point)
   end
 
@@ -234,5 +182,115 @@ defmodule Domain.Creator.EventHandlers.Adventure do
 
     multi
     |> Ecto.Multi.update({event.id, event.name}, clue)
+  end
+
+  defp update_password_answer(multi, updates, point_id) do
+    updates
+    |> case do
+      %{password_answer: password_answer} -> password_answer
+      %{} -> :not_exists
+    end
+    |> case do
+      nil ->
+        answer =
+          Models.Answer
+          |> where([answer], answer.type == "password")
+          |> Repository.get_by(point_id: point_id)
+
+        multi
+        |> Ecto.Multi.delete({Ecto.UUID.generate(), "Delete password answer"}, answer)
+
+      :not_exists ->
+        multi
+
+      password_answer ->
+        Models.Answer
+        |> where([answer], answer.type == "password")
+        |> Repository.get_by(point_id: point_id)
+        |> case do
+          nil ->
+            answer =
+              %Models.Answer{}
+              |> Models.Answer.changeset(%{
+                point_id: point_id,
+                type: "password",
+                details: %{
+                  password_type: password_answer.type,
+                  password: password_answer.password
+                }
+              })
+
+            multi
+            |> Ecto.Multi.insert({Ecto.UUID.generate(), "Add password answer"}, answer)
+
+          answer ->
+            answer =
+              answer
+              |> Models.Answer.changeset(%{
+                details: %{
+                  password_type: password_answer.type,
+                  password: password_answer.password
+                }
+              })
+
+            multi
+            |> Ecto.Multi.update({Ecto.UUID.generate(), "Update password answer"}, answer)
+        end
+    end
+  end
+
+  defp update_time_answer(multi, updates, point_id) do
+    updates
+    |> case do
+      %{time_answer: time_answer} -> time_answer
+      %{} -> :not_exists
+    end
+    |> case do
+      nil ->
+        answer =
+          Models.Answer
+          |> where([answer], answer.type == "time")
+          |> Repository.get_by(point_id: point_id)
+
+        multi
+        |> Ecto.Multi.delete({Ecto.UUID.generate(), "Delete password answer"}, answer)
+
+      :not_exists ->
+        multi
+
+      time_answer ->
+        Models.Answer
+        |> where([answer], answer.type == "time")
+        |> Repository.get_by(point_id: point_id)
+        |> case do
+          nil ->
+            answer =
+              %Models.Answer{}
+              |> Models.Answer.changeset(%{
+                point_id: point_id,
+                type: "time",
+                details: %{
+                  start_time: time_answer.start_time,
+                  duration: time_answer.duration
+                }
+              })
+
+            multi
+            |> Ecto.Multi.insert({Ecto.UUID.generate(), "Add password answer"}, answer)
+
+          answer ->
+            answer =
+              answer
+              |> Models.Answer.changeset(%{
+                details: %{
+                  start_time: time_answer.start_time,
+                  duration: time_answer.duration
+                }
+              })
+
+            multi
+            |> Ecto.Multi.update({Ecto.UUID.generate(), "Update password answer"}, answer)
+        end
+    end
   end
 end
