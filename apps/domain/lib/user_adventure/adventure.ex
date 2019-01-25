@@ -220,6 +220,7 @@ defmodule Domain.UserAdventure.Adventure do
           "UserPointUpdated",
           result
           |> Map.put(:completed, user_point.completed)
+          |> Map.from_struct()
         )
     end
   end
