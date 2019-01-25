@@ -22,10 +22,13 @@ defmodule Domain.UserAdventure.Projections.Ranking do
   end
 
   def current_user_ranking(%{id: adventure_id}, %{id: owner_id}) do
-    result = ranking_query(adventure_id)
+    ranking_query(adventure_id)
     |> where([user_ranking], user_ranking.user_id == ^owner_id)
     |> Repository.one()
-    {:ok, result}
+    |> case do
+      nil -> {:error, {:ranking, "not_found"}}
+      result -> {:ok, result}
+    end
   end
 
   defp ranking_query(adventure_id) do
