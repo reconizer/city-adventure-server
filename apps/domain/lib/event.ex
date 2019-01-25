@@ -19,6 +19,10 @@ defmodule Domain.Event do
       def emit(aggregate_struct, event_name, event_data) do
         event_data =
           event_data
+          |> case do
+            %{__struct__: _} = struct -> struct |> Map.from_struct()
+            map -> map
+          end
           |> Enum.map(fn
             {key, %Ecto.Changeset{} = value} -> {key, value |> Ecto.Changeset.apply_changes()}
             other -> other
