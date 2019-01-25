@@ -10,8 +10,8 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :creator_api, CreatorApiWeb.Endpoint,
-  http: [:inet6, port: System.get_env("PORT") || 4000],
-  url: [host: "example.com", port: 80],
+  http: [:inet6, port: 8081],
+  url: [host: "localhost", port: 8081],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
