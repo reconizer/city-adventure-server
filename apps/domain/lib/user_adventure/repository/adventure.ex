@@ -35,7 +35,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
 
   def start_adventure(%{adventure_id: adventure_id} = params, %Contract.User.Profile{id: id}) do
     Multi.new()
-    |> Multi.run(:start_point, fn _ -> get_start_point(adventure_id) end)
+    |> Multi.run(:start_point, fn -> get_start_point(adventure_id) end)
     |> Multi.insert(:user_adventure, build_user_adventure(params, id), returning: true)
     |> Multi.merge(fn %{start_point: start_point} ->
       Multi.new
@@ -106,9 +106,9 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   def load_answers(answer) do
     %Answer{
       sort: answer.sort,
-      type:  answer.type,
+      type: answer.type,
       details: answer.details,
-      point_id:  answer.point_id,
+      point_id: answer.point_id,
       id: answer.id
     }
   end
