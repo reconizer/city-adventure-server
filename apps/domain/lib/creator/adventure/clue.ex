@@ -1,6 +1,6 @@
 defmodule Domain.Creator.Adventure.Clue do
   use Ecto.Schema
-  import Ecto.Changeset, only: [cast: 3, validate_required: 2, cast_embed: 2, apply_changes: 1, validate_change: 3, get_field: 2]
+  import Ecto.Changeset, only: [cast: 3, validate_required: 2, validate_inclusion: 3, cast_embed: 2, apply_changes: 1, validate_change: 3, get_field: 2]
 
   alias Domain.Creator.Adventure
 
@@ -19,15 +19,18 @@ defmodule Domain.Creator.Adventure.Clue do
   @fields ~w(id type description tip sort asset_id point_id)a
   @required_fields @fields -- [:asset_id]
 
+  @available_types ~w(text audio video image url)
+
   def changeset(struct, params) do
     struct
     |> cast(params, @fields)
     |> validate_required(@required_fields)
+    |> validate_inclusion(:type, @available_types)
   end
 
-  def new(%{type: type, description: description, tip: tip, sort: sort, point_id: point_id}) do
+  def new(%{id: id, type: type, description: description, tip: tip, sort: sort, point_id: point_id}) do
     %Adventure.Clue{
-      id: Ecto.UUID.generate()
+      id: id
     }
     |> changeset(%{
       type: type,

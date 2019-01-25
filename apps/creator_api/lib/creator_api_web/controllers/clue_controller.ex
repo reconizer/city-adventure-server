@@ -4,19 +4,67 @@ defmodule CreatorApiWeb.ClueController do
   alias CreatorApiWeb.ClueContract
   alias Domain.Creator
 
+  def item(conn, params) do
+    ClueContract.item(conn, params)
+    |> case do
+      {:ok, params} ->
+        Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
+        |> case do
+          {:ok, adventure} ->
+            adventure
+            |> Creator.Adventure.get_clue(params.id)
+            |> case do
+              {:ok, clue} ->
+                conn
+                |> render("item.json", %{item: clue})
+
+              {:error, errors} ->
+                conn
+                |> handle_errors(errors)
+            end
+
+          {:error, errors} ->
+            conn
+            |> handle_errors(errors)
+        end
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
+
   def create(conn, params) do
     ClueContract.create(conn, params)
     |> case do
       {:ok, params} ->
         Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
         |> Creator.Adventure.add_clue(%{
+          id: params.id,
           point_id: params.point_id,
           type: params.type,
           description: params.description,
           tip: params.tip
         })
         |> Creator.Repository.Adventure.save()
-        |> handle_repository_action(conn)
+        |> case do
+          {:ok, adventure} ->
+            adventure
+            |> Creator.Adventure.get_clue(params.id)
+            |> case do
+              {:ok, clue} ->
+                conn
+                |> render("item.json", %{item: clue})
+
+              {:error, errors} ->
+                conn
+                |> handle_errors(errors)
+            end
+
+          error ->
+            error
+            |> handle_repository_action(conn)
+        end
 
       {:error, errors} ->
         conn

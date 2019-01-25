@@ -55,7 +55,8 @@ defmodule Domain.Creator.Repository.User do
 
   def build_adventure(adventure_model) do
     %Creator.User.Adventure{
-      id: adventure_model.id
+      id: adventure_model.id,
+      name: adventure_model.name
     }
   end
 end

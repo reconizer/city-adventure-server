@@ -1,6 +1,21 @@
 defmodule CreatorApiWeb.ClueContract do
   use CreatorApiWeb, :contract
 
+  def item(conn, params) do
+    params
+    |> with_creator(conn)
+    |> cast(%{
+      creator_id: Ecto.UUID,
+      adventure_id: Ecto.UUID,
+      id: Ecto.UUID
+    })
+    |> validate(%{
+      id: :required,
+      creator_id: :required,
+      adventure_id: :required
+    })
+  end
+
   def create(conn, params) do
     params
     |> with_creator(conn)

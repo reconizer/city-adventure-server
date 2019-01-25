@@ -7,12 +7,13 @@ defmodule Domain.Creator.User.Adventure do
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
+    field(:name, :string)
   end
 
-  @fields ~w(id)a
+  @fields ~w(id name)a
   @required_fields @fields
 
-  @spec changeset(Transfer.t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do
     struct
     |> cast(params, @fields)
