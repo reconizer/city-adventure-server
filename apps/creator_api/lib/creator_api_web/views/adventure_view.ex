@@ -10,7 +10,6 @@ defmodule CreatorApiWeb.AdventureView do
         |> Enum.map(fn point ->
           CreatorApiWeb.PointView.render("item.json", %{item: point})
         end),
-      name: item.name,
       description: item.description,
       language: item.language,
       difficulty_level: item.difficulty_level,
