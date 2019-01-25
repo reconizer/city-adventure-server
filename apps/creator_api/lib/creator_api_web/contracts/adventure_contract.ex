@@ -46,7 +46,11 @@ defmodule CreatorApiWeb.AdventureContract do
       name: :string,
       position: CreatorApi.Type.Position
     })
+    |> default(%{
+      id: Ecto.UUID.generate()
+    })
     |> validate(%{
+      id: :required,
       creator_id: :required,
       name: :required,
       position: :required

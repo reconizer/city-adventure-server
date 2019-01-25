@@ -13,9 +13,11 @@ defmodule CreatorApiWeb.ClueContract do
       tip: :boolean
     })
     |> default(%{
-      tip: false
+      tip: false,
+      id: Ecto.UUID.generate()
     })
     |> validate(%{
+      id: :required,
       adventure_id: :required,
       creator_id: :required,
       point_id: :required,

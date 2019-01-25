@@ -22,7 +22,11 @@ defmodule CreatorApiWeb.QAContract do
       adventure_id: Ecto.UUID,
       content: :string
     })
+    |> default(%{
+      id: Ecto.UUID.generate()
+    })
     |> validate(%{
+      id: :required,
       creator_id: :required,
       adventure_id: :required,
       content: :string
