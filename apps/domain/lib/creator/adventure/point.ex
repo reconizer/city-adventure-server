@@ -13,9 +13,9 @@ defmodule Domain.Creator.Adventure.Point do
     field(:radius, :integer)
     field(:show, :boolean)
 
-    embeds_one(:position, Adventure.Position)
+    embeds_one(:position, Adventure.Position, on_replace: :update)
     embeds_many(:clues, Adventure.Clue)
-    embeds_one(:time_answer, Adventure.TimeAnswer)
+    embeds_one(:time_answer, Adventure.TimeAnswer, on_replace: :update)
     embeds_one(:password_answer, Adventure.PasswordAnswer)
   end
 

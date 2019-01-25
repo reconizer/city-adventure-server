@@ -9,7 +9,7 @@ use Mix.Config
 
 # Configures the endpoint
 config :creator_api, CreatorApiWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: "127.0.0.1"],
   secret_key_base: "lzdFG7k+xDkp0xvu+Odfa5OTRaCd+TWLwqLk1ltmhZNvb4GOWIKey+extDw8+337",
   render_errors: [view: CreatorApiWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: CreatorApi.PubSub, adapter: Phoenix.PubSub.PG2]
