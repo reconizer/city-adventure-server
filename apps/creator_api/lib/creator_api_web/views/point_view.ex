@@ -7,7 +7,6 @@ defmodule CreatorApiWeb.PointView do
       parent_point_id: point.parent_point_id,
       radius: point.radius,
       show: point.show,
-      # answers: point.answers,
       position: %{
         lat: point.position.lat,
         lng: point.position.lng
@@ -16,7 +15,19 @@ defmodule CreatorApiWeb.PointView do
         point.clues
         |> Enum.map(fn clue ->
           CreatorApiWeb.ClueView.render("item.json", %{item: clue})
-        end)
+        end),
+      time_answer: point.time_answer |> build_answer(:time),
+      password_answer: point.password_answer |> build_answer(:password)
     }
+  end
+
+  def build_answer(nil, _), do: nil
+
+  def build_answer(answer, :time) do
+    %{start_time: answer.start_time, duration: answer.duration}
+  end
+
+  def build_answer(answer, :password) do
+    %{type: answer.type, password: answer.password}
   end
 end
