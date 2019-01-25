@@ -52,5 +52,11 @@ defmodule CreatorApiWeb.AuthController do
 
   def logout(conn, params) do
     AuthContract.logout(conn, params)
+    |> case do
+      {:ok, _params} ->
+        conn
+        |> put_view(CreatorApiWeb.CommonView)
+        |> render("empty.json", %{})
+    end
   end
 end

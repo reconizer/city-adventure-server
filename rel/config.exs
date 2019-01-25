@@ -62,7 +62,7 @@ release :app do
       infrastructure: :permanent,
       session: :permanent,
       user_api: :permanent,
-      creator_api: :premanent,
+      creator_api: :permanent,
       seed: :permanent,
       worker: :permanent
     ]
