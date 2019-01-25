@@ -33,7 +33,7 @@ defmodule UserApiWeb.PointController do
          {:ok, adventure} <-
            validate_params
            |> AdventureRepository.get(context["current_user"]),
-         {:ok, _point} <-
+         {:ok, point} <-
            adventure
            |> AdventureDomain.check_point_position(validate_params),
          {:ok, _adventure} <-
@@ -41,10 +41,10 @@ defmodule UserApiWeb.PointController do
            |> AdventureDomain.check_adventure_completed(),
          {:ok, _adventure} <-
            adventure
-           |> AdventureDomain.check_point_completed(validate_params),
-         {:ok, _} <- adventure |> AdventureDomain.check_answer_and_time(validate_params) do
+           |> AdventureDomain.check_point_completed(point),
+         {:ok, _} <- adventure |> AdventureDomain.check_answer_and_time(point) do
       adventure
-      |> AdventureDomain.resolve_point(validate_params, context["current_user"])
+      |> AdventureDomain.resolve_point(validate_params, context["current_user"], point)
       |> case do
         {:error, result} ->
           session |> Session.add_error(result)

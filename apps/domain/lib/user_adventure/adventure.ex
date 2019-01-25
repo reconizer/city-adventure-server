@@ -34,28 +34,24 @@ defmodule Domain.UserAdventure.Adventure do
     |> cast_assoc(:points)
   end
 
-  def resolve_point(adventure, params, user) do
+  def resolve_point(adventure, params, user, point) do
     adventure
-    |> set_current_point_id(params)
+    |> set_current_point_id(point)
     |> set_answer_type_and_last_point()
-    |> add_user_point(params, user)
+    |> add_user_point(params, user, point)
     |> completed_adventure()
     |> create_ranking()
   end
 
-  def check_point_position(%Adventure{} = adventure, %{point_id: point_id, position: %{coordinates: {lng, lat}}}) do
+  def check_point_position(%Adventure{} = adventure, %{position: %{coordinates: {lng, lat}}}) do
     adventure
-    |> get_point!(point_id)
+    |> Map.get(:points)
+    |> Enum.find(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} = point -> 
+      Geocalc.within?(radius, %{lat: p_lat, lng: p_lng}, %{lat: lat, lng: lng})
+    end)
     |> case do
-      nil ->
-        {:error, {:point, "not_found"}}
-
-      %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} = result ->
-        Geocalc.within?(radius, %{lat: p_lat, lng: p_lng}, %{lat: lat, lng: lng})
-        |> case do
-          true -> {:ok, result}
-          false -> {:error, {:point, "not_in_radius"}}
-        end
+      nil -> {:error, {:point, "not_found"}}
+      result -> {:ok, result}
     end
   end
 
@@ -68,7 +64,7 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  def check_point_completed(%Adventure{} = adventure, %{point_id: point_id}) do
+  def check_point_completed(%Adventure{} = adventure, %{id: point_id}) do
     adventure
     |> Map.get(:user_points)
     |> Enum.find(fn user_point ->
@@ -88,7 +84,7 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  def check_answer_and_time(%Adventure{} = adventure, %{point_id: point_id}) do
+  def check_answer_and_time(%Adventure{} = adventure, %{id: point_id}) do
     adventure
     |> get_answers(point_id)
     |> Enum.filter(fn answer ->
@@ -183,11 +179,11 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  defp add_user_point(adventure, params, user) do
+  defp add_user_point(adventure, params, user, point) do
     user_point = %{
       user_id: user.id,
       point_id: adventure.current_point_id,
-      completed: adventure |> point_completed(params),
+      completed: adventure |> point_completed(point, params),
       created_at: NaiveDateTime.utc_now(),
       updated_at: NaiveDateTime.utc_now()
     }
@@ -224,13 +220,14 @@ defmodule Domain.UserAdventure.Adventure do
           "UserPointUpdated",
           result
           |> Map.put(:completed, user_point.completed)
+          |> Map.from_struct()
         )
     end
   end
 
-  defp point_completed(%Adventure{} = adventure, %{point_id: point_id, answer_text: answer_text, answer_type: answer_type}) do
+  defp point_completed(%Adventure{} = adventure, point, %{answer_text: answer_text, answer_type: answer_type}) do
     adventure
-    |> get_answers(point_id)
+    |> get_answers(point.id)
     |> case do
       [] ->
         true
@@ -274,7 +271,7 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  defp set_current_point_id(%Adventure{} = adventure, %{point_id: point_id}) do
+  defp set_current_point_id(%Adventure{} = adventure, %{id: point_id}) do
     adventure
     |> Map.put(:current_point_id, point_id)
   end

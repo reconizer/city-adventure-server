@@ -7,13 +7,12 @@ defmodule Domain.UserAdventure.Answer do
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
-    field(:sort, :integer)
     field(:type, :string)
     field(:details, :map)
     field(:point_id, Ecto.UUID)
   end
 
-  @fields [:details, :type, :sort, :point_id, :id]
+  @fields [:details, :type, :point_id, :id]
   @required_fields @fields
 
   @spec changeset(Answer.t(), map()) :: Ecto.Changeset.t()

@@ -57,10 +57,13 @@ release :app do
     applications: [
       :runtime_tools,
       contract: :permanent,
+      creator_api: :permanent,
       domain: :permanent,
       infrastructure: :permanent,
       session: :permanent,
-      user_api: :permanent
+      user_api: :permanent,
+      seed: :permanent,
+      worker: :permanent
     ]
   )
 end
