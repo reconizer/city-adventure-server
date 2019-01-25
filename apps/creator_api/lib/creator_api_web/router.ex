@@ -51,4 +51,10 @@ defmodule CreatorApiWeb.Router do
       end
     end
   end
+
+  scope "/api/ping", CreatorApiWeb do
+    pipe_through(:api)
+
+    get("/", PingController, :ping)
+  end
 end
