@@ -4,12 +4,43 @@ defmodule CreatorApiWeb.PointController do
   alias CreatorApiWeb.PointContract
   alias Domain.Creator
 
+  def item(conn, params) do
+    PointContract.item(conn, params)
+    |> case do
+      {:ok, params} ->
+        Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
+        |> case do
+          {:ok, adventure} ->
+            adventure
+            |> Creator.Adventure.get_point(params.id)
+            |> case do
+              {:ok, point} ->
+                conn
+                |> render("item.json", %{item: point})
+
+              {:error, errors} ->
+                conn
+                |> handle_errors(errors)
+            end
+
+          {:error, errors} ->
+            conn
+            |> handle_errors(errors)
+        end
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
+
   def create(conn, params) do
     PointContract.create(conn, params)
     |> case do
       {:ok, params} ->
         Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
         |> Creator.Adventure.add_point(%{
+          id: params.id,
           parent_point_id: params.parent_point_id,
           radius: params.radius,
           show: params.show,
@@ -19,7 +50,24 @@ defmodule CreatorApiWeb.PointController do
           }
         })
         |> Domain.Creator.Repository.Adventure.save()
-        |> handle_repository_action(conn)
+        |> case do
+          {:ok, adventure} ->
+            adventure
+            |> Creator.Adventure.get_point(params.id)
+            |> case do
+              {:ok, point} ->
+                conn
+                |> render("item.json", %{item: point})
+
+              {:error, errors} ->
+                conn
+                |> handle_errors(errors)
+            end
+
+          error ->
+            error
+            |> handle_repository_action(conn)
+        end
 
       {:error, errors} ->
         conn

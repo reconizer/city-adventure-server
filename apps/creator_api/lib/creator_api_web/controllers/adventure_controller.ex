@@ -47,7 +47,23 @@ defmodule CreatorApiWeb.AdventureController do
       {:ok, params} ->
         Domain.Creator.Adventure.new(params)
         |> Domain.Creator.Repository.Adventure.save()
-        |> handle_repository_action(conn)
+        |> case do
+          {:ok, _} ->
+            Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.id)
+            |> case do
+              {:ok, adventure} ->
+                conn
+                |> render("item.json", %{item: adventure})
+
+              {:error, errors} ->
+                conn
+                |> handle_errors(errors)
+            end
+
+          error ->
+            error
+            |> handle_repository_action(conn)
+        end
 
       {:error, errors} ->
         conn
