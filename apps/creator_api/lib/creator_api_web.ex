@@ -58,6 +58,13 @@ defmodule CreatorApiWeb do
     end
   end
 
+  def contract do
+    quote do
+      import Contract
+      import CreatorApiWeb.Utils
+    end
+  end
+
   @doc """
   When used, dispatch to the appropriate controller/view/etc.
   """

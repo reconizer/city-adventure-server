@@ -56,16 +56,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
         :radius,
         :parent_point_id,
         :show,
-        :answers
+        :time_answer,
+        :password_answer
       ])
       |> Enum.map(fn
-        {:position, changeset = %Ecto.Changeset{}} ->
-          %{lat: lat, lng: lng} =
-            changeset
-            |> Ecto.Changeset.apply_changes()
-
-          {:position, %Geo.Point{coordinates: {lat, lng}}}
-
         {:position, %{lat: lat, lng: lng}} ->
           {:position, %Geo.Point{coordinates: {lat, lng}}}
 
@@ -73,6 +67,60 @@ defmodule Domain.Creator.EventHandlers.Adventure do
           {key, value}
       end)
       |> Enum.into(%{})
+
+    multi =
+      updates
+      |> case do
+        %{time_answer: time_answer} -> time_answer
+        %{} -> :not_exists
+      end
+      |> case do
+        nil ->
+          answer =
+            Models.Answer
+            |> where([answer], answer.type == "time")
+            |> Repository.get_by(point_id: event.data.id)
+
+          multi
+          |> Ecto.Multi.delete({Ecto.UUID.generate(), event.name}, answer)
+
+        :not_exists ->
+          multi
+
+        time_answer ->
+          Models.Answer
+          |> where([answer], answer.type == "time")
+          |> Repository.get_by(point_id: event.data.id)
+          |> case do
+            nil ->
+              answer =
+                %Models.Answer{}
+                |> Models.Answer.changeset(%{
+                  point_id: event.data.id,
+                  type: "time",
+                  details: %{
+                    start_time: time_answer.start_time,
+                    duration: time_answer.duration
+                  }
+                })
+
+              multi
+              |> Ecto.Multi.insert({Ecto.UUID.generate(), event.name}, answer)
+
+            answer ->
+              answer =
+                answer
+                |> Models.Answer.changeset(%{
+                  details: %{
+                    start_time: time_answer.start_time,
+                    duration: time_answer.duration
+                  }
+                })
+
+              multi
+              |> Ecto.Multi.update({Ecto.UUID.generate(), event.name}, answer)
+          end
+      end
 
     point =
       Models.Point
