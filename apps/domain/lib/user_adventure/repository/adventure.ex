@@ -105,7 +105,6 @@ defmodule Domain.UserAdventure.Repository.Adventure do
 
   def load_answers(answer) do
     %Answer{
-      sort: answer.sort,
       type: answer.type,
       details: answer.details,
       point_id: answer.point_id,
