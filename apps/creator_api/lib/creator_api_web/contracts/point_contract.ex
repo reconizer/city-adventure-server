@@ -14,9 +14,11 @@ defmodule CreatorApiWeb.PointContract do
     })
     |> default(%{
       show: false,
-      radius: 10
+      radius: 10,
+      id: Ecto.UUID.generate()
     })
     |> validate(%{
+      id: :required,
       creator_id: :required,
       adventure_id: :required,
       position: :required,

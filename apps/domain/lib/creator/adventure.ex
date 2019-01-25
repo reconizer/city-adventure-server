@@ -39,9 +39,9 @@ defmodule Domain.Creator.Adventure do
     |> cast_embed(:points)
   end
 
-  def new(%{name: name, creator_id: creator_id, position: %{lat: lat, lng: lng}}) do
+  def new(%{id: id, name: name, creator_id: creator_id, position: %{lat: lat, lng: lng}}) do
     %Adventure{
-      id: Ecto.UUID.generate()
+      id: id
     }
     |> changeset(%{
       creator_id: creator_id,
@@ -102,12 +102,14 @@ defmodule Domain.Creator.Adventure do
   def add_point({:error, _} = error, _), do: error
 
   def add_point(adventure, %{
+        id: id,
         position: %{lat: lat, lng: lng},
         radius: radius,
         parent_point_id: parent_point_id,
         show: show
       }) do
     Adventure.Point.new(%{
+      id: id,
       parent_point_id: parent_point_id,
       radius: radius,
       lat: lat,
@@ -188,12 +190,13 @@ defmodule Domain.Creator.Adventure do
   def add_clue({:ok, adventure}, clue_params), do: add_clue(adventure, clue_params)
   def add_clue({:error, _} = error, _), do: error
 
-  def add_clue(adventure, %{point_id: point_id, type: type, description: description, tip: tip}) do
+  def add_clue(adventure, %{id: id, point_id: point_id, type: type, description: description, tip: tip}) do
     adventure
     |> get_point(point_id)
     |> case do
       {:ok, point} ->
         Adventure.Clue.new(%{
+          id: id,
           point_id: point_id,
           type: type,
           description: description,
