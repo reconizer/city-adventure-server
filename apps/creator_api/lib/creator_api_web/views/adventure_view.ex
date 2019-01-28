@@ -28,7 +28,11 @@ defmodule CreatorApiWeb.AdventureView do
   def adventure_list_item(adventure) do
     %{
       id: adventure.id,
-      name: adventure.name
+      name: adventure.name,
+      show: adventure.show,
+      rating: adventure.rating,
+      status: adventure.status,
+      coverl_url: asset_url(adventure.asset)
     }
   end
 end

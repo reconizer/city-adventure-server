@@ -1,25 +1,19 @@
-defmodule Domain.Creator.User.Adventure do
+defmodule Domain.Creator.User.Asset do
   use Ecto.Schema
-  use Domain.Event, "Creator.User"
   import Ecto.Changeset
-
-  alias Domain.Creator.User
 
   @type t :: %__MODULE__{}
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
+    field(:type, :string)
     field(:name, :string)
-    field(:rating, :decimal)
-    field(:show, :boolean)
-    field(:status, :string)
-    embeds_one(:asset, User.Asset)
+    field(:extension, :string)
   end
 
-  @fields ~w(id name)a
+  @fields ~w(id type name extension)a
   @required_fields @fields
 
-  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do
     struct
     |> cast(params, @fields)

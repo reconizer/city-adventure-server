@@ -2,8 +2,8 @@ use Mix.Config
 
 config :infrastructure, Infrastructure.Repository,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "developer",
+  password: "developer",
   database: "gameinn_2_test",
   hostname: "localhost",
   port: 5433,

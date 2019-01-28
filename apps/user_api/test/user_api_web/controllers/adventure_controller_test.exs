@@ -43,7 +43,7 @@ defmodule UserApiWeb.AdventureControllerTest do
       }
       conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
       conn = get conn, "/api/adventures/", params
-      assert json_response(conn, 422) == %{"position" => "can't be blank"}
+      assert json_response(conn, 422) == %{"position" => ["can't be blank"]}
     end
 
   end
@@ -75,7 +75,7 @@ defmodule UserApiWeb.AdventureControllerTest do
       }
       conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
       conn = get conn, "/api/adventures/#{Ecto.UUID.generate()}", params
-      assert json_response(conn, 422) == %{"adventure" => "not_found"}
+      assert json_response(conn, 422) == %{"adventure" => ["not_found"]}
     end
 
     test "- adventure not published",  %{conn: conn, adventure_pub: adventure} do
@@ -84,7 +84,7 @@ defmodule UserApiWeb.AdventureControllerTest do
       }
       conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
       conn = get conn, "/api/adventures/#{adventure.id}", params 
-      assert json_response(conn, 422) == %{"adventure" => "not_found"}
+      assert json_response(conn, 422) == %{"adventure" => ["not_found"]}
     end
     
   end
