@@ -28,7 +28,8 @@ defmodule Domain.Creator.Repository.Adventure do
     %Creator.Adventure{
       id: adventure_model.id,
       name: adventure_model.name,
-      creator_id: adventure_model.creator_id
+      creator_id: adventure_model.creator_id,
+      status: adventure_model.status
     }
     |> Creator.Adventure.set_points(Enum.map(adventure_model.points, &build_point/1))
     |> case do

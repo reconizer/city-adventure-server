@@ -15,7 +15,8 @@ defmodule CreatorApiWeb.AdventureView do
       difficulty_level: item.difficulty_level,
       min_time: item.min_time,
       max_time: item.max_time,
-      show: item.show
+      show: item.show,
+      status: item.status
     }
   end
 
