@@ -39,6 +39,7 @@ defmodule CreatorApiWeb.Router do
       end
 
       scope "/points" do
+        get("/", PointController, :list)
         get("/:id", PointController, :item)
         post("/", PointController, :create)
         patch("/", PointController, :update)
