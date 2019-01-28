@@ -1,6 +1,19 @@
 defmodule CreatorApiWeb.PointContract do
   use CreatorApiWeb, :contract
 
+  def list(conn, params) do
+    params
+    |> with_creator(conn)
+    |> cast(%{
+      creator_id: Ecto.UUID,
+      adventure_id: Ecto.UUID
+    })
+    |> validate(%{
+      creator_id: :required,
+      adventure_id: :required
+    })
+  end
+
   def item(conn, params) do
     params
     |> with_creator(conn)

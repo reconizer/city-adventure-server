@@ -6,6 +6,26 @@ defmodule Domain.Creator.EventHandlers.Adventure do
 
   alias Infrastructure.Repository
 
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "SentToReview"} = event) do
+    adventure =
+      Models.Adventure
+      |> Repository.get(event.aggregate_id)
+      |> Models.Adventure.changeset(%{status: "in_review"})
+
+    multi
+    |> Ecto.Multi.update({event.id, event.name}, adventure)
+  end
+
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "SentToPending"} = event) do
+    adventure =
+      Models.Adventure
+      |> Repository.get(event.aggregate_id)
+      |> Models.Adventure.changeset(%{status: "pending"})
+
+    multi
+    |> Ecto.Multi.update({event.id, event.name}, adventure)
+  end
+
   def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "Created"} = event) do
     event.data
     |> case do

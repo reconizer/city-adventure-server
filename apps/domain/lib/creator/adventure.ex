@@ -1,7 +1,7 @@
 defmodule Domain.Creator.Adventure do
   use Ecto.Schema
   use Domain.Event, "Creator.Adventure"
-  import Ecto.Changeset, only: [cast: 3, validate_required: 2, cast_embed: 2, apply_changes: 1, validate_change: 3, get_field: 2]
+  import Ecto.Changeset, only: [cast: 3, validate_inclusion: 3, validate_required: 2, cast_embed: 2, apply_changes: 1, validate_change: 3, get_field: 2]
 
   alias Domain.Creator.Adventure
 
@@ -23,12 +23,13 @@ defmodule Domain.Creator.Adventure do
     field(:min_time, :time)
     field(:max_time, :time)
     field(:show, :boolean)
+    field(:status, :string)
     embeds_many(:points, Adventure.Point)
 
     aggregate_fields()
   end
 
-  @fields ~w(id name creator_id description language difficulty_level min_time max_time show)a
+  @fields ~w(id name creator_id description language difficulty_level min_time max_time show status)a
   @required_fields ~w(id name creator_id)a
 
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
@@ -44,6 +45,7 @@ defmodule Domain.Creator.Adventure do
       id: id
     }
     |> changeset(%{
+      status: "pending",
       creator_id: creator_id,
       name: name
     })
@@ -78,6 +80,78 @@ defmodule Domain.Creator.Adventure do
 
         {:ok, adventure}
     end
+  end
+
+  @spec send_to_review(aggregate) :: aggregate
+  def send_to_review({:ok, adventure}), do: send_to_review(adventure)
+  def send_to_review({:error, _} = error), do: error
+
+  def send_to_review(adventure) do
+    adventure
+    |> can_be_sent_to_review?
+    |> case do
+      true ->
+        adventure
+        |> changeset(%{
+          status: "in_review"
+        })
+        |> case do
+          %{valid?: true} = changeset ->
+            changeset
+            |> apply_changes
+            |> emit("SentToReview", changeset.changes)
+
+          changeset ->
+            {:error, changeset}
+        end
+
+      false ->
+        {:error, {:adventure_id, "cannot be sent to in review state"}}
+    end
+  end
+
+  @spec send_to_pending(aggregate) :: aggregate
+  def send_to_pending({:ok, adventure}), do: send_to_pending(adventure)
+  def send_to_pending({:error, _} = error), do: error
+
+  def send_to_pending(adventure) do
+    adventure
+    |> can_be_sent_to_pending?
+    |> case do
+      true ->
+        adventure
+        |> changeset(%{
+          status: "pending"
+        })
+        |> case do
+          %{valid?: true} = changeset ->
+            changeset
+            |> apply_changes
+            |> emit("SentToPending", changeset.changes)
+
+          changeset ->
+            {:error, changeset}
+        end
+
+      false ->
+        {:error, {:adventure_id, "cannot be sent to pending state"}}
+    end
+  end
+
+  @spec can_be_sent_to_pending?(aggregate) :: true | false | error
+  def can_be_sent_to_pending?({:ok, adventure}), do: can_be_sent_to_pending?(adventure)
+  def can_be_sent_to_pending?({:error, _} = error), do: error
+
+  def can_be_sent_to_pending?(adventure) do
+    adventure.status in ["rejected", "unpublished"]
+  end
+
+  @spec can_be_sent_to_review?(aggregate) :: true | false | error
+  def can_be_sent_to_review?({:ok, adventure}), do: can_be_sent_to_review?(adventure)
+  def can_be_sent_to_review?({:error, _} = error), do: error
+
+  def can_be_sent_to_review?(adventure) do
+    adventure.status == "pending"
   end
 
   @spec change(aggregate(), Map.t()) :: t() | error
@@ -362,7 +436,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec do_add_clue(aggregate, Ecto.UUID.t(), Adventure.Clue.t()) :: t() | {:error, any}
+  @spec do_add_clue(aggregate, Ecto.UUID.t(), Adventure.Clue.t()) :: t() | error
   def do_add_clue({:ok, adventure}, point_id, clue), do: do_add_clue(adventure, point_id, clue)
   def do_add_clue({:error, _} = error, _, _), do: error
 
