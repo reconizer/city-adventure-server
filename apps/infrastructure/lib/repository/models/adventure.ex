@@ -9,7 +9,9 @@ defmodule Infrastructure.Repository.Models.Adventure do
     Asset,
     Image,
     UserAdventure,
-    Creator
+    AdventureRating,
+    Creator,
+    CreatorAdventureRating
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -30,9 +32,11 @@ defmodule Infrastructure.Repository.Models.Adventure do
 
     belongs_to(:asset, Asset)
     belongs_to(:creator, Creator)
+    has_one(:creator_adventure_rating, CreatorAdventureRating)
     has_many(:points, Point)
     has_many(:images, Image)
     has_many(:user_adventures, UserAdventure)
+    has_many(:adventure_ratings, AdventureRating)
     has_many(:user_points, through: [:points, :user_points])
   end
 
