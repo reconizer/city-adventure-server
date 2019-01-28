@@ -34,6 +34,27 @@ defmodule CreatorApiWeb.PointController do
     end
   end
 
+  def list(conn, params) do
+    PointContract.list(conn, params)
+    |> case do
+      {:ok, params} ->
+        Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
+        |> case do
+          {:ok, adventure} ->
+            conn
+            |> render("list.json", %{list: adventure.points})
+
+          {:error, errors} ->
+            conn
+            |> handle_errors(errors)
+        end
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
+
   def create(conn, params) do
     PointContract.create(conn, params)
     |> case do

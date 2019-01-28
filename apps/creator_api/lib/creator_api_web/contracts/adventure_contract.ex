@@ -76,4 +76,30 @@ defmodule CreatorApiWeb.AdventureContract do
       adventure_id: :required
     })
   end
+
+  def send_to_pending(conn, params) do
+    params
+    |> with_creator(conn)
+    |> cast(%{
+      creator_id: Ecto.UUID,
+      adventure_id: Ecto.UUID
+    })
+    |> validate(%{
+      creator_id: :required,
+      adventure_id: :required
+    })
+  end
+
+  def send_to_review(conn, params) do
+    params
+    |> with_creator(conn)
+    |> cast(%{
+      creator_id: Ecto.UUID,
+      adventure_id: Ecto.UUID
+    })
+    |> validate(%{
+      creator_id: :required,
+      adventure_id: :required
+    })
+  end
 end

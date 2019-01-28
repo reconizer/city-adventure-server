@@ -21,6 +21,13 @@ defmodule CreatorApiWeb.PointView do
     }
   end
 
+  def render("list.json", %{list: list}) do
+    list
+    |> Enum.map(fn point ->
+      render("item.json", %{item: point})
+    end)
+  end
+
   def build_answer(nil, _), do: nil
 
   def build_answer(answer, :time) do

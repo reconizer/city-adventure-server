@@ -23,6 +23,9 @@ defmodule CreatorApiWeb.Router do
         patch("/", AdventureController, :update)
         post("/", AdventureController, :create)
 
+        post("/send_to_pending", AdventureController, :send_to_pending)
+        post("/send_to_review", AdventureController, :send_to_review)
+
         get("/:adventure_id/qa", QAController, :list)
         post("/:adventure_id/qa", QAController, :create)
       end
@@ -36,6 +39,7 @@ defmodule CreatorApiWeb.Router do
       end
 
       scope "/points" do
+        get("/", PointController, :list)
         get("/:id", PointController, :item)
         post("/", PointController, :create)
         patch("/", PointController, :update)

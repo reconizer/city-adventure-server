@@ -85,4 +85,34 @@ defmodule CreatorApiWeb.AdventureController do
         |> handle_errors(errors)
     end
   end
+
+  def send_to_pending(conn, params) do
+    AdventureContract.send_to_pending(conn, params)
+    |> case do
+      {:ok, params} ->
+        Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
+        |> Domain.Creator.Adventure.send_to_pending()
+        |> Domain.Creator.Repository.Adventure.save()
+        |> handle_repository_action(conn)
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
+
+  def send_to_review(conn, params) do
+    AdventureContract.send_to_review(conn, params)
+    |> case do
+      {:ok, params} ->
+        Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
+        |> Domain.Creator.Adventure.send_to_review()
+        |> Domain.Creator.Repository.Adventure.save()
+        |> handle_repository_action(conn)
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
 end

@@ -26,6 +26,7 @@ defmodule Infrastructure.Repository.Models.Adventure do
     field(:max_time, :time)
     field(:name, :string)
     field(:published, :boolean)
+    field(:status, :string)
     field(:show, :boolean)
 
     timestamps()
@@ -44,7 +45,7 @@ defmodule Infrastructure.Repository.Models.Adventure do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(id description code language difficulty_level min_time max_time published show name creator_id asset_id)a
+  @params ~w(id description code language difficulty_level min_time max_time published show name creator_id asset_id status)a
   @required_params ~w(name)a
 
   def changeset(model, params \\ %{}) do
