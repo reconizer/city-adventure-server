@@ -52,7 +52,7 @@ defmodule Domain.Creator.Repository.Adventure do
     }
   end
 
-  def build_position(%{coordinates: {lat, lng}} = _position) do
+  def build_position(%{coordinates: {lng, lat}} = _position) do
     %Creator.Adventure.Position{
       lat: lat,
       lng: lng
