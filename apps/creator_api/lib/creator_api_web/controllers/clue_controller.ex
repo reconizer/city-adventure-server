@@ -44,7 +44,8 @@ defmodule CreatorApiWeb.ClueController do
           point_id: params.point_id,
           type: params.type,
           description: params.description,
-          tip: params.tip
+          tip: params.tip,
+          url: Map.get(params, :url)
         })
         |> Creator.Repository.Adventure.save()
         |> case do

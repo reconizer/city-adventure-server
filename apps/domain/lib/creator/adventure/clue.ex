@@ -14,10 +14,11 @@ defmodule Domain.Creator.Adventure.Clue do
     field(:tip, :boolean)
     field(:sort, :integer)
     field(:asset_id, :binary_id)
+    field(:url, :string)
   end
 
-  @fields ~w(id type description tip sort asset_id point_id)a
-  @required_fields @fields -- [:asset_id]
+  @fields ~w(id type description tip sort asset_id point_id url)a
+  @required_fields @fields -- [:asset_id, :url]
 
   @available_types ~w(text audio video image url)
 
@@ -28,7 +29,7 @@ defmodule Domain.Creator.Adventure.Clue do
     |> validate_inclusion(:type, @available_types)
   end
 
-  def new(%{id: id, type: type, description: description, tip: tip, sort: sort, point_id: point_id}) do
+  def new(%{id: id, type: type, description: description, tip: tip, sort: sort, point_id: point_id, url: url}) do
     %Adventure.Clue{
       id: id
     }
@@ -37,7 +38,8 @@ defmodule Domain.Creator.Adventure.Clue do
       description: description,
       tip: tip,
       sort: sort,
-      point_id: point_id
+      point_id: point_id,
+      url: url
     })
     |> case do
       %{valid?: true} = changeset ->

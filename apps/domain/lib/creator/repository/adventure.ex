@@ -97,7 +97,8 @@ defmodule Domain.Creator.Repository.Adventure do
       tip: clue_model.tip,
       point_id: clue_model.point_id,
       description: clue_model.description,
-      asset_id: clue_model.asset_id
+      asset_id: clue_model.asset_id,
+      url: clue_model.url
     }
   end
 
