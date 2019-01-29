@@ -17,7 +17,6 @@ defmodule Domain.Creator.User.Adventure do
     field(:show, :boolean)
     field(:status, :string)
     embeds_one(:asset, User.Asset)
-    embeds_many(:images, User.Image)
   end
 
   @fields ~w(id name)a

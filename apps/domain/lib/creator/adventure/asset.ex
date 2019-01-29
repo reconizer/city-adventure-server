@@ -1,4 +1,4 @@
-defmodule Domain.Creator.User.Image do
+defmodule Domain.Creator.Adventure.Asset do
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -24,7 +24,10 @@ defmodule Domain.Creator.Adventure do
     field(:max_time, :time)
     field(:show, :boolean)
     field(:status, :string)
+    field(:rating, :decimal)
     embeds_many(:points, Adventure.Point)
+    embeds_one(:asset, Adventure.Asset)
+    embeds_many(:images, Adventure.Image)
 
     aggregate_fields()
   end

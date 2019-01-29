@@ -4,9 +4,9 @@ defmodule CreatorApiWeb.PointView do
   def render("item.json", %{item: point}) do
     %{
       id: point.id,
-      parent_point_id: point.parent_point_id,
+      parent_id: point.parent_point_id,
       radius: point.radius,
-      show: point.show,
+      shown: point.show,
       position: %{
         lat: point.position.lat,
         lng: point.position.lng

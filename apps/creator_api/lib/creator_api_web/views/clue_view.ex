@@ -5,10 +5,11 @@ defmodule CreatorApiWeb.ClueView do
     %{
       id: clue.id,
       type: clue.type,
+      point_id: clue.poinr_id,
       description: clue.description,
-      sort: clue.sort,
+      order: clue.sort,
       tip: clue.tip,
-      asset_id: clue.asset_id
+      url: clue.url
     }
   end
 end

@@ -10,6 +10,9 @@ defmodule Domain.Creator.Repository.Adventure do
   def get(id) do
     Models.Adventure
     |> preload(points: [:answers, :clues])
+    |> preload(:asset)
+    |> preload([images: :asset])
+    |> preload(:creator_adventure_rating)
     |> Repository.get(id)
     |> case do
       nil -> {:error, :not_found}
@@ -28,8 +31,17 @@ defmodule Domain.Creator.Repository.Adventure do
     %Creator.Adventure{
       id: adventure_model.id,
       name: adventure_model.name,
+      description: adventure_model.description,
+      language: adventure_model.language,
+      show: adventure_model.show,
+      difficulty_level: adventure_model.difficulty_level,
+      max_time: adventure_model.max_time |> parse_time_to_seconds(),
+      min_time: adventure_model.min_time |> parse_time_to_seconds(),
       creator_id: adventure_model.creator_id,
-      status: adventure_model.status
+      status: adventure_model.status,
+      rating: adventure_model.creator_adventure_rating |> adventure_rating(),
+      asset: adventure_model.asset |> build_asset(),
+      images: adventure_model.images |> Enum.map(&build_image/1)
     }
     |> Creator.Adventure.set_points(Enum.map(adventure_model.points, &build_point/1))
     |> case do
@@ -88,4 +100,36 @@ defmodule Domain.Creator.Repository.Adventure do
       asset_id: clue_model.asset_id
     }
   end
+
+  defp build_asset(nil), do: nil
+  defp build_asset(asset_model) do
+    %Creator.Adventure.Asset{
+      id: asset_model.id,
+      type: asset_model.type,
+      name: asset_model.name,
+      extension: asset_model.extension
+    }
+  end
+
+  defp build_image(nil), do: nil
+  defp build_image(image_model) do
+    %Creator.Adventure.Image{
+      id: image_model.id,
+      sort: image_model.sort,
+      asset: image_model.asset |> build_asset()
+    }
+  end
+
+  defp adventure_rating(nil), do: nil
+  defp adventure_rating(%{rating: rating}) do
+    rating
+  end
+
+  defp parse_time_to_seconds(nil), do: nil
+  defp parse_time_to_seconds(time) do
+    time 
+    |> Time.to_erl() 
+    |> :calendar.time_to_seconds()
+  end
+
 end
