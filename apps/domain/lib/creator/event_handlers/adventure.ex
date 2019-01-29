@@ -81,7 +81,7 @@ defmodule Domain.Creator.EventHandlers.Adventure do
       ])
       |> Enum.map(fn
         {:position, %{lat: lat, lng: lng}} ->
-          {:position, %Geo.Point{coordinates: {lat, lng}}}
+          {:position, %Geo.Point{coordinates: {lng, lat}}}
 
         {key, value} ->
           {key, value}
@@ -118,7 +118,7 @@ defmodule Domain.Creator.EventHandlers.Adventure do
             radius: radius,
             parent_point_id: parent_point_id,
             adventure_id: event.aggregate_id,
-            position: %Geo.Point{coordinates: {lat, lng}}
+            position: %Geo.Point{coordinates: {lng, lat}}
           })
 
         multi
