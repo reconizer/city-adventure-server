@@ -1,4 +1,9 @@
 defmodule Contract do
+  @type validate_params_t :: %{required(atom()) => any()}
+  @type error :: {:error, any()}
+  @type validate_params :: validate_params | {:ok, validate_params} | error
+  @type validate_result :: {:ok, Ecto.Changeset.t()} | error
+
   defmacro __using__(_) do
     quote do
       import Ecto.Changeset
@@ -51,22 +56,30 @@ defmodule Contract do
   end
 
   def cast(params, types) do
+    type_keys = types |> Map.keys() |> Enum.map(&"#{&1}")
+
     initial =
       params
-      |> Enum.map(fn {key, _value} ->
-        {key |> String.to_existing_atom(), nil}
+      |> Enum.map(fn
+        {key, _value} when is_atom(key) ->
+          {key, nil}
+
+        {key, _value} when is_bitstring(key) ->
+          (key in type_keys)
+          |> case do
+            true ->
+              {key |> String.to_existing_atom(), nil}
+            false ->
+              nil
+          end
       end)
+      |> Enum.filter(& &1)
       |> Enum.into(%{})
 
     {initial, types}
     |> Ecto.Changeset.cast(params, Map.keys(types))
     |> resolve_changeset
   end
-
-  @type validate_params_t :: %{required(atom()) => any()}
-  @type error :: {:error, any()}
-  @type validate_params :: validate_params | {:ok, validate_params} | error
-  @type validate_result :: {:ok, Ecto.Changeset.t()} | error
 
   @spec validate(validate_params, Map.t()) :: validate_result
   def validate({:ok, params}, validations) do

@@ -50,9 +50,6 @@ defmodule Domain.Event do
               %{operations: current_operations} ->
                 {:ok, %{aggregate_struct | operations: current_operations |> Ecto.Multi.append(multi), events: aggregate_struct.events ++ [event]}}
             end
-
-          {:error, _} = error ->
-            error
         end
       end
     end
