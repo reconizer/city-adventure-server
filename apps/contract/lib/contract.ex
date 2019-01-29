@@ -78,7 +78,7 @@ defmodule Contract do
   end
 
   def validate(params, validations) do
-    param_keys = for key <- params |> Map.keys(), do: {key |> String.to_existing_atom(), :any}, into: %{}
+    param_keys = for key <- params |> Map.keys(), do: {key, :any}, into: %{}
     validation_keys = for key <- validations |> Map.keys(), do: {key, :any}, into: %{}
 
     keys = Map.merge(param_keys, validation_keys)
