@@ -1,6 +1,6 @@
 defmodule Domain.Creator.Adventure.Clue do
   use Ecto.Schema
-  import Ecto.Changeset, only: [cast: 3, validate_required: 2, validate_inclusion: 3, cast_embed: 2, apply_changes: 1, validate_change: 3, get_field: 2]
+  import Ecto.Changeset, only: [cast: 3, validate_required: 2, validate_inclusion: 3, apply_changes: 1]
 
   alias Domain.Creator.Adventure
 

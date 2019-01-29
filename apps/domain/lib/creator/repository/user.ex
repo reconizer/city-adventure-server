@@ -12,28 +12,14 @@ defmodule Domain.Creator.Repository.User do
     |> join(:left, [creator], adventures in assoc(creator, :adventures))
     |> join(:left, [creator, adventures], asset in assoc(adventures, :asset))
     |> join(:left, [creator, adventures, asset], rating in assoc(adventures, :creator_adventure_rating))
-    |> preload([creator, adventures, asset, rating], [adventures: {adventures, [asset: asset, creator_adventure_rating: rating]}])
+    |> join(:left, [creator, adventures, asset, rating], images in assoc(adventures, :images))
+    |> preload([creator, adventures, asset, rating, images], [adventures: {adventures, [asset: asset, creator_adventure_rating: rating, images: images]}])
     |> Repository.get(id)
     |> case do
       nil -> {:error, :not_found}
       user -> {:ok, user |> build_creator}
     end
   end
-
-  # def get_creator_adventures(id) do
-  #   from(creator in Models.Creator,
-  #     join: adventures in assoc(creator, :adventures),
-  #     left_join: asset in assoc(adventures, :asset),
-  #     left_join: rating in assoc(adventures, :creator_adventure_rating),
-  #     preload: [adventures: {adventures, [asset: asset, creator_adventure_rating: rating]}], 
-  #     where: creator.id == ^id
-  #   )
-  #   |> Repository.one()
-  #   |> case do
-  #     nil -> {:error, :not_found}
-  #     user -> {:ok, user |> build_creator}
-  #   end
-  # end
 
   def get!(id) do
     get(id)
@@ -47,8 +33,9 @@ defmodule Domain.Creator.Repository.User do
     |> join(:left, [creator], adventures in assoc(creator, :adventures))
     |> join(:left, [creator, adventures], asset in assoc(adventures, :asset))
     |> join(:left, [creator, adventures, asset], rating in assoc(adventures, :creator_adventure_rating))
-    |> where([creator, adventures, asset, rating], ilike(creator.email, ^email))
-    |> preload([creator, adventures, asset, rating], [adventures: {adventures, [asset: asset, creator_adventure_rating: rating]}])
+    |> join(:left, [creator, adventures, asset, rating], images in assoc(adventures, :images))
+    |> where([creator, adventures, asset, rating, images], ilike(creator.email, ^email))
+    |> preload([creator, adventures, asset, rating, images], [adventures: {adventures, [asset: asset, creator_adventure_rating: rating, images: images]}])
     |> Repository.one()
     |> case do
       nil ->

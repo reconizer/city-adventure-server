@@ -1,4 +1,4 @@
-defmodule Domain.Creator.Adventure.Answer do
+defmodule Domain.Creator.User.Image do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,10 +7,11 @@ defmodule Domain.Creator.Adventure.Answer do
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
     field(:type, :string)
-    field(:details, :map)
+    field(:name, :string)
+    field(:extension, :string)
   end
 
-  @fields ~w(id type details)a
+  @fields ~w(id type name extension)a
   @required_fields @fields
 
   def changeset(struct, params) do

@@ -63,6 +63,12 @@ defmodule Contract do
     |> resolve_changeset
   end
 
+  @type validate_params_t :: %{required(atom()) => any()}
+  @type error :: {:error, any()}
+  @type validate_params :: validate_params | {:ok, validate_params} | error
+  @type validate_result :: {:ok, Ecto.Changeset.t()} | error
+
+  @spec validate(validate_params, Map.t()) :: validate_result
   def validate({:ok, params}, validations) do
     validate(params, validations)
   end
@@ -79,8 +85,8 @@ defmodule Contract do
 
     initial =
       params
-      |> Enum.map(fn {key, _value} ->
-        {key |> String.to_existing_atom(), nil}
+      |> Enum.map(fn
+        {key, _value} -> {key, nil}
       end)
       |> Enum.into(%{})
 

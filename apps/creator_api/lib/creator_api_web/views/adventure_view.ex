@@ -12,10 +12,12 @@ defmodule CreatorApiWeb.AdventureView do
         end),
       description: item.description,
       language: item.language,
-      difficulty_level: item.difficulty_level,
-      min_time: item.min_time,
-      max_time: item.max_time,
-      show: item.show,
+      difficulty: item.difficulty_level,
+      duration: %{
+        min: item.min_time,
+        max: item.max_time
+      },
+      shown: item.show,
       status: item.status
     }
   end
@@ -29,7 +31,7 @@ defmodule CreatorApiWeb.AdventureView do
     %{
       id: adventure.id,
       name: adventure.name,
-      show: adventure.show,
+      shown: adventure.show,
       rating: adventure.rating,
       status: adventure.status,
       coverl_url: asset_url(adventure.asset)

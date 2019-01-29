@@ -6,6 +6,9 @@ defmodule Domain.Creator.User.Adventure do
   alias Domain.Creator.User
 
   @type t :: %__MODULE__{}
+  @type ok_t :: t | {:ok, %__MODULE__{}}
+  @type error :: {:error, any()}
+  @type aggregate :: ok_t() | error
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
@@ -14,6 +17,7 @@ defmodule Domain.Creator.User.Adventure do
     field(:show, :boolean)
     field(:status, :string)
     embeds_one(:asset, User.Asset)
+    embeds_many(:images, User.Image)
   end
 
   @fields ~w(id name)a
