@@ -2,10 +2,6 @@ defmodule Domain.Creator.EventHandlers.User do
   use Domain.EventHandler
   use Infrastructure.Repository.Models
 
-  import Ecto.Query
-
-  alias Infrastructure.Repository
-
   def process(multi, %Domain.Event{aggregate_name: "Creator.User", name: "Created"} = event) do
     event.data
     |> case do

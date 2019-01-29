@@ -1,6 +1,6 @@
 defmodule Domain.Creator.Adventure.PasswordAnswer do
   use Ecto.Schema
-  import Ecto.Changeset, only: [cast: 3, validate_required: 2, cast_embed: 2, apply_changes: 1, validate_change: 3, get_field: 2, validate_inclusion: 3]
+  import Ecto.Changeset, only: [cast: 3, validate_required: 2, apply_changes: 1, validate_inclusion: 3]
 
   alias Domain.Creator.Adventure
 
