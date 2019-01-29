@@ -69,6 +69,7 @@ defmodule Contract do
           |> case do
             true ->
               {key |> String.to_existing_atom(), nil}
+
             false ->
               nil
           end

@@ -43,6 +43,8 @@ environment :prod do
       migrate: "rel/commands/migrate.sh"
     ]
   )
+
+  set(run_erl_env: "RUN_ERL_LOG_MAXSIZE=10000000 RUN_ERL_LOG_GENERATIONS=10")
 end
 
 # You may define one or more releases in this file.
