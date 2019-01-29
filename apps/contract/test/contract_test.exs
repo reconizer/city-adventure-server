@@ -9,8 +9,8 @@ defmodule ContractTest do
     assert {:error, _} = params |> Contract.cast(%{bar: :string})
   end
 
-  test "validate/2" do
-    params = %{"foo" => 2}
+  test "validate/2 with atom keys" do
+    params = %{foo: 2}
 
     assert {:ok, _} = params |> Contract.validate(%{foo: :required})
     assert {:error, _} = params |> Contract.validate(%{bar: :required})

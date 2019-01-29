@@ -4,6 +4,9 @@ defmodule Domain.Creator.User.Adventure do
   import Ecto.Changeset
 
   @type t :: %__MODULE__{}
+  @type ok_t :: t | {:ok, %__MODULE__{}}
+  @type error :: {:error, any()}
+  @type aggregate :: ok_t() | error
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
