@@ -150,7 +150,8 @@ defmodule Domain.Creator.EventHandlers.Adventure do
         type: type,
         description: description,
         tip: tip,
-        sort: sort
+        sort: sort,
+        url: url
       } ->
         point =
           %Models.Clue{}
@@ -160,7 +161,8 @@ defmodule Domain.Creator.EventHandlers.Adventure do
             type: type,
             description: description,
             tip: tip,
-            sort: sort
+            sort: sort,
+            url: url
           })
 
         multi
@@ -192,7 +194,8 @@ defmodule Domain.Creator.EventHandlers.Adventure do
         :description,
         :tip,
         :sort,
-        :asset_id
+        :asset_id,
+        :url
       ])
 
     clue =

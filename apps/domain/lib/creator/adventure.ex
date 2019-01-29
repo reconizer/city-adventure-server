@@ -265,7 +265,7 @@ defmodule Domain.Creator.Adventure do
   def add_clue({:ok, adventure}, clue_params), do: add_clue(adventure, clue_params)
   def add_clue({:error, _} = error, _), do: error
 
-  def add_clue(adventure, %{id: id, point_id: point_id, type: type, description: description, tip: tip}) do
+  def add_clue(adventure, %{id: id, point_id: point_id, type: type, description: description, tip: tip} = params) do
     adventure
     |> get_point(point_id)
     |> case do
@@ -276,6 +276,7 @@ defmodule Domain.Creator.Adventure do
           type: type,
           description: description,
           tip: tip,
+          url: params |> Map.get(:url),
           sort: point |> Adventure.Point.last_clue_sort()
         })
         |> case do
@@ -284,6 +285,7 @@ defmodule Domain.Creator.Adventure do
             |> do_add_clue(point_id, clue)
             |> emit("PointClueAdded", %{
               id: clue.id,
+              url: clue.url,
               point_id: point_id,
               type: clue.type,
               description: clue.description,

@@ -25,7 +25,8 @@ defmodule CreatorApiWeb.ClueContract do
       point_id: Ecto.UUID,
       type: :string,
       description: :string,
-      tip: :boolean
+      tip: :boolean,
+      url: :string
     })
     |> default(%{
       tip: false,
@@ -51,7 +52,8 @@ defmodule CreatorApiWeb.ClueContract do
       point_id: Ecto.UUID,
       type: :string,
       description: :string,
-      tip: :boolean
+      tip: :boolean,
+      url: :string
     })
     |> validate(%{
       id: :required,
