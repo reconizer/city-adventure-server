@@ -17,6 +17,7 @@ defmodule Infrastructure.Repository.Models.Clue do
     field(:tip, :boolean)
     field(:description, :string)
     field(:sort, :integer)
+    field(:url, :string)
 
     timestamps()
 
@@ -28,7 +29,7 @@ defmodule Infrastructure.Repository.Models.Clue do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(id point_id type sort tip description asset_id)a
+  @params ~w(id point_id type sort tip description asset_id url)a
   @required_params ~w(id point_id type sort)a
 
   def changeset(model, params \\ %{}) do
