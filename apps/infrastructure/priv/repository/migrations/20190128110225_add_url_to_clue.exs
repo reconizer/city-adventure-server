@@ -1,4 +1,4 @@
-defmodule Infrastructure.Repository.Migrations.AddStatusToAdventure do
+defmodule Infrastructure.Repository.Migrations.AddUrlToClue do
   use Ecto.Migration
 
   def change do

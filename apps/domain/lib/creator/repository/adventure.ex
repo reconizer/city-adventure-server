@@ -11,7 +11,7 @@ defmodule Domain.Creator.Repository.Adventure do
     Models.Adventure
     |> preload(points: [:answers, clues: [:asset]])
     |> preload(:asset)
-    |> preload([images: [asset: [:asset_conversions]]])
+    |> preload(images: [asset: [:asset_conversions]])
     |> preload(:creator_adventure_rating)
     |> Repository.get(id)
     |> case do
@@ -104,6 +104,7 @@ defmodule Domain.Creator.Repository.Adventure do
   end
 
   defp build_asset(nil), do: nil
+
   defp build_asset(asset_model) do
     %Creator.Adventure.Asset{
       id: asset_model.id,
@@ -116,7 +117,7 @@ defmodule Domain.Creator.Repository.Adventure do
 
   def build_asset_conversions(%Models.AssetConversion{} = asset_conversion_models) do
     asset_conversion_models
-    |> Enum.map(fn conversion_model -> 
+    |> Enum.map(fn conversion_model ->
       %Creator.Adventure.AssetConversion{
         id: conversion_model.id,
         type: conversion_model.type,
@@ -126,9 +127,11 @@ defmodule Domain.Creator.Repository.Adventure do
       }
     end)
   end
+
   def build_asset_conversions(_), do: []
 
   defp build_image(nil), do: nil
+
   defp build_image(image_model) do
     %Creator.Adventure.Image{
       id: image_model.id,
@@ -138,15 +141,16 @@ defmodule Domain.Creator.Repository.Adventure do
   end
 
   defp adventure_rating(nil), do: nil
+
   defp adventure_rating(%{rating: rating}) do
     rating
   end
 
   defp parse_time_to_seconds(nil), do: nil
+
   defp parse_time_to_seconds(time) do
-    time 
-    |> Time.to_erl() 
+    time
+    |> Time.to_erl()
     |> :calendar.time_to_seconds()
   end
-
 end

@@ -34,7 +34,7 @@ defmodule Infrastructure.Repository.Models.Creator do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(description name address1 address2 city country email password_digest zip_code approved asset_id)a
+  @params ~w(id description name address1 address2 city country email password_digest zip_code approved asset_id)a
   @required_params ~w(name email password_digest)a
 
   def changeset(model, params \\ %{}) do

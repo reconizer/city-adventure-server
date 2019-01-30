@@ -67,16 +67,25 @@ defmodule Domain.Creator.Adventure.Point do
     end
   end
 
+  @spec get_clue(Adventure.Point.t(), Ecto.UUID.t()) :: {:ok, Adventure.Clue.t()} | {:error, any()}
   def get_clue({:ok, point}, clue_id), do: get_clue(point, clue_id)
   def get_clue({:error, _} = error, _), do: error
-  @spec get_clue(Adventure.Point.t(), Ecto.UUID.t()) :: {:ok, Adventure.Clue.t()} | {:error, any()}
+
   def get_clue(point, clue_id) do
-    point.clues
+    point
+    |> get_clues()
     |> Enum.find(&(&1.id == clue_id))
     |> case do
       nil -> {:error, {:clue_id, "not found in point"}}
       clue -> {:ok, clue}
     end
+  end
+
+  def get_clues({:ok, point}), do: get_clues(point)
+  def get_clues({:error, _} = error), do: error
+
+  def get_clues(point) do
+    point.clues
   end
 
   def add_clue({:ok, point}, clue), do: add_clue(point, clue)
