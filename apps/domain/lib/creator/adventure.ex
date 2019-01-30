@@ -13,6 +13,15 @@ defmodule Domain.Creator.Adventure do
   @type point_order :: %{id: Ecto.UUID.t(), parent_point_id: Ecto.UUID.t()}
   @type point_orders :: [point_order]
 
+  @type add_clue_params :: %{
+          required(:id) => Ecto.UUID.t(),
+          required(:point_id) => Ecto.UUID.t(),
+          required(:type) => String.t(),
+          required(:description) => String.t(),
+          required(:tip) => :boolean,
+          optional(:url) => String.t()
+        }
+
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
     field(:creator_id, :binary_id)
@@ -261,7 +270,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec add_clue(aggregate, %{point_id: Ecto.UUID.t(), type: String.t(), description: String.t(), tip: :boolean}) :: t() | error
+  @spec add_clue(aggregate(), add_clue_params()) :: t() | error
   def add_clue({:ok, adventure}, clue_params), do: add_clue(adventure, clue_params)
   def add_clue({:error, _} = error, _), do: error
 
