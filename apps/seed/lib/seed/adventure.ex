@@ -25,7 +25,7 @@ defmodule Seed.Adventure do
         gallery = [creator_image | gallery]
         gallery = [user_avatar | gallery]
         Multi.new()
-        |> Multi.run(:send_assets, fn _ -> send_assets(gallery) end)
+        |> Multi.run(:send_assets, fn _, _-> send_assets(gallery) end)
       end)
     end)
     |> Multi.merge(&create_points/1)
@@ -49,7 +49,7 @@ defmodule Seed.Adventure do
     |> Multi.insert_all(:answers, Models.Answer, answers, returning: true)
     |> Multi.merge(fn %{assets: {_, assets}} ->
       Multi.new()
-      |> Multi.run(:assets_send, fn _ -> send_assets(assets) end)
+      |> Multi.run(:assets_send, fn _, _-> send_assets(assets) end)
     end)
   end
 
@@ -59,8 +59,8 @@ defmodule Seed.Adventure do
       %{
         asset_id: asset.id,
         user_id: user.id,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
     end)
   end
@@ -72,8 +72,8 @@ defmodule Seed.Adventure do
         adventure_id: adventure.id,
         user_id: user.id,
         completed: true,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
     end)
   end
@@ -84,8 +84,8 @@ defmodule Seed.Adventure do
       type: "avatar",
       extension: "jpg",
       name: "avatar",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     })  
   end
 
@@ -96,8 +96,8 @@ defmodule Seed.Adventure do
         adventure_id: adventure.id,
         user_id: user.id,
         completion_time: Enum.random([~T[02:10:00.000000], ~T[02:11:00.000000], ~T[01:52:00.000000], ~T[02:34:00.000000]]),
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
     end)
   end
@@ -109,8 +109,8 @@ defmodule Seed.Adventure do
         adventure_id: adventure.id,
         user_id: user.id,
         rating: Enum.random(1..5),
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
     end)
   end
@@ -121,8 +121,8 @@ defmodule Seed.Adventure do
       %{
         asset_id: asset.id,
         adventure_id: adventure.id,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
     end)
   end
@@ -133,8 +133,8 @@ defmodule Seed.Adventure do
       type: "image",
       extension: "png",
       name: "creator",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     })  
   end
 
@@ -144,16 +144,16 @@ defmodule Seed.Adventure do
       type: "image",
       extension: "jpg",
       name: "tor1",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     tor2 = %{
       id: Ecto.UUID.generate(),
       type: "image",
       extension: "jpg",
       name: "tor2",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     [tor1, tor2]
   end
@@ -179,8 +179,8 @@ defmodule Seed.Adventure do
       type: "image",
       extension: "jpg",
       name: "tor3",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     })
   end
 
@@ -197,8 +197,8 @@ defmodule Seed.Adventure do
       max_time: "09:00:00",
       creator_id: creator.id,
       asset_id: image.id,
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     })
   end
 
@@ -214,8 +214,8 @@ defmodule Seed.Adventure do
       email: "builder@adventure.com",
       password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
       zip_code: "87-100",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     })
   end
 
@@ -226,48 +226,48 @@ defmodule Seed.Adventure do
         email: "martin@gmail.com",
         nick: "martin",
         password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
         email: "adam@gmail.com",
         nick: "adam",
         password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
         email: "luck@gmail.com",
         nick: "luck",
         password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
         email: "nick@gmail.com",
         nick: "nick",
         password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
         email: "simon@gmail.com",
         nick: "simon",
         password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
         email: "paul@gmail.com",
         nick: "paul",
         password_digest: Comeonin.Bcrypt.hashpwsalt("1234"),
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
     ]
   end
@@ -279,8 +279,8 @@ defmodule Seed.Adventure do
       parent_point_id: nil,
       radius: 50,
       id: Ecto.UUID.generate(),
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     fontanna = %{
       show: false,
@@ -289,8 +289,8 @@ defmodule Seed.Adventure do
       radius: 50,
       parent_point_id: osiolek.id,
       id: Ecto.UUID.generate(),
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     filutek = %{
       show: false,
@@ -299,8 +299,8 @@ defmodule Seed.Adventure do
       radius: 10,
       parent_point_id: fontanna.id,
       id: Ecto.UUID.generate(),
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     smok = %{
       show: false,
@@ -309,8 +309,8 @@ defmodule Seed.Adventure do
       radius: 10,
       parent_point_id: filutek.id,
       id: Ecto.UUID.generate(),
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     kura = %{
       show: false,
@@ -319,8 +319,8 @@ defmodule Seed.Adventure do
       radius: 10,
       parent_point_id: smok.id,
       id: Ecto.UUID.generate(),
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     kopernik = %{
       show: false,
@@ -329,8 +329,8 @@ defmodule Seed.Adventure do
       radius: 20,
       parent_point_id: kura.id,
       id: Ecto.UUID.generate(),
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     brama = %{
       show: false,
@@ -339,8 +339,8 @@ defmodule Seed.Adventure do
       radius: 20,
       parent_point_id: kopernik.id,
       id: Ecto.UUID.generate(),
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
 
     witcher = %{
@@ -348,48 +348,48 @@ defmodule Seed.Adventure do
       type: "clue_audio",
       extension: "mp3",
       name: "witcher",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     img_1 = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
       extension: "jpg",
       name: "img_1",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     img_2 = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
       extension: "jpg",
       name: "img_2",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     img_3 = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
       extension: "jpg",
       name: "img_3",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     clock = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
       extension: "png",
       name: "clock",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     panorama = %{
       id: Ecto.UUID.generate(),
       type: "clue_image",
       extension: "png",
       name: "panorama",
-      inserted_at: NaiveDateTime.utc_now(),
-      updated_at: NaiveDateTime.utc_now()
+      inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+      updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
     
     assets = [witcher, img_1, img_2, img_3, clock, panorama]
@@ -402,8 +402,8 @@ defmodule Seed.Adventure do
         sort: 0,
         point_id: osiolek.id,
         tip: false,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
@@ -413,8 +413,8 @@ defmodule Seed.Adventure do
         point_id: osiolek.id,
         tip: false,
         asset_id: witcher.id,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
@@ -423,8 +423,8 @@ defmodule Seed.Adventure do
         sort: 0,
         point_id: fontanna.id,
         tip: false,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
@@ -434,8 +434,8 @@ defmodule Seed.Adventure do
         point_id: filutek.id,
         tip: false,
         asset_id: img_1.id,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
@@ -445,8 +445,8 @@ defmodule Seed.Adventure do
         point_id: smok.id,
         tip: false,
         asset_id: img_2.id,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }, 
       %{
         id: Ecto.UUID.generate(),
@@ -456,8 +456,8 @@ defmodule Seed.Adventure do
         point_id: kura.id,
         tip: false,
         asset_id: img_3.id,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
@@ -467,8 +467,8 @@ defmodule Seed.Adventure do
         point_id: kopernik.id,
         tip: false,
         asset_id: clock.id,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       },
       %{
         id: Ecto.UUID.generate(),
@@ -478,8 +478,8 @@ defmodule Seed.Adventure do
         point_id: kopernik.id,
         tip: false,
         asset_id: panorama.id,
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
     ]
     points = [osiolek, fontanna, filutek, smok, kura, kopernik, brama]
@@ -490,8 +490,8 @@ defmodule Seed.Adventure do
         point_id: fontanna.id,
         sort: 0,
         details: %{password: "sword of destiny",  password_type: "text"},
-        inserted_at: NaiveDateTime.utc_now(),
-        updated_at: NaiveDateTime.utc_now()
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
     ]
     %{points: points, clues: clues, answers: answers, assets: assets}
