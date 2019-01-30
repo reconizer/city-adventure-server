@@ -109,6 +109,10 @@ defmodule Domain.UserAdventure.Projections.Adventure do
 
   defp get_ranking(%Adventure{} = adventure) do
     from(ranking in Models.UserRanking,
+      join: user in assoc(ranking, :user),
+      left_join: avatar in assoc(user, :avatar), 
+      left_join: asset in assoc(avatar, :asset),
+      preload: [asset: asset],
       where: ranking.adventure_id == ^adventure.id,
       limit: 5
     )
@@ -123,6 +127,10 @@ defmodule Domain.UserAdventure.Projections.Adventure do
 
   defp get_owner_ranking(%Adventure{} = adventure, owner_id) do
     from(ranking in Models.UserRanking,
+      join: user in assoc(ranking, :user),
+      left_join: avatar in assoc(user, :avatar), 
+      left_join: asset in assoc(avatar, :asset),
+      preload: [asset: asset],
       where: ranking.adventure_id == ^adventure.id,
       where: ranking.user_id == ^owner_id
     )
