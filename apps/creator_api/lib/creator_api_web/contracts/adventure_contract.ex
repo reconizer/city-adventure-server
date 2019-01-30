@@ -66,8 +66,8 @@ defmodule CreatorApiWeb.AdventureContract do
       description: :string,
       language: :string,
       difficulty_level: :integer,
-      min_time: :time,
-      max_time: :time,
+      min_time: :integer,
+      max_time: :integer,
       name: :string,
       show: :boolean
     })

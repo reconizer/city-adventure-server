@@ -33,9 +33,9 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     end
   end
 
-  def start_adventure(%{adventure_id: adventure_id} = params, %Contract.User.Profile{id: id}) do
+  def start_adventure(%{adventure_id: adventure_id} = params, %{id: id}) do
     Multi.new()
-    |> Multi.run(:start_point, fn -> get_start_point(adventure_id) end)
+    |> Multi.run(:start_point, fn _, _ -> get_start_point(adventure_id) end)
     |> Multi.insert(:user_adventure, build_user_adventure(params, id), returning: true)
     |> Multi.merge(fn %{start_point: start_point} ->
       Multi.new
