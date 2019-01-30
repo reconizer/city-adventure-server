@@ -208,7 +208,6 @@ defmodule CreatorApiWeb.ClueControllerTest do
         |> Enum.group_by(fn %{"point_id" => point_id} ->
           point_id
         end)
-        |> IO.inspect()
 
       conn
       |> patch("/api/clues/reorder", %{"adventure_id" => adventure_id, "clue_order" => clue_order})
