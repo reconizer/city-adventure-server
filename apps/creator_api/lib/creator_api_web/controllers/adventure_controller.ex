@@ -33,7 +33,8 @@ defmodule CreatorApiWeb.AdventureController do
     |> case do
       {:ok, _params} ->
         conn
-        |> resp(200, "OK")
+        |> put_status(200)
+        |> json(%{})
 
       {:error, errors} ->
         conn

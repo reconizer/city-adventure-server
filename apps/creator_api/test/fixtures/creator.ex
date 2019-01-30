@@ -4,10 +4,11 @@ defmodule CreatorApiWeb.Fixtures.Creator do
   def new(params) do
     Creator.User.new(
       %{
-        email: params |> Map.get(:email),
-        name: params |> Map.get(:name)
+        id: Map.get(params, :id),
+        email: Map.get(params, :email),
+        name: Map.get(params, :name)
       },
-      params |> Map.get(:password)
+      Map.get(params, :password)
     )
     |> Creator.Repository.User.save()
   end

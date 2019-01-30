@@ -1,5 +1,5 @@
 defmodule CreatorApiWeb.AuthControllerTest do
-  use CreatorApiWeb.ConnCase
+  use CreatorApiWeb.ConnCase, async: true
   alias CreatorApiWeb.Fixtures.Creator
 
   setup do
@@ -8,13 +8,13 @@ defmodule CreatorApiWeb.AuthControllerTest do
 
   describe "login" do
     setup do
-      Creator.new(%{email: "user@email.com", password: "testtest", name: "Foobar"})
+      Creator.new(%{id: Ecto.UUID.generate(), email: "test@test.com", password: "testtest", name: "Foobar"})
       :ok
     end
 
     test "login/2", %{conn: conn} do
       params = %{
-        "email" => "user@email.com",
+        "email" => "test@test.com",
         "password" => "testtest"
       }
 
