@@ -160,6 +160,8 @@ defmodule CreatorApiWeb.ClueControllerTest do
     test "works", %{conn: conn, adventure: adventure, adventure_id: adventure_id, point_id: point_id} do
       clue_ids = for _ <- 0..4, do: Ecto.UUID.generate(), into: []
 
+      other_point_id = Ecto.UUID.generate()
+
       {:ok, adventure} =
         clue_ids
         |> Enum.reduce(adventure, fn clue_id, adventure ->
@@ -172,6 +174,16 @@ defmodule CreatorApiWeb.ClueControllerTest do
             tip: [true, false] |> Enum.random()
           })
         end)
+        |> Adventure.with_point(%{
+          id: other_point_id,
+          position: %{
+            lat: 10,
+            lng: 10
+          },
+          parent_point_id: point_id,
+          radius: 10,
+          show: true
+        })
         |> Adventure.save()
 
       clue_ids =
@@ -185,23 +197,38 @@ defmodule CreatorApiWeb.ClueControllerTest do
         |> Enum.with_index()
         |> Enum.map(fn {clue_id, idx} ->
           %{
-            point_id: point_id,
-            id: clue_id,
-            sort: idx
+            "point_id" => [point_id, other_point_id] |> Enum.random(),
+            "id" => clue_id,
+            "sort" => idx
           }
         end)
+
+      new_order =
+        clue_order
+        |> Enum.group_by(fn %{"point_id" => point_id} ->
+          point_id
+        end)
+        |> IO.inspect()
 
       conn
       |> patch("/api/clues/reorder", %{"adventure_id" => adventure_id, "clue_order" => clue_order})
       |> json_response(200)
 
-      adventure_clue_ids =
-        Adventure.get(adventure_id)
-        |> Domain.Creator.Adventure.get_point(point_id)
-        |> Domain.Creator.Adventure.Point.get_clues()
-        |> Enum.map(& &1.id)
+      {:ok, adventure} = Adventure.get(adventure_id)
 
-      assert clue_ids |> Enum.reverse() == adventure_clue_ids
+      new_order
+      |> Enum.each(fn {point_id, orders} ->
+        point_clues =
+          adventure
+          |> Domain.Creator.Adventure.get_point(point_id)
+          |> Domain.Creator.Adventure.Point.get_clues()
+          |> Enum.map(& &1.id)
+          |> Enum.reverse()
+
+        order_clues = orders |> Enum.map(fn %{"id" => id} -> id end)
+
+        assert point_clues == order_clues
+      end)
     end
   end
 end

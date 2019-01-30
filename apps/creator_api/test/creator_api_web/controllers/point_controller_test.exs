@@ -1,17 +1,10 @@
 defmodule CreatorApiWeb.PointControllerTest do
-  use CreatorApiWeb.ConnCase
+  use CreatorApiWeb.ConnCase, async: true
   alias Domain.Creator.Adventure
   alias Domain.Creator.User
 
   alias Domain.Creator.Repository.Adventure, as: AdventureRepository
   alias Domain.Creator.Repository.User, as: UserRepository
-
-  # get("/", PointController, :list)
-  # get("/:id", PointController, :item)
-  # post("/", PointController, :create)
-  # patch("/", PointController, :update)
-  # delete("/", PointController, :delete)
-  # patch("/reorder", PointController, :reorder)
 
   setup %{conn: conn} do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
@@ -75,7 +68,7 @@ defmodule CreatorApiWeb.PointControllerTest do
       {:ok, %{id: parent_point_id}} = adventure |> Adventure.get_last_point()
       point_id = Ecto.UUID.generate()
 
-      {:ok, adventure} =
+      {:ok, _adventure} =
         adventure
         |> Adventure.add_point(%{
           id: point_id,
@@ -109,10 +102,9 @@ defmodule CreatorApiWeb.PointControllerTest do
         }
       }
 
-      response =
-        conn
-        |> patch("/api/points", point_params)
-        |> json_response(200)
+      conn
+      |> patch("/api/points", point_params)
+      |> json_response(200)
 
       {:ok, point} =
         AdventureRepository.get(adventure_id)
@@ -161,7 +153,7 @@ defmodule CreatorApiWeb.PointControllerTest do
       point_id = Ecto.UUID.generate()
       clue_id = Ecto.UUID.generate()
 
-      {:ok, adventure} =
+      {:ok, _adventure} =
         adventure
         |> Adventure.add_point(%{
           id: point_id,
@@ -238,7 +230,7 @@ defmodule CreatorApiWeb.PointControllerTest do
       {:ok, %{id: parent_point_id}} = adventure |> Adventure.get_last_point()
       point_id = Ecto.UUID.generate()
 
-      {:ok, adventure} =
+      {:ok, _adventure} =
         adventure
         |> Adventure.add_point(%{
           id: point_id,

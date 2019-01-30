@@ -358,17 +358,14 @@ defmodule Domain.Creator.Adventure do
 
   def reorder_clues(adventure, clue_orders) do
     clue_orders
-    |> Enum.reduce(adventure, fn clue_order_params, adventure ->
-      adventure
-      |> change_clue(clue_order_params)
-      |> case do
-        {:ok, adventure} -> adventure
-        _ -> adventure
-      end
+    |> Enum.reduce({:ok, adventure}, fn
+      _, {:error, _} = error ->
+        error
+
+      clue_order_params, adventure ->
+        adventure
+        |> change_clue(clue_order_params)
     end)
-    |> case do
-      adventure -> {:ok, adventure}
-    end
   end
 
   @spec reorder_points(aggregate, point_orders) :: t() | error
@@ -377,18 +374,21 @@ defmodule Domain.Creator.Adventure do
 
   def reorder_points(adventure, points_order) do
     points_order
-    |> Enum.reduce(adventure, fn %{id: point_id, parent_point_id: parent_point_id}, adventure ->
-      adventure
-      |> change_point(%{id: point_id, parent_point_id: parent_point_id})
-      |> case do
-        {:ok, adventure} -> adventure
-        _ -> adventure
-      end
+    |> Enum.reduce({:ok, adventure}, fn
+      %{id: point_id, parent_point_id: parent_point_id}, {:ok, adventure} ->
+        adventure
+        |> change_point(%{id: point_id, parent_point_id: parent_point_id})
+
+      _, {:error, _} = error ->
+        error
     end)
     |> case do
-      adventure ->
+      {:ok, adventure} ->
         adventure = adventure |> set_points(adventure.points)
         {:ok, adventure}
+
+      error ->
+        error
     end
   end
 
