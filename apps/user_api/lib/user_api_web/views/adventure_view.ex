@@ -66,7 +66,8 @@ defmodule UserApiWeb.AdventureView do
       completion_time: owner_ranking.completion_time,
       nick: owner_ranking.nick,
       position: owner_ranking.position,
-      user_id: owner_ranking.user_id
+      user_id: owner_ranking.user_id,
+      avatar_url: asset_url(owner_ranking.asset)
     }
   end
 
