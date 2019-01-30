@@ -15,6 +15,8 @@ defmodule Domain.Creator.Adventure.Clue do
     field(:sort, :integer)
     field(:asset_id, :binary_id)
     field(:url, :string)
+
+    embeds_one(:asset, Adventure.Asset)
   end
 
   @fields ~w(id type description tip sort asset_id point_id url)a

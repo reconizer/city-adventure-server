@@ -40,6 +40,7 @@ defmodule CreatorApiWeb do
       import CreatorApiWeb.ErrorHelpers
       import CreatorApiWeb.Gettext
       alias CreatorApiWeb.Router.Helpers, as: Routes
+      import CreatorApiWeb.ViewHelpers
     end
   end
 

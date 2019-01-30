@@ -13,6 +13,7 @@ defmodule Infrastructure.Repository.Models.Image do
   @foreign_key_type :binary_id
 
   schema "images" do
+    field(:sort, :integer)
     timestamps()
 
     belongs_to :adventure, Adventure
@@ -23,7 +24,7 @@ defmodule Infrastructure.Repository.Models.Image do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(adventure_id asset_id)a
+  @params ~w(adventure_id asset_id sort)a
   @required_params ~w(adventure_id)a
 
   def changeset(model, params \\ %{}) do

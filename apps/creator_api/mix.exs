@@ -38,7 +38,7 @@ defmodule CreatorApi.MixProject do
     [
       {:contract, in_umbrella: true},
       {:domain, in_umbrella: true},
-      {:infrastructure, in_umbrella: true, only: :test},
+      {:infrastructure, in_umbrella: true},
       {:phoenix, "~> 1.4.0"},
       {:phoenix_pubsub, "~> 1.1"},
       {:gettext, "~> 0.11"},

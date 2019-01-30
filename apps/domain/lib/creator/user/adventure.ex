@@ -3,6 +3,8 @@ defmodule Domain.Creator.User.Adventure do
   use Domain.Event, "Creator.User"
   import Ecto.Changeset
 
+  alias Domain.Creator.User
+
   @type t :: %__MODULE__{}
   @type ok_t :: t | {:ok, %__MODULE__{}}
   @type error :: {:error, any()}
@@ -11,6 +13,10 @@ defmodule Domain.Creator.User.Adventure do
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
     field(:name, :string)
+    field(:rating, :decimal)
+    field(:show, :boolean)
+    field(:status, :string)
+    embeds_one(:asset, User.Asset)
   end
 
   @fields ~w(id name)a
