@@ -12,7 +12,8 @@ defmodule UserApiWeb.PointView do
       completed: user_points |> find_user_point(adventure.current_point_id) |> Map.get(:completed),
       radius: points |> find_point(adventure.current_point_id) |> Map.get(:radius),
       answer_type: points |> find_point(adventure.current_point_id) |> Map.get(:answer_type),
-      last_point: points |> find_point(adventure.current_point_id) |> Map.get(:last_point)
+      last_point: points |> find_point(adventure.current_point_id) |> Map.get(:last_point),
+      current_point_id: adventure.current_point_id
     }
   end
 
