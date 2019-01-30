@@ -9,7 +9,10 @@ defmodule Domain.Creator.Repository.Adventure do
 
   def get(id) do
     Models.Adventure
-    |> preload(points: [:answers, :clues])
+    |> preload(points: [:answers, clues: [:asset]])
+    |> preload(:asset)
+    |> preload([images: [asset: [:asset_conversions]]])
+    |> preload(:creator_adventure_rating)
     |> Repository.get(id)
     |> case do
       nil -> {:error, :not_found}
@@ -28,8 +31,17 @@ defmodule Domain.Creator.Repository.Adventure do
     %Creator.Adventure{
       id: adventure_model.id,
       name: adventure_model.name,
+      description: adventure_model.description,
+      language: adventure_model.language,
+      show: adventure_model.show,
+      difficulty_level: adventure_model.difficulty_level,
+      max_time: adventure_model.max_time |> parse_time_to_seconds(),
+      min_time: adventure_model.min_time |> parse_time_to_seconds(),
       creator_id: adventure_model.creator_id,
-      status: adventure_model.status
+      status: adventure_model.status,
+      rating: adventure_model.creator_adventure_rating |> adventure_rating(),
+      asset: adventure_model.asset |> build_asset(),
+      images: adventure_model.images |> Enum.map(&build_image/1)
     }
     |> Creator.Adventure.set_points(Enum.map(adventure_model.points, &build_point/1))
     |> case do
@@ -86,7 +98,55 @@ defmodule Domain.Creator.Repository.Adventure do
       point_id: clue_model.point_id,
       description: clue_model.description,
       asset_id: clue_model.asset_id,
-      url: clue_model.url
+      url: clue_model.url,
+      asset: clue_model.asset |> build_asset()
     }
   end
+
+  defp build_asset(nil), do: nil
+  defp build_asset(asset_model) do
+    %Creator.Adventure.Asset{
+      id: asset_model.id,
+      type: asset_model.type,
+      name: asset_model.name,
+      extension: asset_model.extension,
+      asset_conversions: asset_model.asset_conversions |> build_asset_conversions()
+    }
+  end
+
+  def build_asset_conversions(%Models.AssetConversion{} = asset_conversion_models) do
+    asset_conversion_models
+    |> Enum.map(fn conversion_model -> 
+      %Creator.Adventure.AssetConversion{
+        id: conversion_model.id,
+        type: conversion_model.type,
+        name: conversion_model.name,
+        extension: conversion_model.extension,
+        asset_id: conversion_model.asset_id
+      }
+    end)
+  end
+  def build_asset_conversions(_), do: []
+
+  defp build_image(nil), do: nil
+  defp build_image(image_model) do
+    %Creator.Adventure.Image{
+      id: image_model.id,
+      sort: image_model.sort,
+      asset: image_model.asset |> build_asset()
+    }
+  end
+
+  defp adventure_rating(nil), do: nil
+  defp adventure_rating(%{rating: rating}) do
+    rating
+  end
+
+  defp parse_time_to_seconds(nil), do: nil
+  defp parse_time_to_seconds(time) do
+    time 
+    |> Time.to_erl() 
+    |> :calendar.time_to_seconds()
+  end
+
 end

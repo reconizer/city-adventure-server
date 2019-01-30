@@ -27,8 +27,8 @@ defmodule Domain.UserAdventure.Projections.Adventure do
         name: result.name,
         creator_id: result.creator_id,
         description: result.description, 
-        min_time: result.min_time |> Time.to_erl() |> :calendar.time_to_seconds(), 
-        max_time: result.max_time |> Time.to_erl() |> :calendar.time_to_seconds(), 
+        min_time: result.min_time |> parse_time_to_seconds(), 
+        max_time: result.max_time |> parse_time_to_seconds(), 
         difficulty_level: result.difficulty_level, 
         language: result.language,
         asset: result.asset
@@ -133,6 +133,13 @@ defmodule Domain.UserAdventure.Projections.Adventure do
         adventure
         |> Map.put(:owner_ranking, result)
     end
+  end
+
+  defp parse_time_to_seconds(nil), do: nil
+  defp parse_time_to_seconds(time) do
+    time 
+    |> Time.to_erl() 
+    |> :calendar.time_to_seconds()
   end
 
 end

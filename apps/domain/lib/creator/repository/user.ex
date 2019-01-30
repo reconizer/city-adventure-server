@@ -9,7 +9,10 @@ defmodule Domain.Creator.Repository.User do
 
   def get(id) do
     Models.Creator
-    |> preload([:adventures])
+    |> join(:left, [creator], adventures in assoc(creator, :adventures))
+    |> join(:left, [creator, adventures], asset in assoc(adventures, :asset))
+    |> join(:left, [creator, adventures, asset], rating in assoc(adventures, :creator_adventure_rating))
+    |> preload([creator, adventures, asset, rating], [adventures: {adventures, [asset: asset, creator_adventure_rating: rating]}])
     |> Repository.get(id)
     |> case do
       nil -> {:error, :not_found}
@@ -26,8 +29,11 @@ defmodule Domain.Creator.Repository.User do
 
   def get_by_email_and_password(email, password) do
     Models.Creator
-    |> where([creator], ilike(creator.email, ^email))
-    |> preload([:adventures])
+    |> join(:left, [creator], adventures in assoc(creator, :adventures))
+    |> join(:left, [creator, adventures], asset in assoc(adventures, :asset))
+    |> join(:left, [creator, adventures, asset], rating in assoc(adventures, :creator_adventure_rating))
+    |> where([creator, adventures, asset, rating], ilike(creator.email, ^email))
+    |> preload([creator, adventures, asset, rating], [adventures: {adventures, [asset: asset, creator_adventure_rating: rating]}])
     |> Repository.one()
     |> case do
       nil ->
@@ -53,10 +59,30 @@ defmodule Domain.Creator.Repository.User do
     }
   end
 
-  def build_adventure(adventure_model) do
+  defp build_adventure(adventure_model) do
     %Creator.User.Adventure{
       id: adventure_model.id,
-      name: adventure_model.name
+      name: adventure_model.name,
+      show: adventure_model.show,
+      status: adventure_model.status,
+      rating: adventure_model.creator_adventure_rating |> adventure_rating(),
+      asset: adventure_model.asset |> build_asset()
     }
   end
+
+  defp build_asset(nil), do: nil
+  defp build_asset(asset_model) do
+    %Creator.User.Asset{
+      id: asset_model.id,
+      type: asset_model.type,
+      name: asset_model.name,
+      extension: asset_model.extension
+    }
+  end
+
+  defp adventure_rating(nil), do: nil
+  defp adventure_rating(%{rating: rating}) do
+    rating
+  end
+
 end
