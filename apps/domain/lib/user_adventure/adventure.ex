@@ -46,7 +46,7 @@ defmodule Domain.UserAdventure.Adventure do
   def check_point_position(%Adventure{} = adventure, %{position: %{coordinates: {lng, lat}}}) do
     adventure
     |> Map.get(:points)
-    |> Enum.find(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} = point -> 
+    |> Enum.find(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} -> 
       Geocalc.within?(radius, %{lat: p_lat, lng: p_lng}, %{lat: lat, lng: lng})
     end)
     |> case do

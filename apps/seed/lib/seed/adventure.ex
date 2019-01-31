@@ -160,7 +160,7 @@ defmodule Seed.Adventure do
 
   defp send_asset(asset) do
     file_path = Path.join([Application.app_dir(:seed), "priv", "helpers", Enum.join([asset.name, asset.extension], ".")])
-    upload_url = Path.join([asset.type, asset.id, "original.#{asset.extension}"])
+    upload_url = Path.join([asset.type, asset.id, "#{asset.name}.#{asset.extension}"])
     send_assets_to_s3(upload_url, file_path)
   end
 
