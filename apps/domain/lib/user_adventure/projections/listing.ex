@@ -3,13 +3,14 @@ defmodule Domain.UserAdventure.Projections.Listing do
   Projection of adventure start points
   """
   @distance 10000
+  @srid 4326
 
   use Infrastructure.Repository.Models
   import Ecto.Query
 
   alias Infrastructure.Repository
 
-  def get_start_points(%{position: %Geo.Point{coordinates: {lng, lat}, srid: srid}}, %{id: id}) do
+  def get_start_points(%{user_id: id, position: %{lat: lat, lng: lng}}) do
     result =
       from(adventure in Models.Adventure,
         left_join: user_adventure in Models.UserAdventure,
@@ -30,7 +31,7 @@ defmodule Domain.UserAdventure.Projections.Listing do
           purchased: false
         },
         where: adventure.show == true and adventure.published == true,
-        where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^srid, start_point.position, @distance),
+        where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^@srid, start_point.position, @distance),
         group_by: [adventure.id, start_point.id, user_adventure.adventure_id, user_adventure.completed]
       )
       |> Repository.all()

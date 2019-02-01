@@ -26,11 +26,11 @@ defmodule UserApi.Type.Position do
       })
 
     cond do
-      changeset.valid? ->
+      %{valid?: true, changes: changes} = changeset ->
         {:ok,
          %{
-           lat: lat,
-           lng: lng
+           lat: changes.lat,
+           lng: changes.lng
          }}
 
       true ->

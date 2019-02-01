@@ -4,18 +4,19 @@ defmodule UserApiWeb.AdventureController do
   alias Domain.UserAdventure.Projections.Adventure, as: AdventureProjection
   alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
   alias Domain.UserAdventure.Projections.Ranking, as: RankingProjection
+  alias UserApiWeb.AdventureContract
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     position = %{
-      lat: context |> Map.get("lat", nil),
-      lng: context |> Map.get("lng", nil)
+      "lat" => context |> Map.get("lat", nil),
+      "lng" => context |> Map.get("lng", nil)
     }
     with %Session{valid?: true, context: context} <- session
                                                      |> Session.update_context(%{"position" => position}),
-      {:ok, validate_params} <- context
-                                |> Contract.Adventure.Listing.validate(),
+      {:ok, validate_params} <- conn
+                                |> AdventureContract.index(context),
       {:ok, start_points} <- validate_params
-                             |> ListingProjection.get_start_points(context["current_user"])
+                             |> ListingProjection.get_start_points()
     do
       session
       |> Session.update_context(%{"adventures" => start_points})
@@ -31,9 +32,9 @@ defmodule UserApiWeb.AdventureController do
 
   def show(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
-      {:ok, validate_params} <- context 
-                                |> Contract.Adventure.Show.validate(),
-      {:ok, adventure} <- AdventureProjection.get_adventure_by_id(validate_params, context["current_user"])
+      {:ok, validate_params} <- conn
+                                |> AdventureContract.show(context),
+      {:ok, adventure} <- validate_params |> AdventureProjection.get_adventure_by_id()
     do
       session
       |> Session.update_context(%{"adventure" => adventure})
@@ -49,9 +50,9 @@ defmodule UserApiWeb.AdventureController do
 
   def start(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
-      {:ok, validate_params} <- context 
-                                |> Contract.Adventure.Start.validate(),
-      {:ok, adventure} <- AdventureRepository.start_adventure(validate_params, context["current_user"])
+      {:ok, validate_params} <- conn 
+                                |> AdventureContract.start(context),
+      {:ok, adventure} <- validate_params |> AdventureRepository.start_adventure()
     do
       session
       |> Session.update_context(%{"adventure" => adventure})
@@ -67,8 +68,8 @@ defmodule UserApiWeb.AdventureController do
 
   def summary(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
-      {:ok, validate_params} <- context 
-                                |> Contract.Adventure.Summary.validate(),
+      {:ok, validate_params} <- conn 
+                                |> AdventureContract.summary(context),
       {:ok, ranking} <- validate_params
                         |> RankingProjection.top_ten_ranking()
     do

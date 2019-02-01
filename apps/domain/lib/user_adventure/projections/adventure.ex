@@ -12,7 +12,7 @@ defmodule Domain.UserAdventure.Projections.Adventure do
   alias Domain.UserAdventure.Projections.Adventure
   alias Infrastructure.Repository
 
-  def get_adventure_by_id(%{id: adventure_id}, %{id: owner_id}) do
+  def get_adventure_by_id(%{id: adventure_id, user_id: owner_id}) do
     from(adventure in Models.Adventure,
       left_join: asset in assoc(adventure, :asset),
       preload: [asset: asset], 

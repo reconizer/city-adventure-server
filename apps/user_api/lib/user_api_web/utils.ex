@@ -23,11 +23,14 @@ defmodule UserApiWeb.Utils do
     |> Phoenix.Controller.render("422.json", errors: errors)
   end
 
-  def with_user(params, conn) do
-    user_id = conn.assigns |> Map.get(:user_id)
-
+  def with_user(params, %{assigns: %{session: %{context: %{"current_user" => %{id: id}}}}}) do
     params
-    |> Map.merge(%{"user_id" => user_id})
+    |> Map.merge(%{"user_id" => id})
+  end
+
+  def with_user(params, conn) do
+    params
+    |> Map.merge(%{"user_id" => nil})
   end
 
   def handle_repository_action(result, conn) do

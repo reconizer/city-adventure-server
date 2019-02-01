@@ -33,10 +33,10 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     end
   end
 
-  def start_adventure(%{adventure_id: adventure_id} = params, %{id: id}) do
+  def start_adventure(%{adventure_id: adventure_id, user_id: id} = params) do
     Multi.new()
     |> Multi.run(:start_point, fn _, _ -> get_start_point(adventure_id) end)
-    |> Multi.insert(:user_adventure, build_user_adventure(params, id), returning: true)
+    |> Multi.insert(:user_adventure, params |> build_user_adventure(), returning: true)
     |> Multi.merge(fn %{start_point: start_point} ->
       Multi.new
       |> Multi.insert(:user_point, build_user_point(start_point, id)) 
@@ -59,7 +59,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> Repository.update()
   end
 
-  defp build_user_adventure(%{adventure_id: id}, user_id) do
+  defp build_user_adventure(%{adventure_id: id, user_id: user_id}) do
     %{
       adventure_id: id,
       user_id: user_id,
