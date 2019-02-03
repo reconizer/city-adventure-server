@@ -1,11 +1,12 @@
 defmodule UserApiWeb.RankingController do
   use UserApiWeb, :controller
   alias Domain.UserAdventure.Projections.Ranking, as: RankingProjection
+  alias UserApiWeb.RankingContract
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
-      {:ok, validate_params} <- context
-                                |> Contract.Adventure.Ranking.validate(),
+      {:ok, validate_params} <- conn
+                                |> RankingContract.index(context),
       {:ok, paginate} <- context
                          |> Contract.Paginate.validate(),
       {:ok, ranking} <- validate_params
@@ -25,10 +26,10 @@ defmodule UserApiWeb.RankingController do
 
   def current_user_ranking(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
-    {:ok, validate_params} <- context
-                              |> Contract.Adventure.CurrentUserRanking.validate(),
+    {:ok, validate_params} <- conn
+                              |> RankingContract.current_user_ranking(context),
     {:ok, current_user_ranking} <- validate_params
-                                   |> RankingProjection.current_user_ranking(context["current_user"])
+                                   |> RankingProjection.current_user_ranking()
     do
       session
       |> Session.update_context(%{"current_user_ranking" => current_user_ranking})

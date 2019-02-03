@@ -34,16 +34,16 @@ defmodule Domain.UserAdventure.Adventure do
     |> cast_assoc(:points)
   end
 
-  def resolve_point(adventure, params, user, point) do
+  def resolve_point(adventure, params, point) do
     adventure
     |> set_current_point_id(point)
     |> set_answer_type_and_last_point()
-    |> add_user_point(params, user, point)
+    |> add_user_point(params, point)
     |> completed_adventure()
     |> create_ranking()
   end
 
-  def check_point_position(%Adventure{} = adventure, %{position: %{coordinates: {lng, lat}}}) do
+  def check_point_position(%Adventure{} = adventure, %{position: %{lat: lat, lng: lng}}) do
     adventure
     |> Map.get(:points)
     |> Enum.find(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} -> 
@@ -179,9 +179,9 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  defp add_user_point(adventure, params, user, point) do
+  defp add_user_point(adventure, params, point) do
     user_point = %{
-      user_id: user.id,
+      user_id: params.user_id,
       point_id: adventure.current_point_id,
       completed: adventure |> point_completed(point, params),
       created_at: NaiveDateTime.utc_now(),

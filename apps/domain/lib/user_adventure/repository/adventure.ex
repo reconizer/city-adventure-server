@@ -16,7 +16,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     UserAdventure
   }
 
-  def get(%{adventure_id: adventure_id}, %{id: user_id}) do
+  def get(%{adventure_id: adventure_id, user_id: user_id}) do
     Models.Adventure
     |> join(:left, [adventure], points in assoc(adventure, :points))
     |> join(:left, [adventure, points], user_points in assoc(points, :user_points), on: user_points.user_id == ^user_id)

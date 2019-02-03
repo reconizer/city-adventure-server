@@ -3,7 +3,7 @@ defmodule Domain.UserAdventure.Projections.Points do
   alias Infrastructure.Repository
   use Infrastructure.Repository.Models
 
-  def get_completed_points(%{adventure_id: adventure_id}, %{id: owner_id}) do
+  def get_completed_points(%{adventure_id: adventure_id, user_id: owner_id}) do
     result =
       from(point in Models.Point,
         join: user_point in Models.UserPoint,
@@ -29,7 +29,7 @@ defmodule Domain.UserAdventure.Projections.Points do
     {:ok, result}
   end
 
-  def get_completed_points_with_clues(%{adventure_id: adventure_id}, %{id: user_id}) do
+  def get_completed_points_with_clues(%{adventure_id: adventure_id, user_id: user_id}) do
     result =
       from(point in Models.Point,
         join: user_points in assoc(point, :user_points),

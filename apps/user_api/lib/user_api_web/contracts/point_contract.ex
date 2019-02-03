@@ -24,6 +24,10 @@ defmodule UserApiWeb.PointContract do
       answer_text: :string,
       answer_type: :string
     })
+    |> default(%{
+      answer_text: nil,
+      answer_type: nil
+    })
     |> validate(%{
       user_id: :required,
       position: :required,
