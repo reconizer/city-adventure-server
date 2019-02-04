@@ -40,4 +40,15 @@ defmodule CreatorApi.Type.PointOrder do
   def cast(_) do
     :error
   end
+
+  def type() do
+  end
+
+  def load(_) do
+    {:ok, nil}
+  end
+
+  def dump(_) do
+    {:ok, nil}
+  end
 end

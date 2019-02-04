@@ -17,8 +17,8 @@ defmodule CreatorApiWeb.Router do
 
       scope "/adventures" do
         get("/", AdventureController, :list)
-        get("/:adventure_id", AdventureController, :item)
         get("/statistics", AdventureController, :statistics)
+        get("/:adventure_id", AdventureController, :item)
 
         patch("/", AdventureController, :update)
         post("/", AdventureController, :create)

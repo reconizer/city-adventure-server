@@ -13,6 +13,15 @@ defmodule Domain.Creator.Adventure do
   @type point_order :: %{id: Ecto.UUID.t(), parent_point_id: Ecto.UUID.t()}
   @type point_orders :: [point_order]
 
+  @type add_clue_params :: %{
+          required(:id) => Ecto.UUID.t(),
+          required(:point_id) => Ecto.UUID.t(),
+          required(:type) => String.t(),
+          required(:description) => String.t(),
+          required(:tip) => :boolean,
+          optional(:url) => String.t()
+        }
+
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
     field(:creator_id, :binary_id)
@@ -20,8 +29,8 @@ defmodule Domain.Creator.Adventure do
     field(:description, :string)
     field(:language, :string)
     field(:difficulty_level, :integer)
-    field(:min_time, :time)
-    field(:max_time, :time)
+    field(:min_time, :integer)
+    field(:max_time, :integer)
     field(:show, :boolean)
     field(:status, :string)
     field(:rating, :decimal)
@@ -50,7 +59,8 @@ defmodule Domain.Creator.Adventure do
     |> changeset(%{
       status: "pending",
       creator_id: creator_id,
-      name: name
+      name: name,
+      difficulty_level: 1
     })
     |> case do
       %{valid?: true} = changeset ->
@@ -64,24 +74,21 @@ defmodule Domain.Creator.Adventure do
         error
 
       {:ok, adventure} ->
-        adventure =
-          adventure
-          |> emit("Created", %{
-            creator_id: adventure.creator_id,
-            name: adventure.name
-          })
-          |> add_point(%{
-            id: Ecto.UUID.generate(),
-            parent_point_id: nil,
-            radius: 10,
-            show: true,
-            position: %{
-              lat: lat,
-              lng: lng
-            }
-          })
-
-        {:ok, adventure}
+        adventure
+        |> emit("Created", %{
+          creator_id: adventure.creator_id,
+          name: adventure.name
+        })
+        |> add_point(%{
+          id: Ecto.UUID.generate(),
+          parent_point_id: nil,
+          radius: 10,
+          show: true,
+          position: %{
+            lat: lat,
+            lng: lng
+          }
+        })
     end
   end
 
@@ -264,7 +271,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec add_clue(aggregate, %{point_id: Ecto.UUID.t(), type: String.t(), description: String.t(), tip: :boolean}) :: t() | error
+  @spec add_clue(aggregate(), add_clue_params()) :: t() | error
   def add_clue({:ok, adventure}, clue_params), do: add_clue(adventure, clue_params)
   def add_clue({:error, _} = error, _), do: error
 
@@ -337,7 +344,7 @@ defmodule Domain.Creator.Adventure do
     |> case do
       {:ok, {clue, clue_changes}} ->
         adventure
-        |> do_replace_point(clue)
+        |> do_replace_clue(clue.point_id, clue)
         |> emit("PointClueChanged", clue_changes |> Map.put(:id, clue.id))
 
       error ->
@@ -351,17 +358,14 @@ defmodule Domain.Creator.Adventure do
 
   def reorder_clues(adventure, clue_orders) do
     clue_orders
-    |> Enum.reduce(adventure, fn clue_order_params, adventure ->
-      adventure
-      |> change_clue(clue_order_params)
-      |> case do
-        {:ok, adventure} -> adventure
-        _ -> adventure
-      end
+    |> Enum.reduce({:ok, adventure}, fn
+      _, {:error, _} = error ->
+        error
+
+      clue_order_params, adventure ->
+        adventure
+        |> change_clue(clue_order_params)
     end)
-    |> case do
-      adventure -> {:ok, adventure}
-    end
   end
 
   @spec reorder_points(aggregate, point_orders) :: t() | error
@@ -370,18 +374,21 @@ defmodule Domain.Creator.Adventure do
 
   def reorder_points(adventure, points_order) do
     points_order
-    |> Enum.reduce(adventure, fn %{id: point_id, parent_point_id: parent_point_id}, adventure ->
-      adventure
-      |> change_point(%{id: point_id, parent_point_id: parent_point_id})
-      |> case do
-        {:ok, adventure} -> adventure
-        _ -> adventure
-      end
+    |> Enum.reduce({:ok, adventure}, fn
+      %{id: point_id, parent_point_id: parent_point_id}, {:ok, adventure} ->
+        adventure
+        |> change_point(%{id: point_id, parent_point_id: parent_point_id})
+
+      _, {:error, _} = error ->
+        error
     end)
     |> case do
-      adventure ->
+      {:ok, adventure} ->
         adventure = adventure |> set_points(adventure.points)
         {:ok, adventure}
+
+      error ->
+        error
     end
   end
 
@@ -441,11 +448,24 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec do_add_clue(aggregate, Ecto.UUID.t(), Adventure.Clue.t()) :: t() | error
-  def do_add_clue({:ok, adventure}, point_id, clue), do: do_add_clue(adventure, point_id, clue)
-  def do_add_clue({:error, _} = error, _, _), do: error
+  @spec get_last_point(aggregate) :: {:ok, Adventure.Point.t()} | error
+  def get_last_point({:ok, adventure}), do: get_last_point(adventure)
+  def get_last_point({:error, _} = error), do: error
 
-  def do_add_clue(adventure, point_id, clue) do
+  def get_last_point(adventure) do
+    adventure.points
+    |> Enum.reverse()
+    |> case do
+      [last_point | _] -> {:ok, last_point}
+      _ -> {:error, "no points in adventure"}
+    end
+  end
+
+  @spec do_add_clue(aggregate, Ecto.UUID.t(), Adventure.Clue.t()) :: t() | error
+  defp do_add_clue({:ok, adventure}, point_id, clue), do: do_add_clue(adventure, point_id, clue)
+  defp do_add_clue({:error, _} = error, _, _), do: error
+
+  defp do_add_clue(adventure, point_id, clue) do
     adventure
     |> get_point(point_id)
     |> Adventure.Point.add_clue(clue)
@@ -460,10 +480,10 @@ defmodule Domain.Creator.Adventure do
   end
 
   @spec do_remove_clue(aggregate, Ecto.UUID.t()) :: t() | {:error, any}
-  def do_remove_clue({:ok, adventure}, clue_id), do: do_remove_clue(adventure, clue_id)
-  def do_remove_clue({:error, _} = error, _), do: error
+  defp do_remove_clue({:ok, adventure}, clue_id), do: do_remove_clue(adventure, clue_id)
+  defp do_remove_clue({:error, _} = error, _), do: error
 
-  def do_remove_clue(adventure, clue_id) do
+  defp do_remove_clue(adventure, clue_id) do
     adventure
     |> get_clue(clue_id)
     |> case do
@@ -485,11 +505,11 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec do_replace_clue(aggregate, Ecto.UUID.t(), Ecto.UUID.t()) :: t() | {:error, any}
-  def do_replace_clue({:ok, adventure}, point_id, clue_id), do: do_replace_clue(adventure, point_id, clue_id)
-  def do_replace_clue({:error, _} = error, _, _), do: error
+  @spec do_replace_clue(aggregate, Ecto.UUID.t(), Adventure.Clue.t()) :: t() | {:error, any}
+  defp do_replace_clue({:ok, adventure}, point_id, clue), do: do_replace_clue(adventure, point_id, clue)
+  defp do_replace_clue({:error, _} = error, _, _), do: error
 
-  def do_replace_clue(adventure, point_id, clue) do
+  defp do_replace_clue(adventure, point_id, clue) do
     adventure
     |> get_point(point_id)
     |> Adventure.Point.replace_clue(clue)
@@ -517,30 +537,30 @@ defmodule Domain.Creator.Adventure do
   end
 
   @spec do_add_point(aggregate, Adventure.Point.t()) :: t() | {:error, any}
-  def do_add_point({:ok, adventure}, point), do: do_add_point(adventure, point)
-  def do_add_point({:error, _} = error, _), do: error
+  defp do_add_point({:ok, adventure}, point), do: do_add_point(adventure, point)
+  defp do_add_point({:error, _} = error, _), do: error
 
-  def do_add_point(adventure, point) do
+  defp do_add_point(adventure, point) do
     new_points = adventure.points ++ [point]
 
     {:ok, %{adventure | points: new_points}}
   end
 
   @spec do_remove_point(aggregate, Ecto.UUID.t()) :: t()
-  def do_remove_point({:ok, adventure}, point_id), do: do_remove_point(adventure, point_id)
-  def do_remove_point({:error, _} = error, _), do: error
+  defp do_remove_point({:ok, adventure}, point_id), do: do_remove_point(adventure, point_id)
+  defp do_remove_point({:error, _} = error, _), do: error
 
-  def do_remove_point(adventure, point_id) do
+  defp do_remove_point(adventure, point_id) do
     new_points = adventure.points |> Enum.reject(&(&1.id == point_id))
 
     {:ok, %{adventure | points: new_points}}
   end
 
   @spec do_replace_point(aggregate, Adventure.Point.t()) :: t()
-  def do_replace_point({:ok, adventure}, point), do: do_replace_point(adventure, point)
-  def do_replace_point({:error, _} = error, _), do: error
+  defp do_replace_point({:ok, adventure}, point), do: do_replace_point(adventure, point)
+  defp do_replace_point({:error, _} = error, _), do: error
 
-  def do_replace_point(adventure, %{id: point_id} = point) do
+  defp do_replace_point(adventure, %{id: point_id} = point) do
     adventure.points
     |> Enum.map(fn
       %{id: ^point_id} -> point

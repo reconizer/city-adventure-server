@@ -45,14 +45,13 @@ defmodule Domain.Creator.User do
         error
 
       {:ok, user} ->
-        {:ok,
-         user
-         |> emit!("Created", %{
-           id: user.id,
-           password_digest: Comeonin.Bcrypt.hashpwsalt(password),
-           email: user.email |> String.downcase(),
-           name: user.name
-         })}
+        user
+        |> emit("Created", %{
+          id: user.id,
+          password_digest: Comeonin.Bcrypt.hashpwsalt(password),
+          email: user.email |> String.downcase(),
+          name: user.name
+        })
     end
   end
 

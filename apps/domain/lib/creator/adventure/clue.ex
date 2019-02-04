@@ -20,7 +20,7 @@ defmodule Domain.Creator.Adventure.Clue do
   end
 
   @fields ~w(id type description tip sort asset_id point_id url)a
-  @required_fields @fields -- [:asset_id, :url]
+  @required_fields @fields -- [:asset_id, :url, :description]
 
   @available_types ~w(text audio video image url)
 
