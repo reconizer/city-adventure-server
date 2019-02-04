@@ -21,7 +21,7 @@ defmodule UserApiWeb.PointController do
 
       {:error, reason} ->
         session
-        |> Session.add_error(reason)
+        |> handle_errors(reason)
     end
     |> present(conn, UserApiWeb.PointView, "completed_points.json")
   end
@@ -47,9 +47,6 @@ defmodule UserApiWeb.PointController do
       adventure
       |> AdventureDomain.resolve_point(validate_params, point)
       |> case do
-        {:error, result} ->
-          session |> Session.add_error(result)
-
         {:ok, adventure} ->
           adventure
           |> AdventureRepository.save()
@@ -63,7 +60,7 @@ defmodule UserApiWeb.PointController do
 
       {:error, reason} ->
         session
-        |> Session.add_error(reason)
+        |> handle_errors(reason)
     end
     |> present(conn, UserApiWeb.PointView, "resolve_point_position.json")
   end

@@ -1,5 +1,5 @@
-defmodule Domain.UserAdventure.Answer do
-  alias Domain.UserAdventure.Answer
+defmodule Domain.UserAdventure.Adventure.Answer do
+  alias Domain.UserAdventure.Adventure.Answer
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -21,5 +21,4 @@ defmodule Domain.UserAdventure.Answer do
     |> cast(params, @fields)
     |> validate_required(@required_fields)
   end
-
 end

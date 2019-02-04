@@ -1,10 +1,11 @@
 defmodule Domain.UserAdventure.Adventure do
-  alias Domain.UserAdventure.{
-    Adventure,
+  alias Domain.UserAdventure.Adventure.{
     Point,
     UserAdventure,
     UserPoint
   }
+
+  alias Domain.UserAdventure.Adventure
 
   use Ecto.Schema
   use Domain.Event, "UserAdventure"
@@ -46,7 +47,7 @@ defmodule Domain.UserAdventure.Adventure do
   def check_point_position(%Adventure{} = adventure, %{position: %{lat: lat, lng: lng}}) do
     adventure
     |> Map.get(:points)
-    |> Enum.find(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} -> 
+    |> Enum.find(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} ->
       Geocalc.within?(radius, %{lat: p_lat, lng: p_lng}, %{lat: lat, lng: lng})
     end)
     |> case do

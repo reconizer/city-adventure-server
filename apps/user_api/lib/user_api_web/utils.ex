@@ -24,9 +24,8 @@ defmodule UserApiWeb.Utils do
     |> Map.merge(%{"user_id" => id})
   end
 
-  def with_user(params, conn) do
+  def with_user(params, _conn) do
     params
     |> Map.merge(%{"user_id" => nil})
   end
-
 end

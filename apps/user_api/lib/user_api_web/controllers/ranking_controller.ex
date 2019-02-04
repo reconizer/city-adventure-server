@@ -19,7 +19,7 @@ defmodule UserApiWeb.RankingController do
         session
       {:error, reason} ->
         session
-        |> Session.add_error(reason)
+        |> handle_errors(reason)
     end
     |> present(conn, UserApiWeb.RankingView, "index.json")
   end
@@ -38,7 +38,7 @@ defmodule UserApiWeb.RankingController do
         session
       {:error, reason} ->
         session
-        |> Session.add_error(reason)
+        |> handle_errors(reason)
     end
     |> present(conn, UserApiWeb.RankingView, "current_user.json")
     end

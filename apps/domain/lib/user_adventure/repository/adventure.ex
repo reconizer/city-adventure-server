@@ -7,8 +7,9 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   import Ecto.Query
   alias Infrastructure.Repository
   alias Ecto.Multi
-  alias Domain.UserAdventure.{
-    Adventure,
+  alias Domain.UserAdventure.Adventure
+
+  alias Domain.UserAdventure.Adventure.{
     Point,
     Answer,
     Clue,
@@ -22,10 +23,10 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> join(:left, [adventure, points], user_points in assoc(points, :user_points), on: user_points.user_id == ^user_id)
     |> join(:left, [adventure, points, user_points], user_adventures in assoc(adventure, :user_adventures))
     |> where([adventure, points, user_points, user_adventures], user_adventures.user_id == ^user_id)
-    |> preload([adventure, points, user_points, user_adventures], [user_points: user_points])
-    |> preload([adventure, points, user_points, user_adventures], [user_adventures: user_adventures])
-    |> preload([points: :clues])
-    |> preload([points: :answers])
+    |> preload([adventure, points, user_points, user_adventures], user_points: user_points)
+    |> preload([adventure, points, user_points, user_adventures], user_adventures: user_adventures)
+    |> preload(points: :clues)
+    |> preload(points: :answers)
     |> Repository.get(adventure_id)
     |> case do
       nil -> {:error, {:adventure, "not_founds"}}
@@ -38,8 +39,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> Multi.run(:start_point, fn _, _ -> get_start_point(adventure_id) end)
     |> Multi.insert(:user_adventure, params |> build_user_adventure(), returning: true)
     |> Multi.merge(fn %{start_point: start_point} ->
-      Multi.new
-      |> Multi.insert(:user_point, build_user_point(start_point, id)) 
+      Multi.new()
+      |> Multi.insert(:user_point, build_user_point(start_point, id))
     end)
     |> Infrastructure.Repository.transaction()
   end
@@ -71,7 +72,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   defp get_start_point(adventure_id) do
     from(point in Models.Point,
       where: is_nil(point.parent_point_id),
-      where: point.adventure_id == ^adventure_id 
+      where: point.adventure_id == ^adventure_id
     )
     |> Repository.one()
     |> case do
@@ -84,7 +85,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     %Adventure{
       id: model.id,
       points: model.points |> Enum.map(&load_points/1),
-      user_adventure: model.user_adventures |> List.first |> load_user_adventure(),
+      user_adventure: model.user_adventures |> List.first() |> load_user_adventure(),
       user_points: model.user_points |> Enum.map(&load_user_points/1)
     }
   end
@@ -93,7 +94,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     %Point{
       id: point.id,
       position: point.position,
-      show: point.show, 
+      show: point.show,
       radius: point.radius,
       inserted_at: point.inserted_at,
       parent_point_id: point.parent_point_id,
@@ -136,6 +137,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   end
 
   def load_user_adventure(nil), do: nil
+
   def load_user_adventure(user_adventure) do
     %UserAdventure{
       completed: user_adventure.completed,
@@ -143,5 +145,4 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       adventure_id: user_adventure.adventure_id
     }
   end
-
 end
