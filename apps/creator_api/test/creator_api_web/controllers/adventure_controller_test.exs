@@ -1,22 +1,38 @@
 defmodule CreatorApiWeb.AdventureControllerTest do
   use CreatorApiWeb.ConnCase, async: true
-  alias CreatorApiWeb.Fixtures.Creator
-  alias CreatorApiWeb.Fixtures.Adventure
+  alias Domain.Creator.Adventure
+  alias Domain.Creator.User
+
+  alias Domain.Creator.Repository.Adventure, as: AdventureRepository
+  alias Domain.Creator.Repository.User, as: UserRepository
 
   setup %{conn: conn} do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
-
     creator_id = Ecto.UUID.generate()
     adventure_id = Ecto.UUID.generate()
+    point_id = Ecto.UUID.generate()
 
-    {:ok, _creator} = Creator.new(%{id: creator_id, email: "test@test.com", password: "testtest", name: "Test"})
-    {:ok, _adventure} = Adventure.new(%{id: adventure_id, creator_id: creator_id, name: "test adventure", position: %{lat: 70, lng: 80}}) |> Adventure.save()
+    {:ok, _creator} =
+      User.new(%{id: creator_id, email: "test@test.com", name: "Test"}, "testtest")
+      |> UserRepository.save()
+
+    {:ok, adventure} =
+      Adventure.new(%{
+        id: adventure_id,
+        creator_id: creator_id,
+        name: "test adventure",
+        position: %{lat: 70, lng: 80}
+      })
+      |> AdventureRepository.save()
+
     token = CreatorApi.Token.create(creator_id)
 
     [
       creator_id: creator_id,
+      point_id: point_id,
       adventure_id: adventure_id,
       token: token,
+      adventure: adventure,
       conn: conn |> put_req_header("authorization", token)
     ]
   end
@@ -31,33 +47,61 @@ defmodule CreatorApiWeb.AdventureControllerTest do
         }
       }
 
-      conn
-      |> post("/api/adventures", adventure_params)
-      |> json_response(200)
+      response =
+        conn
+        |> post("/api/adventures", adventure_params)
+        |> json_response(200)
+
+      assert %{
+               "name" => "Test adventure"
+             } = response
     end
   end
 
   describe "updating existing adventure" do
     test "works", %{conn: conn, adventure_id: adventure_id} do
       adventure_params = %{
-        name: "Test adventure",
-        adventure_id: adventure_id
+        name: "Adventure",
+        adventure_id: adventure_id,
+        description: "FooBar",
+        language: "PL",
+        difficulty_level: 2,
+        min_time: 15,
+        max_time: 45,
+        show: false
       }
 
       conn
       |> patch("/api/adventures", adventure_params)
       |> json_response(200)
+
+      {:ok, adventure} = AdventureRepository.get(adventure_id)
+
+      assert %{
+               name: "Adventure",
+               description: "FooBar",
+               language: "PL",
+               difficulty_level: 2,
+               min_time: 15,
+               max_time: 45,
+               show: false
+             } = adventure
     end
   end
 
   describe "list adventures" do
-    test "works", %{conn: conn} do
+    test "works", %{conn: conn, adventure_id: adventure_id} do
       response =
         conn
         |> get("/api/adventures")
         |> json_response(200)
 
-      assert response |> length == 1
+      assert [
+               %{
+                 "id" => ^adventure_id,
+                 "name" => "test adventure"
+               }
+             ] = response
     end
   end
 
@@ -107,6 +151,12 @@ defmodule CreatorApiWeb.AdventureControllerTest do
       conn
       |> post("/api/adventures/send_to_pending", adventure_params)
       |> json_response(422)
+
+      {:ok, adventure} = AdventureRepository.get(adventure_id)
+
+      assert %{
+               status: "pending"
+             } = adventure
     end
 
     test "works when state is rejected", %{conn: conn, adventure_id: adventure_id} do
@@ -124,6 +174,12 @@ defmodule CreatorApiWeb.AdventureControllerTest do
       conn
       |> post("/api/adventures/send_to_pending", adventure_params)
       |> json_response(200)
+
+      {:ok, adventure} = AdventureRepository.get(adventure_id)
+
+      assert %{
+               status: "pending"
+             } = adventure
     end
 
     test "works when sending to in review state", %{conn: conn, adventure_id: adventure_id} do
@@ -134,6 +190,12 @@ defmodule CreatorApiWeb.AdventureControllerTest do
       conn
       |> post("/api/adventures/send_to_review", adventure_params)
       |> json_response(200)
+
+      {:ok, adventure} = AdventureRepository.get(adventure_id)
+
+      assert %{
+               status: "in_review"
+             } = adventure
     end
   end
 end
