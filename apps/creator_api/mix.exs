@@ -28,7 +28,7 @@ defmodule CreatorApi.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support", "test/fixtures"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -36,6 +36,8 @@ defmodule CreatorApi.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:contract, in_umbrella: true},
+      {:domain, in_umbrella: true},
       {:infrastructure, in_umbrella: true},
       {:phoenix, "~> 1.4.0"},
       {:phoenix_pubsub, "~> 1.1"},

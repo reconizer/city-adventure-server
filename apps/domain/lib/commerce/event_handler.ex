@@ -1,6 +1,4 @@
 defmodule Domain.Commerce.EventHandler do
-  use Domain.EventHandler
-
   @handlers [
     Domain.Commerce.Transfer.EventHandler
   ]

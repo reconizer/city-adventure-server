@@ -22,8 +22,8 @@ defmodule Infrastructure.Repository.Models.Adventure do
     field(:code, :string)
     field(:language, :string)
     field(:difficulty_level, :integer)
-    field(:min_time, :time)
-    field(:max_time, :time)
+    field(:min_time, :integer)
+    field(:max_time, :integer)
     field(:name, :string)
     field(:published, :boolean)
     field(:status, :string)
@@ -46,7 +46,7 @@ defmodule Infrastructure.Repository.Models.Adventure do
   end
 
   @params ~w(id description code language difficulty_level min_time max_time published show name creator_id asset_id status)a
-  @required_params ~w(name)a
+  @required_params ~w(name creator_id)a
 
   def changeset(model, params \\ %{}) do
     model
@@ -54,5 +54,6 @@ defmodule Infrastructure.Repository.Models.Adventure do
     |> validate_required(@required_params)
     |> validate_number(:difficulty_level, greater_than_or_equal_to: 1)
     |> validate_number(:difficulty_level, less_than_or_equal_to: 3)
+    |> foreign_key_constraint(:creator_id)
   end
 end

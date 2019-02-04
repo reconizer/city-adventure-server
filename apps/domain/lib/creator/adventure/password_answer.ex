@@ -5,8 +5,10 @@ defmodule Domain.Creator.Adventure.PasswordAnswer do
   alias Domain.Creator.Adventure
 
   @type t :: %__MODULE__{}
-  @type ok_t :: t() | {:ok, t()}
+  @type ok_t :: {:ok, t()}
   @type error :: {:error, any()}
+  @type entity :: ok_t() | error()
+  @type entity_changeset :: {:ok, {t(), Map.t()}} | error()
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
@@ -58,7 +60,7 @@ defmodule Domain.Creator.Adventure.PasswordAnswer do
     end
   end
 
-  @spec change(ok_t(), Map.t()) :: ok_t | error
+  @spec change(t() | entity(), Map.t()) :: entity_changeset
   def change({:ok, password_answer}, password_answer_params), do: change(password_answer, password_answer_params)
   def change({:error, _} = error, _), do: error
 

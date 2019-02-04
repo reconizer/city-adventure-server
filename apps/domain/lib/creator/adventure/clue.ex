@@ -5,6 +5,10 @@ defmodule Domain.Creator.Adventure.Clue do
   alias Domain.Creator.Adventure
 
   @type t :: %__MODULE__{}
+  @type ok_t :: {:ok, t()}
+  @type error :: {:error, any()}
+  @type entity :: ok_t() | error()
+  @type entity_changeset :: {:ok, {t(), Map.t()}} | error()
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
@@ -20,7 +24,7 @@ defmodule Domain.Creator.Adventure.Clue do
   end
 
   @fields ~w(id type description tip sort asset_id point_id url)a
-  @required_fields @fields -- [:asset_id, :url]
+  @required_fields @fields -- [:asset_id, :url, :description]
 
   @available_types ~w(text audio video image url)
 
@@ -31,6 +35,7 @@ defmodule Domain.Creator.Adventure.Clue do
     |> validate_inclusion(:type, @available_types)
   end
 
+  @spec new(Map.t()) :: entity()
   def new(%{id: id, type: type, description: description, tip: tip, sort: sort, point_id: point_id, url: url}) do
     %Adventure.Clue{
       id: id
@@ -52,6 +57,7 @@ defmodule Domain.Creator.Adventure.Clue do
     end
   end
 
+  @spec change(t() | entity(), Map.t()) :: entity_changeset()
   def change({:ok, clue}, clue_params), do: change(clue, clue_params)
   def change({:error, _} = error, _), do: error
 
