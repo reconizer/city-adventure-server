@@ -23,6 +23,7 @@ defmodule UserApiWeb do
       use UserApiWeb.ControllerHelpers
       import Plug.Conn
       import UserApiWeb.Gettext
+      import UserApiWeb.Utils
       alias UserApiWeb.Router.Helpers, as: Routes
     end
   end
