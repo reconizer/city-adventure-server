@@ -45,11 +45,6 @@ defmodule UserApiWeb.Plugs.CreateSession do
         session
         |> Session.add_error(error)
         |> Session.update_context(%{"response_code" => 401})
-
-      _ ->
-        session
-        |> Session.add_error({:jwt, "Unauthenticated"})
-        |> Session.update_context(%{"response_code" => 401})
     end
   end
 
@@ -57,9 +52,11 @@ defmodule UserApiWeb.Plugs.CreateSession do
     UserRepository.get_by_id(user_id)
     |> case do
       {:ok, _result} ->
-        {:ok, user} = ProfileContract.validate(user) 
+        {:ok, user} = ProfileContract.validate(user)
+
         session
         |> Session.update_context(%{"current_user" => user})
+
       {:error, reason} ->
         session
         |> Session.add_error(reason)
