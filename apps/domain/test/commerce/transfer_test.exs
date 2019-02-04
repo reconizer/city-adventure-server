@@ -188,7 +188,7 @@ defmodule Domain.Commerce.TransferTest do
 
     assert {:ok, transaction} = result
 
-    result = transfer |> Transfer.get_pending_transaction(uuid)
+    result = transfer |> Transfer.get_pending_transaction(uuid())
 
     assert :error = result
   end
@@ -247,8 +247,8 @@ defmodule Domain.Commerce.TransferTest do
     }
 
     assert %{
-             accounts: [to_account, from_account],
-             pending_transactions: [pending_transaction]
+             accounts: [^to_account, ^from_account],
+             pending_transactions: [^pending_transaction]
            } = result
   end
 

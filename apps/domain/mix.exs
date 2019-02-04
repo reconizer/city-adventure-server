@@ -37,6 +37,7 @@ defmodule Domain.MixProject do
   defp deps do
     [
       {:infrastructure, in_umbrella: true},
+      {:contract, in_umbrella: true},
       {:joken, "~> 1.5"},
       {:comeonin, "~> 4.1"},
       {:bcrypt_elixir, "~> 0.12"},
