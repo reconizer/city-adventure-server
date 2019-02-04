@@ -5,7 +5,10 @@ defmodule Domain.Creator.Adventure.Point do
   alias Domain.Creator.Adventure
 
   @type t :: %__MODULE__{}
-  @type aggregate_result :: t() | {:ok, t()} | {:error, any()}
+  @type ok_t :: {:ok, t()}
+  @type error :: {:error, any()}
+  @type entity :: ok_t() | error()
+  @type entity_changeset :: {:ok, {t(), Map.t()}} | error()
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
@@ -52,6 +55,7 @@ defmodule Domain.Creator.Adventure.Point do
     end
   end
 
+  @spec change(t() | entity(), Map.t()) :: entity_changeset
   def change({:ok, point}, point_params), do: change(point, point_params)
   def change({:error, _} = error, _), do: error
 
@@ -67,7 +71,7 @@ defmodule Domain.Creator.Adventure.Point do
     end
   end
 
-  @spec get_clue(Adventure.Point.t(), Ecto.UUID.t()) :: {:ok, Adventure.Clue.t()} | {:error, any()}
+  @spec get_clue(t() | entity(), Ecto.UUID.t()) :: Adventure.Clue.entity()
   def get_clue({:ok, point}, clue_id), do: get_clue(point, clue_id)
   def get_clue({:error, _} = error, _), do: error
 
@@ -81,6 +85,7 @@ defmodule Domain.Creator.Adventure.Point do
     end
   end
 
+  @spec get_clues(t() | entity()) :: [Adventure.Clue.t()] | error
   def get_clues({:ok, point}), do: get_clues(point)
   def get_clues({:error, _} = error), do: error
 
@@ -88,6 +93,7 @@ defmodule Domain.Creator.Adventure.Point do
     point.clues
   end
 
+  @spec add_clue(t() | entity(), Adventure.Clue.t()) :: entity()
   def add_clue({:ok, point}, clue), do: add_clue(point, clue)
   def add_clue({:error, _} = error, _), do: error
 
@@ -97,6 +103,7 @@ defmodule Domain.Creator.Adventure.Point do
     {:ok, %{point | clues: new_clues}}
   end
 
+  @spec remove_clue(t() | entity(), Ecto.UUID.t()) :: entity()
   def remove_clue({:ok, point}, clue_id), do: remove_clue(point, clue_id)
   def remove_clue({:error, _} = error, _), do: error
 
@@ -106,6 +113,7 @@ defmodule Domain.Creator.Adventure.Point do
     {:ok, %{point | clues: new_clues}}
   end
 
+  @spec replace_clue(t() | entity(), Adventure.Clue.t()) :: entity()
   def replace_clue({:error, _} = error, _), do: error
   def replace_clue({:ok, point}, clue), do: replace_clue(point, clue)
 
@@ -121,6 +129,10 @@ defmodule Domain.Creator.Adventure.Point do
         error
     end
   end
+
+  @spec last_clue_sort(t() | entity()) :: error() | :integer
+  def last_clue_sort({:ok, point}), do: last_clue_sort(point)
+  def last_clue_sort({:error, _} = error), do: error
 
   def last_clue_sort(point) do
     point.clues

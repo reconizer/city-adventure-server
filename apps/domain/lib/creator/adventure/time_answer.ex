@@ -5,8 +5,10 @@ defmodule Domain.Creator.Adventure.TimeAnswer do
   alias Domain.Creator.Adventure
 
   @type t :: %__MODULE__{}
-  @type ok_t :: t() | {:ok, t()}
+  @type ok_t :: {:ok, t()}
   @type error :: {:error, any()}
+  @type entity :: ok_t() | error()
+  @type entity_changeset :: {:ok, {t(), Map.t()}} | error()
 
   @primary_key false
   embedded_schema do
@@ -40,7 +42,7 @@ defmodule Domain.Creator.Adventure.TimeAnswer do
     end
   end
 
-  @spec change(ok_t(), Map.t()) :: ok_t | error
+  @spec change(t() | entity(), Map.t()) :: entity_changeset
   def change({:ok, time_answer}, time_answer_params), do: change(time_answer, time_answer_params)
   def change({:error, _} = error, _), do: error
 

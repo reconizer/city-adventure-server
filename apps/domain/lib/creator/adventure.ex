@@ -5,9 +5,11 @@ defmodule Domain.Creator.Adventure do
 
   alias Domain.Creator.Adventure
 
-  @type t :: %__MODULE__{} | {:ok, %__MODULE__{}}
+  @type t :: %__MODULE__{}
+  @type ok_t :: {:ok, t()}
   @type error :: {:error, any()}
-  @type aggregate :: t() | error
+  @type entity :: ok_t() | error()
+
   @type clue_order :: %{id: Ecto.UUID.t(), point_id: Ecto.UUID.t()}
   @type clue_orders :: [clue_order]
   @type point_order :: %{id: Ecto.UUID.t(), parent_point_id: Ecto.UUID.t()}
@@ -92,7 +94,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec send_to_review(aggregate) :: aggregate
+  @spec send_to_review(t() | entity()) :: entity()
   def send_to_review({:ok, adventure}), do: send_to_review(adventure)
   def send_to_review({:error, _} = error), do: error
 
@@ -120,7 +122,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec send_to_pending(aggregate) :: aggregate
+  @spec send_to_pending(t() | entity()) :: entity()
   def send_to_pending({:ok, adventure}), do: send_to_pending(adventure)
   def send_to_pending({:error, _} = error), do: error
 
@@ -148,7 +150,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec can_be_sent_to_pending?(aggregate) :: true | false | error
+  @spec can_be_sent_to_pending?(t() | entity()) :: true | false | error
   def can_be_sent_to_pending?({:ok, adventure}), do: can_be_sent_to_pending?(adventure)
   def can_be_sent_to_pending?({:error, _} = error), do: error
 
@@ -156,7 +158,7 @@ defmodule Domain.Creator.Adventure do
     adventure.status in ["rejected", "unpublished"]
   end
 
-  @spec can_be_sent_to_review?(aggregate) :: true | false | error
+  @spec can_be_sent_to_review?(t() | entity()) :: true | false | error
   def can_be_sent_to_review?({:ok, adventure}), do: can_be_sent_to_review?(adventure)
   def can_be_sent_to_review?({:error, _} = error), do: error
 
@@ -164,7 +166,7 @@ defmodule Domain.Creator.Adventure do
     adventure.status == "pending"
   end
 
-  @spec change(aggregate(), Map.t()) :: t() | error
+  @spec change(t() | entity(), Map.t()) :: entity()
   def change({:ok, adventure}, params), do: change(adventure, params)
   def change({:error, _} = error, _), do: error
 
@@ -182,7 +184,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec add_point(aggregate, Map.t()) :: t() | error
+  @spec add_point(t() | entity(), Map.t()) :: entity()
   def add_point({:ok, adventure}, params), do: add_point(adventure, params)
   def add_point({:error, _} = error, _), do: error
 
@@ -219,7 +221,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec change_point(aggregate, Map.t()) :: t() | error
+  @spec change_point(t() | entity(), Map.t()) :: entity()
   def change_point({:ok, adventure}, params), do: change_point(adventure, params)
   def change_point({:error, _} = error, _), do: error
 
@@ -238,7 +240,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec remove_point(aggregate, Ecto.UUID.t()) :: t() | error
+  @spec remove_point(t() | entity(), Ecto.UUID.t()) :: entity()
   def remove_point({:ok, adventure}, point_id), do: remove_point(adventure, point_id)
   def remove_point({:error, _} = error, _), do: error
 
@@ -271,7 +273,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec add_clue(aggregate(), add_clue_params()) :: t() | error
+  @spec add_clue(t() | entity(), add_clue_params()) :: entity()
   def add_clue({:ok, adventure}, clue_params), do: add_clue(adventure, clue_params)
   def add_clue({:error, _} = error, _), do: error
 
@@ -312,7 +314,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec remove_clue(aggregate, Ecto.UUID.t()) :: t() | error
+  @spec remove_clue(t() | entity(), Ecto.UUID.t()) :: entity()
   def remove_clue({:ok, adventure}, clue_id), do: remove_clue(adventure, clue_id)
   def remove_clue({:error, _} = error, _), do: error
 
@@ -333,7 +335,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec change_clue(aggregate, Map.t()) :: {:ok, t} | error
+  @spec change_clue(t() | entity(), Map.t()) :: entity()
   def change_clue({:ok, adventure}, params), do: change_clue(adventure, params)
   def change_clue({:error, _} = error, _), do: error
 
@@ -352,7 +354,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec reorder_clues(aggregate, clue_orders) :: t() | error
+  @spec reorder_clues(t() | entity(), clue_orders) :: entity()
   def reorder_clues({:ok, adventure}, params), do: reorder_clues(adventure, params)
   def reorder_clues({:error, _} = error, _), do: error
 
@@ -368,7 +370,7 @@ defmodule Domain.Creator.Adventure do
     end)
   end
 
-  @spec reorder_points(aggregate, point_orders) :: t() | error
+  @spec reorder_points(t() | entity(), point_orders()) :: entity()
   def reorder_points({:ok, adventure}, points_order), do: reorder_points(adventure, points_order)
   def reorder_points({:error, _} = error, _), do: error
 
@@ -392,7 +394,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec get_point_children(Aventure.t(), Ecto.UUID.t()) :: [Adventure.Point.t()]
+  @spec get_point_children(t(), Ecto.UUID.t()) :: [Adventure.Point.t()]
   def get_point_children(adventure, point_id) do
     adventure.points
     |> Enum.filter(&(&1.parent_point_id == point_id))
@@ -401,7 +403,10 @@ defmodule Domain.Creator.Adventure do
   @doc """
   Orders points using their parent_point_ids and point_ids
   """
-  @spec set_points(t(), [Adventure.Point.t()]) :: t()
+  @spec set_points(t() | entity(), [Adventure.Point.t()]) :: entity()
+  def set_points({:ok, adventure}, points), do: set_points(adventure, points)
+  def set_points({:error, _} = error, _points), do: error
+
   def set_points(adventure, points) do
     {[first_point], remaining_points} =
       points
@@ -434,7 +439,7 @@ defmodule Domain.Creator.Adventure do
     {:ok, %{adventure | points: points}}
   end
 
-  @spec get_clue(aggregate, Ecto.UUID.t()) :: {:ok, Adventure.Clue.t()} | error
+  @spec get_clue(t() | entity(), Ecto.UUID.t()) :: Adventure.Clue.entity()
   def get_clue({:ok, adventure}, clue_id), do: get_clue(adventure, clue_id)
   def get_clue({:error, _} = error, _), do: error
 
@@ -448,7 +453,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec get_last_point(aggregate) :: {:ok, Adventure.Point.t()} | error
+  @spec get_last_point(t() | entity()) :: Adventure.Point.entity()
   def get_last_point({:ok, adventure}), do: get_last_point(adventure)
   def get_last_point({:error, _} = error), do: error
 
@@ -461,7 +466,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec do_add_clue(aggregate, Ecto.UUID.t(), Adventure.Clue.t()) :: t() | error
+  @spec do_add_clue(t() | entity(), Ecto.UUID.t(), Adventure.Clue.t()) :: entity()
   defp do_add_clue({:ok, adventure}, point_id, clue), do: do_add_clue(adventure, point_id, clue)
   defp do_add_clue({:error, _} = error, _, _), do: error
 
@@ -479,7 +484,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec do_remove_clue(aggregate, Ecto.UUID.t()) :: t() | {:error, any}
+  @spec do_remove_clue(t() | entity(), Ecto.UUID.t()) :: entity()
   defp do_remove_clue({:ok, adventure}, clue_id), do: do_remove_clue(adventure, clue_id)
   defp do_remove_clue({:error, _} = error, _), do: error
 
@@ -505,7 +510,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec do_replace_clue(aggregate, Ecto.UUID.t(), Adventure.Clue.t()) :: t() | {:error, any}
+  @spec do_replace_clue(t() | entity(), Ecto.UUID.t(), Adventure.Clue.t()) :: entity()
   defp do_replace_clue({:ok, adventure}, point_id, clue), do: do_replace_clue(adventure, point_id, clue)
   defp do_replace_clue({:error, _} = error, _, _), do: error
 
@@ -523,7 +528,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec get_point(aggregate, Ecto.UUID.t()) :: {:error, {:point_id, String.t()}} | {:ok, Adventure.Point.t()}
+  @spec get_point(t() | entity(), Ecto.UUID.t()) :: Aggregate.Point.entity()
   def get_point({:ok, adventure}, point_id), do: get_point(adventure, point_id)
   def get_point({:error, _} = error, _), do: error
 
@@ -536,7 +541,7 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  @spec do_add_point(aggregate, Adventure.Point.t()) :: t() | {:error, any}
+  @spec do_add_point(t() | entity(), Adventure.Point.t()) :: entity()
   defp do_add_point({:ok, adventure}, point), do: do_add_point(adventure, point)
   defp do_add_point({:error, _} = error, _), do: error
 
@@ -546,7 +551,7 @@ defmodule Domain.Creator.Adventure do
     {:ok, %{adventure | points: new_points}}
   end
 
-  @spec do_remove_point(aggregate, Ecto.UUID.t()) :: t()
+  @spec do_remove_point(t() | entity(), Ecto.UUID.t()) :: entity()
   defp do_remove_point({:ok, adventure}, point_id), do: do_remove_point(adventure, point_id)
   defp do_remove_point({:error, _} = error, _), do: error
 
@@ -556,7 +561,7 @@ defmodule Domain.Creator.Adventure do
     {:ok, %{adventure | points: new_points}}
   end
 
-  @spec do_replace_point(aggregate, Adventure.Point.t()) :: t()
+  @spec do_replace_point(t() | entity(), Adventure.Point.t()) :: entity()
   defp do_replace_point({:ok, adventure}, point), do: do_replace_point(adventure, point)
   defp do_replace_point({:error, _} = error, _), do: error
 
