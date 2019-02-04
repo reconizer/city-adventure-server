@@ -44,26 +44,23 @@ defmodule Domain.UserAdventure.Projections.Adventure do
         {:error, {:adventure, "not_found"}}
 
       result ->
-        adventure =
-          %Adventure{
-            id: result.id,
-            name: result.name,
-            creator_id: result.creator_id,
-            description: result.description,
-            min_time: result.min_time |> parse_time_to_seconds(),
-            max_time: result.max_time |> parse_time_to_seconds(),
-            difficulty_level: result.difficulty_level,
-            language: result.language,
-            asset: result.asset
-          }
-          |> get_rating()
-          |> get_owner_rating(owner_id)
-          |> get_assets()
-          |> get_ranking()
-          |> get_owner_ranking(owner_id)
-          |> get_creator()
-
-        {:ok, adventure}
+        %Adventure{
+          id: result.id,
+          name: result.name,
+          creator_id: result.creator_id,
+          description: result.description,
+          min_time: result.min_time |> parse_time_to_seconds(),
+          max_time: result.max_time |> parse_time_to_seconds(),
+          difficulty_level: result.difficulty_level,
+          language: result.language,
+          asset: result.asset
+        }
+        |> get_rating()
+        |> get_owner_rating(owner_id)
+        |> get_assets()
+        |> get_ranking()
+        |> get_owner_ranking(owner_id)
+        |> get_creator()
     end
   end
 
@@ -184,9 +181,7 @@ defmodule Domain.UserAdventure.Projections.Adventure do
 
   defp parse_time_to_seconds(nil), do: nil
 
-  defp parse_time_to_seconds(time) do
-    time
-    |> Time.to_erl()
-    |> :calendar.time_to_seconds()
+  defp parse_time_to_seconds(minute) do
+    minute / 60
   end
 end
