@@ -7,7 +7,6 @@ defmodule Worker.FileUpload.Handler.AssetUpload do
   alias Infrastructure.Repository.Models.Asset
 
   @bucket Application.get_env(:worker, :asset_bucket)
-  @conversion_queue_name Application.get_env(:worker, :conversion_queue_name)
 
   def process(%{body: %{"Records" => [_s3_event]}} = event, queue_name) do
     event
@@ -123,11 +122,15 @@ defmodule Worker.FileUpload.Handler.AssetUpload do
     asset_event
     |> Helper.AssetEvent.build_conversions()
     |> Enum.map(fn conversion ->
-      send_message(@conversion_queue_name, conversion)
+      send_message(conversion_queue_name(), conversion)
     end)
 
     {:ok, asset_event}
   end
 
   def send_conversions(other), do: other
+
+  defp conversion_queue_name do
+    Application.get_env(:worker, :conversion_queue_name)
+  end
 end

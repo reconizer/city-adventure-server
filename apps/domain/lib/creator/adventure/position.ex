@@ -3,6 +3,9 @@ defmodule Domain.Creator.Adventure.Position do
   import Ecto.Changeset
 
   @type t :: %__MODULE__{}
+  @type ok_t :: {:ok, t()}
+  @type error :: {:error, any()}
+  @type entity :: ok_t() | error()
 
   @primary_key false
   embedded_schema do

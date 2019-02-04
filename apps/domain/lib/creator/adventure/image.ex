@@ -5,6 +5,9 @@ defmodule Domain.Creator.Adventure.Image do
   alias Domain.Creator.Adventure
 
   @type t :: %__MODULE__{}
+  @type ok_t :: {:ok, t()}
+  @type error :: {:error, any()}
+  @type entity :: ok_t() | error()
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
