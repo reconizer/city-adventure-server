@@ -1,6 +1,4 @@
 defmodule Domain.Creator.EventHandler do
-  use Domain.EventHandler
-
   @handlers [
     Domain.Creator.EventHandlers.User,
     Domain.Creator.EventHandlers.Adventure

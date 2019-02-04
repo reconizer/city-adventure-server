@@ -81,7 +81,7 @@ defmodule Worker.FileUpload.Handler.ClueImageConversion do
     :ok
   end
 
-  def cleanup({:error, _} = e, _queue_name) do
+  def cleanup({:error, _} = _e, _queue_name) do
     :ok
   end
 end

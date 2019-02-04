@@ -145,12 +145,4 @@ defmodule Domain.Creator.Repository.Adventure do
   defp adventure_rating(%{rating: rating}) do
     rating
   end
-
-  defp parse_time_to_seconds(nil), do: nil
-
-  defp parse_time_to_seconds(time) do
-    time
-    |> Time.to_erl()
-    |> :calendar.time_to_seconds()
-  end
 end
