@@ -15,7 +15,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     Clue,
     UserPoint,
     UserAdventure,
-    Asset
+    Asset,
+    Image
   }
 
   def get(%{adventure_id: adventure_id, user_id: user_id}) do
@@ -26,9 +27,13 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> where([adventure, points, user_points, user_adventures], user_adventures.user_id == ^user_id)
     |> preload([adventure, points, user_points, user_adventures], user_points: user_points)
     |> preload([adventure, points, user_points, user_adventures], user_adventures: user_adventures)
-    |> preload(adventure: :asset)
+    |> preload(:creator)
+    |> preload(images: :asset)
+    |> preload(:asset)
     |> preload(points: :clues)
     |> preload(points: :answers)
+    |> preload(:adventure_ratings)
+    |> preload(user_rankings: :asset)
     |> Repository.get(adventure_id)
     |> case do
       nil -> {:error, {:adventure, "not_founds"}}
@@ -93,6 +98,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       max_time: model.max_time,
       difficulty_level: model.difficulty_level,
       language: model.language,
+      asset: model.asset |> load_asset(),
+      images: model.images |> Enum.map(&load_image/1),
       points: model.points |> Enum.map(&load_points/1),
       user_adventure: model.user_adventures |> List.first() |> load_user_adventure(),
       user_points: model.user_points |> Enum.map(&load_user_points/1)
@@ -142,6 +149,14 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       point_id: user_point.point_id,
       inserted_at: user_point.inserted_at,
       updated_at: user_point.updated_at
+    }
+  end
+
+  defp load_image(image_model) do
+    %Image{
+      id: image_model.id,
+      sort: image_model.sort,
+      asset: image_model.asset |> load_asset()
     }
   end
 

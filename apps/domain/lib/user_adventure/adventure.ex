@@ -3,7 +3,9 @@ defmodule Domain.UserAdventure.Adventure do
     Point,
     UserAdventure,
     UserPoint,
-    Asset
+    Asset,
+    Image,
+    AdventureRating
   }
 
   alias Domain.UserAdventure.Adventure
@@ -23,12 +25,17 @@ defmodule Domain.UserAdventure.Adventure do
     field(:description, :string)
     field(:min_time, :integer)
     field(:max_time, :integer)
+    field(:rating, :decimal)
+    field(:rating_count, :integer)
     field(:difficulty_level, :integer)
     field(:language, :string)
     embeds_many(:points, Point)
     embeds_many(:user_points, UserPoint)
     embeds_one(:user_adventure, UserAdventure)
     embeds_one(:asset, Asset)
+    embeds_many(:images, Image)
+    embeds_many(:ratings, AdventureRating)
+    embeds_many(:rankings, Ranking)
 
     aggregate_fields()
   end
