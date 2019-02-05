@@ -14,7 +14,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     Answer,
     Clue,
     UserPoint,
-    UserAdventure
+    UserAdventure,
+    Asset
   }
 
   def get(%{adventure_id: adventure_id, user_id: user_id}) do
@@ -25,6 +26,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> where([adventure, points, user_points, user_adventures], user_adventures.user_id == ^user_id)
     |> preload([adventure, points, user_points, user_adventures], user_points: user_points)
     |> preload([adventure, points, user_points, user_adventures], user_adventures: user_adventures)
+    |> preload(adventure: :asset)
     |> preload(points: :clues)
     |> preload(points: :answers)
     |> Repository.get(adventure_id)
@@ -84,6 +86,13 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   def load_adventure(model) do
     %Adventure{
       id: model.id,
+      name: model.name,
+      creator_id: model.creator_id,
+      description: model.description,
+      min_time: model.min_time,
+      max_time: model.max_time,
+      difficulty_level: model.difficulty_level,
+      language: model.language,
       points: model.points |> Enum.map(&load_points/1),
       user_adventure: model.user_adventures |> List.first() |> load_user_adventure(),
       user_points: model.user_points |> Enum.map(&load_user_points/1)
@@ -133,6 +142,15 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       point_id: user_point.point_id,
       inserted_at: user_point.inserted_at,
       updated_at: user_point.updated_at
+    }
+  end
+
+  defp load_asset(asset_model) do
+    %Asset{
+      id: asset_model.id,
+      type: asset_model.type,
+      name: asset_model.name,
+      extension: asset_model.extension
     }
   end
 

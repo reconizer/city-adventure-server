@@ -2,7 +2,8 @@ defmodule Domain.UserAdventure.Adventure do
   alias Domain.UserAdventure.Adventure.{
     Point,
     UserAdventure,
-    UserPoint
+    UserPoint,
+    Asset
   }
 
   alias Domain.UserAdventure.Adventure
@@ -17,9 +18,17 @@ defmodule Domain.UserAdventure.Adventure do
   embedded_schema do
     field(:current_point_id, Ecto.UUID)
     field(:completed, :boolean, default: false)
+    field(:name, :string)
+    field(:creator_id, Ecto.UUID)
+    field(:description, :string)
+    field(:min_time, :integer)
+    field(:max_time, :integer)
+    field(:difficulty_level, :integer)
+    field(:language, :string)
     embeds_many(:points, Point)
     embeds_many(:user_points, UserPoint)
     embeds_one(:user_adventure, UserAdventure)
+    embeds_one(:asset, Asset)
 
     aggregate_fields()
   end
