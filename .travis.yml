@@ -19,8 +19,9 @@ addons:
   postgresql: "10"
   apt:
     packages:
-    - postgresql-10-postgis-2.4
-    - postgresql-10-postgis-2.4-scripts
+      - postgresql-10-postgis-2.4
+      - postgresql-10-postgis-2.4-scripts
+      - postgresql-client-10
   s3_region: "eu-west-1"
   artifacts:
     region: "eu-west-1"
@@ -38,4 +39,5 @@ after_success:
 
 env:
   global:
-  - MIX_ENV=test
+    - MIX_ENV=test
+    - PGPORT=5433
