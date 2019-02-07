@@ -18,13 +18,15 @@ cache:
 addons:
   postgresql: "10.4"
   apt:
-      packages:
-      - postgresql-10-postgis-2.4
+    packages:
+    - postgresql-10
+    - postgresql-client-10
+    - postgresql-10-postgis-2.4
   s3_region: "eu-west-1"
   artifacts:
     region: "eu-west-1"
     paths:
-      - ./gameinn.tar.gz
+      - ./app.tar.gz
     target_paths:
       - unfold-server/$TRAVIS_BRANCH/latest
       - unfold-server/$TRAVIS_BRANCH/builds/$TRAVIS_BUILD_NUMBER
@@ -34,3 +36,13 @@ script:
 
 after_success:
   - ./scripts/travis/deploy.sh
+
+env:
+  global:
+  - PGPORT=5433
+  - MIX_ENV=test
+  - DATABASE_PORT=5433
+  - DATABASE_NAME=city_adventure_test
+  - DATABASE_USER=postgres
+  - DATABASE_PASSWORD=postgres
+  - DATABASE_HOST=localhost
