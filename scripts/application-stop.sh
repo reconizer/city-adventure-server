@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if pgrep gameinn > /dev/null 2>&1
+if pgrep app > /dev/null 2>&1
 then
-  sudo initctl stop gameinn
+  sudo service app stop
 fi
