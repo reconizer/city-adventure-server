@@ -20,6 +20,7 @@ addons:
   apt:
     packages:
     - postgresql-10-postgis-2.4
+    - postgresql-10-postgis-2.4-scripts
   s3_region: "eu-west-1"
   artifacts:
     region: "eu-west-1"
