@@ -52,3 +52,17 @@ config :media_storage,
   s3_secret_access_key: System.get_env("CA_MEDIA_STORAGE_S3_SECRET_ACCESS_KEY"),
   s3_region: System.get_env("CA_MEDIA_STORAGE_S3_REGION"),
   s3_bucket: System.get_env("CA_INFRASTRUCTURE_ASSET_BUCKET")
+
+config :worker, :file_upload_queue_name, System.get_env("CA_WORKER_FILE_UPLOAD_QUEUE")
+config :worker, :conversion_queue_name, System.get_env("CA_WORKER_CONVERSION_QUEUE")
+config :worker, :asset_bucket, System.get_env("CA_INFRASTRUCTURE_ASSET_BUCKET")
+
+config :ex_aws, :sqs,
+  access_key_id: System.get_env("CA_EX_AWS_SQS_ACCESS_KEY_ID"),
+  secret_access_key: System.get_env("CA_EX_AWS_SQS_SECRET_ACCESS_KEY"),
+  region: System.get_env("CA_EX_AWS_SQS_REGION")
+
+config :ex_aws, :s3,
+  access_key_id: System.get_env("CA_EX_AWS_S3_ACCESS_KEY_ID"),
+  secret_access_key: System.get_env("CA_EX_AWS_S3_SECRET_ACCESS_KEY"),
+  region: System.get_env("CA_EX_AWS_S3_REGION")
