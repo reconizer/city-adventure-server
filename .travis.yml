@@ -43,5 +43,5 @@ env:
   - DATABASE_PORT=5433
   - DATABASE_NAME=city_adventure_test
   - DATABASE_USER=postgres
-  - DATABASE_PASSWORD=postgres
+  - DATABASE_PASSWORD=
   - DATABASE_HOST=localhost
