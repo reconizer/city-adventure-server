@@ -2,9 +2,9 @@ defmodule Domain.UserAdventure.Point do
   alias Domain.UserAdventure.{
     Point,
     Clue,
-    Answer,
-    UserPoint
+    Answer
   }
+
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -38,16 +38,17 @@ defmodule Domain.UserAdventure.Point do
 
   def set_last_point(%Point{} = point, points) do
     points
-    |> Enum.find(fn p -> 
+    |> Enum.find(fn p ->
       p.parent_point_id == point.id
     end)
     |> case do
       nil ->
         point
-        |> Map.put(:last_point, true) 
-      _result -> 
+        |> Map.put(:last_point, true)
+
+      _result ->
         point
-        |> Map.put(:last_point, false) 
+        |> Map.put(:last_point, false)
     end
   end
 
@@ -55,15 +56,18 @@ defmodule Domain.UserAdventure.Point do
     point
     |> Map.get(:answers)
     |> case do
-      nil -> point
+      nil ->
+        point
+
       result ->
         result
-        |> Enum.find(fn answer -> 
+        |> Enum.find(fn answer ->
           answer.type == "password"
         end)
         |> case do
           nil ->
             point
+
           %{details: %{"password_type" => type}} ->
             point
             |> Map.put(:answer_type, type)
@@ -74,5 +78,4 @@ defmodule Domain.UserAdventure.Point do
   def check_last_point(%Point{} = point) do
     point.last_point
   end
-
 end

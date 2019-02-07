@@ -60,7 +60,7 @@ release :app do
       :runtime_tools,
       contract: :permanent,
       creator_api: :permanent,
-      administrator_api: :permanent,
+      administration_api: :permanent,
       domain: :permanent,
       infrastructure: :permanent,
       session: :permanent,

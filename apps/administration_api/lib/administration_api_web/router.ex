@@ -20,6 +20,15 @@ defmodule AdministrationApiWeb.Router do
         post("/logout", AuthController, :logout)
       end
     end
+
+    scope "/creator", Creator do
+      pipe_through(:authenticated)
+
+      scope "/adventures" do
+        get("/", AdventureController, :list)
+        get("/:adventure_id", AdventureController, :item)
+      end
+    end
   end
 
   scope "/api/ping", AdministrationApiWeb do

@@ -61,6 +61,7 @@ defmodule AdministrationApiWeb do
   def contract do
     quote do
       import Contract
+      import AdministrationApiWeb.Contracts
     end
   end
 
