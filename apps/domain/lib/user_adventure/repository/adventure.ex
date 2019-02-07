@@ -14,9 +14,13 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     Answer,
     Clue,
     UserPoint,
+    UserRanking,
+    AdventureRating,
     UserAdventure,
+    AssetConversion,
     Asset,
-    Image
+    Image,
+    Creator
   }
 
   def get(%{adventure_id: adventure_id, user_id: user_id}) do
@@ -24,20 +28,25 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> join(:left, [adventure], points in assoc(adventure, :points))
     |> join(:left, [adventure, points], user_points in assoc(points, :user_points), on: user_points.user_id == ^user_id)
     |> join(:left, [adventure, points, user_points], user_adventures in assoc(adventure, :user_adventures))
-    |> where([adventure, points, user_points, user_adventures], user_adventures.user_id == ^user_id)
-    |> preload([adventure, points, user_points, user_adventures], user_points: user_points)
-    |> preload([adventure, points, user_points, user_adventures], user_adventures: user_adventures)
-    |> preload(:creator)
+    |> join(:left, [adventure, points, user_points, user_adventures], user_rankings in assoc(adventure, :user_rankings))
+    |> join(:inner, [adventure, points, user_points, user_adventures, user_rankings], user in assoc(user_rankings, :user))
+    |> join(:left, [adventure, points, user_points, user_adventures, user_rankings, user], avatar in assoc(user, :avatar))
+    |> join(:left, [adventure, points, user_points, user_adventures, user_rankings, user, avatar], asset in assoc(avatar, :asset))
+    |> where([_adventure, _points, _user_points, user_adventures, _user_rankings, _user, _avatar, _asset], user_adventures.user_id == ^user_id)
+    |> preload([adventure, points, user_points, user_adventures, user_rankings, user, avatar, asset], user_points: user_points)
+    |> preload([adventure, points, user_points, user_adventures, user_rankings, user, avatar, asset], user_adventures: user_adventures)
+    |> preload([adventure, points, user_points, user_adventures, user_rankings, user, avatar, asset], user_rankings: {user_rankings, asset: asset})
+    |> preload(creator: :asset)
     |> preload(images: :asset)
     |> preload(:asset)
     |> preload(points: :clues)
     |> preload(points: :answers)
     |> preload(:adventure_ratings)
-    |> preload(user_rankings: :asset)
     |> Repository.get(adventure_id)
+    |> IO.inspect()
     |> case do
       nil -> {:error, {:adventure, "not_founds"}}
-      result -> {:ok, result |> load_adventure()}
+      result -> {:ok, result |> load_adventure(user_id)}
     end
   end
 
@@ -88,7 +97,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     end
   end
 
-  def load_adventure(model) do
+  def load_adventure(%Models.Adventure{} = model, user_id) do
     %Adventure{
       id: model.id,
       name: model.name,
@@ -96,8 +105,14 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       description: model.description,
       min_time: model.min_time,
       max_time: model.max_time,
+      creator: model.creator |> load_creator(),
       difficulty_level: model.difficulty_level,
+      rating: model.adventure_ratings |> calculate_rating(),
+      rating_count: model.adventure_ratings |> Enum.count(),
       language: model.language,
+      rankings: model.user_rankings |> Enum.map(&load_user_ranking/1),
+      user_ranking: model.user_rankings |> find_user_ranking(user_id) |> load_user_ranking(),
+      user_rating: model.adventure_ratings |> find_user_rating(user_id) |> load_user_rating(),
       asset: model.asset |> load_asset(),
       images: model.images |> Enum.map(&load_image/1),
       points: model.points |> Enum.map(&load_points/1),
@@ -106,7 +121,14 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
-  def load_points(point) do
+  def load_creator(%Models.Creator{} = creator_model) do
+    %Creator{
+      name: creator_model.name,
+      asset: creator_model.asset |> load_asset()
+    }
+  end
+
+  def load_points(%Models.Point{} = point) do
     %Point{
       id: point.id,
       position: point.position,
@@ -120,7 +142,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
-  def load_answers(answer) do
+  def load_answers(%Models.Answer{} = answer) do
     %Answer{
       type: answer.type,
       details: answer.details,
@@ -129,7 +151,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
-  def load_clues(clue) do
+  def load_clues(%Models.Clue{} = clue) do
     %Clue{
       description: clue.description,
       type: clue.type,
@@ -141,7 +163,42 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
-  def load_user_points(user_point) do
+  def find_user_ranking(user_rankings, user_id) do
+    user_rankings
+    |> Enum.find(fn ranking ->
+      ranking.user_id == user_id
+    end)
+  end
+
+  def find_user_rating(user_ratings, user_id) do
+    user_ratings
+    |> Enum.find(fn rating ->
+      rating.user_id == user_id
+    end)
+  end
+
+  def calculate_rating([]), do: 0
+
+  def calculate_rating(adventure_ratings) do
+    {enum, sum} =
+      adventure_ratings
+      |> Enum.map_reduce(0, fn %{rating: r} = e, acc ->
+        {e, r + acc}
+      end)
+
+    (sum / Enum.count(enum))
+    |> Float.round(2)
+  end
+
+  def load_user_rating(%Models.AdventureRating{} = user_rating) do
+    %AdventureRating{
+      user_id: user_rating.user_id,
+      adventure_id: user_rating.adventure_id,
+      rating: user_rating.rating
+    }
+  end
+
+  def load_user_points(%Models.UserPoint{} = user_point) do
     %UserPoint{
       position: user_point.position,
       completed: user_point.completed,
@@ -152,7 +209,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
-  defp load_image(image_model) do
+  defp load_image(%Models.Image{} = image_model) do
     %Image{
       id: image_model.id,
       sort: image_model.sort,
@@ -160,12 +217,39 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
-  defp load_asset(asset_model) do
+  defp load_asset(%Models.Asset{} = asset_model) do
     %Asset{
       id: asset_model.id,
       type: asset_model.type,
       name: asset_model.name,
-      extension: asset_model.extension
+      extension: asset_model.extension,
+      asset_conversions: asset_model.asset_conversions
+    }
+  end
+
+  def build_asset_conversions(%Models.AssetConversion{} = asset_conversion_models) do
+    asset_conversion_models
+    |> Enum.map(fn conversion_model ->
+      %AssetConversion{
+        id: conversion_model.id,
+        type: conversion_model.type,
+        name: conversion_model.name,
+        extension: conversion_model.extension,
+        asset_id: conversion_model.asset_id
+      }
+    end)
+  end
+
+  def build_asset_conversions(_), do: []
+
+  defp load_user_ranking(%Models.UserRanking{} = ranking_model) do
+    %UserRanking{
+      user_id: ranking_model.user_id,
+      adventure_id: ranking_model.adventure_id,
+      position: ranking_model.position,
+      nick: ranking_model.nick,
+      completion_time: ranking_model.completion_time,
+      asset: ranking_model.asset |> load_asset()
     }
   end
 

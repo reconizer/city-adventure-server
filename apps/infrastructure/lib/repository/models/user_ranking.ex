@@ -11,11 +11,11 @@ defmodule Infrastructure.Repository.Models.UserRanking do
   @foreign_key_type :binary_id
 
   schema "user_ranking_view" do
-    belongs_to :user, Models.User, foreign_key: :user_id
-    belongs_to :adventure, Models.Adventure, foreign_key: :adventure_id
-    has_one :asset, through: [:user, avatar: [:asset]]
-    field :position, :integer
-    field :nick, :string
-    field :completion_time, :integer
+    belongs_to(:user, Models.User, foreign_key: :user_id)
+    belongs_to(:adventure, Models.Adventure, foreign_key: :adventure_id)
+    has_one(:asset, through: [:user, avatar: [:asset]])
+    field(:position, :integer)
+    field(:nick, :string)
+    field(:completion_time, :integer)
   end
 end

@@ -18,11 +18,11 @@ defmodule UserApiWeb.AdventureContract do
     params
     |> with_user(conn)
     |> cast(%{
-      id: Ecto.UUID,
+      adventure_id: Ecto.UUID,
       user_id: Ecto.UUID
     })
     |> validate(%{
-      id: :required,
+      adventure_id: :required,
       user_id: :required
     })
   end
@@ -44,13 +44,12 @@ defmodule UserApiWeb.AdventureContract do
     params
     |> with_user(conn)
     |> cast(%{
-      id: Ecto.UUID,
+      adventure_id: Ecto.UUID,
       user_id: Ecto.UUID
     })
     |> validate(%{
-      id: :required,
+      adventure_id: :required,
       user_id: :required
     })
   end
-
 end

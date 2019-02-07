@@ -39,7 +39,7 @@ defmodule UserApiWeb.AdventureController do
          {:ok, validate_params} <-
            conn
            |> AdventureContract.show(context),
-         {:ok, adventure} <- validate_params |> AdventureProjection.get_adventure_by_id() do
+         {:ok, adventure} <- validate_params |> AdventureRepository.get() do
       session
       |> Session.update_context(%{"adventure" => adventure})
     else
@@ -77,11 +77,11 @@ defmodule UserApiWeb.AdventureController do
          {:ok, validate_params} <-
            conn
            |> AdventureContract.summary(context),
-         {:ok, ranking} <-
+         {:ok, adventure} <-
            validate_params
-           |> RankingProjection.top_ten_ranking() do
+           |> AdventureRepository.get() do
       session
-      |> Session.update_context(%{"ranking" => ranking})
+      |> Session.update_context(%{"adventure" => adventure})
     else
       %Session{valid?: false} = session ->
         session

@@ -3,6 +3,7 @@ defmodule Domain.UserAdventure.Adventure do
     Point,
     UserAdventure,
     UserPoint,
+    UserRanking,
     Asset,
     Image,
     AdventureRating
@@ -32,10 +33,12 @@ defmodule Domain.UserAdventure.Adventure do
     embeds_many(:points, Point)
     embeds_many(:user_points, UserPoint)
     embeds_one(:user_adventure, UserAdventure)
+    embeds_one(:user_ranking, UserRanking)
+    embeds_one(:user_rating, AdventureRating)
+    embeds_one(:creator, Creator)
     embeds_one(:asset, Asset)
     embeds_many(:images, Image)
-    embeds_many(:ratings, AdventureRating)
-    embeds_many(:rankings, Ranking)
+    embeds_many(:rankings, UserRanking)
 
     aggregate_fields()
   end
@@ -77,7 +80,7 @@ defmodule Domain.UserAdventure.Adventure do
     |> Map.get(:completed)
     |> case do
       false -> {:ok, adventure}
-      true -> {:error, {:adventure, "alredy completed"}}
+      true -> {:error, {:adventure, "alredy_completed"}}
     end
   end
 
@@ -95,7 +98,7 @@ defmodule Domain.UserAdventure.Adventure do
         result
         |> Map.get(:completed)
         |> case do
-          true -> {:error, {:point, "alredy completed"}}
+          true -> {:error, {:point, "alredy_completed"}}
           false -> {:ok, adventure}
         end
     end

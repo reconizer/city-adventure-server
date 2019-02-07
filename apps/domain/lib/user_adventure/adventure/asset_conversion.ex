@@ -1,10 +1,6 @@
-defmodule Domain.UserAdventure.Adventure.Asset do
+defmodule Domain.UserAdventure.Adventure.AssetConversion do
   use Ecto.Schema
   import Ecto.Changeset
-
-  alias Domain.UserAdventure.Adventure.{
-    AssetConversion
-  }
 
   @type t :: %__MODULE__{}
   @type ok_t :: {:ok, t()}
@@ -16,10 +12,10 @@ defmodule Domain.UserAdventure.Adventure.Asset do
     field(:type, :string)
     field(:name, :string)
     field(:extension, :string)
-    embeds_many(:asset_conversions, AssetConversion)
+    field(:asset_id, :binary_id)
   end
 
-  @fields ~w(id type name extension)a
+  @fields ~w(id type name extension, asset_id)a
   @required_fields @fields
 
   def changeset(struct, params) do
