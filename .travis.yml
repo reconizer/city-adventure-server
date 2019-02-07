@@ -39,6 +39,7 @@ after_success:
 env:
   global:
   - PGPORT=5433
+  - PGUSER=travis
   - MIX_ENV=test
   - DATABASE_PORT=5433
   - DATABASE_NAME=city_adventure_test
