@@ -37,6 +37,11 @@ script:
 
 # after_success:
 # - ./scripts/travis/deploy.sh
+after_success:
+  - ./scripts/travis/discord-hook.sh success $WEBHOOK_URL
+after_failure:
+  
+  - ./scripts/travis/discord-hook.sh failure $WEBHOOK_URL
 
 env:
   global:
