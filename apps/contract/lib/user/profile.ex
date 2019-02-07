@@ -1,5 +1,6 @@
 defmodule Contract.User.Profile do
   use Ecto.Schema
+  use Contract
   import Ecto.Changeset
 
   @params ~w(email nick id)a
@@ -10,20 +11,8 @@ defmodule Contract.User.Profile do
     field :nick, :string
   end
 
-  def validate(params) do
-    params
-    |> changeset()
-    |> case do
-      %{valid?: true} = login -> 
-        result = login
-        |> apply_changes()
-        {:ok, result}
-      result -> {:error, result.errors} 
-    end
-  end
-
-  defp changeset(params, model \\ %__MODULE__{}) do 
-    model
+  defp changeset(contract, params) do 
+    contract
     |> cast(params, @params)
     |> validate_required(@required_params)
   end

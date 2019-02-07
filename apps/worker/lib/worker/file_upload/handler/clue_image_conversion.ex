@@ -7,14 +7,16 @@ defmodule Worker.FileUpload.Handler.ClueImageConversion do
   alias Infrastructure.Repository.Models.AssetConversion
 
   @bucket Application.get_env(:worker, :asset_bucket)
-  @available_conversions ["800x600"]
 
   def process(%{body: %{"Records" => [_s3_event]}} = event, queue_name) do
     event
     |> Helper.AssetEvent.build_from_queue()
     |> case do
-      {:ok, %{bucket: @bucket, type: "clue_image", file_name: file_name} = asset_event} when file_name in @available_conversions ->
+      {:ok, %{bucket: @bucket, type: "clue_image", file_name: _file_name} = asset_event} ->
         {:ok, asset_event}
+
+      # {:ok, %{bucket: @bucket, type: "clue_image", file_name: file_name} = asset_event} when file_name in @available_conversions ->
+      #   {:ok, asset_event}
 
       {:ok, asset_event} ->
         {:error, {:invalid_conversion, asset_event}}
@@ -81,7 +83,7 @@ defmodule Worker.FileUpload.Handler.ClueImageConversion do
     :ok
   end
 
-  def cleanup({:error, _} = e, _queue_name) do
+  def cleanup({:error, _} = _e, _queue_name) do
     :ok
   end
 end

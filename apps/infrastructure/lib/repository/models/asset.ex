@@ -3,6 +3,14 @@ defmodule Infrastructure.Repository.Models.Asset do
 
   use Ecto.Schema
   import Ecto.Changeset
+  alias Infrastructure.Repository.Models.{
+    Clue,
+    Adventure,
+    Creator,
+    AssetConversion,
+    Image,
+    Avatar
+  }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -14,6 +22,13 @@ defmodule Infrastructure.Repository.Models.Asset do
     field(:uploaded, :boolean, default: false)
 
     timestamps()
+
+    has_one :clue, Clue
+    has_one :adventure, Adventure
+    has_one :image, Image
+    has_one :creator, Creator
+    has_many :avatars, Avatar
+    has_many :asset_conversions, AssetConversion
   end
 
   def build(params) do

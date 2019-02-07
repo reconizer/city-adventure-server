@@ -18,7 +18,7 @@ defmodule Infrastructure.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :postgrex, :ecto, :poison],
+      extra_applications: [:logger, :postgrex, :ecto, :poison, :httpoison],
       mod: {Infrastructure, []}
     ]
   end
@@ -27,11 +27,12 @@ defmodule Infrastructure.MixProject do
   defp deps do
     [
       {:postgrex, ">= 0.0.0"},
-      {:ecto, "~> 2.2.10"},
-      {:geo, "~> 2.0"},
+      {:ecto_sql, "~> 3.0"},
+      {:geo, "~> 3.0"},
       {:gettext, "~> 0.11"},
       {:poison, "~> 3.0"},
-      {:geo_postgis, "~> 1.1"}
+      {:httpoison, "~> 1.4"},
+      {:geo_postgis, "~> 2.0"}
     ]
   end
 end

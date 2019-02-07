@@ -36,7 +36,7 @@ defmodule UserApi.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, github: "phoenixframework/phoenix", override: true},
+      {:phoenix, "~> 1.4.0"},
       {:session, in_umbrella: true},
       {:contract, in_umbrella: true},
       {:domain, in_umbrella: true},
@@ -44,10 +44,12 @@ defmodule UserApi.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:plug_cowboy, "~> 2.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
-      {:cowboy, "~> 1.0"},
-      {:media_storage, git: "git@github.com:reconizer/ex_media_storage", tag: "0.2"}
+      {:timex, "~> 3.2"},
+      {:cowboy, "~> 2.5"},
+      {:media_storage, git: "https://github.com/reconizer/ex_media_storage.git", tag: "0.2"}
     ]
   end
 

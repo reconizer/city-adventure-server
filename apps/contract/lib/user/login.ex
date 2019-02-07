@@ -1,5 +1,6 @@
 defmodule Contract.User.Login do
   use Ecto.Schema
+  use Contract
   import Ecto.Changeset
 
   @primary_key false
@@ -12,20 +13,8 @@ defmodule Contract.User.Login do
   @params ~w(email password)a
   @required_params ~w(email password)a
 
-  def validate(params) do
-    params
-    |> changeset()
-    |> case do
-      %{valid?: true} = login -> 
-        result = login
-        |> apply_changes()
-        {:ok, result}
-      result -> {:error, result.errors} 
-    end
-  end
-
-  def changeset(params, model \\ %__MODULE__{}) do 
-    %__MODULE__{}
+  def changeset(contract, params) do 
+    contract
     |> cast(params, @params)
     |> validate_required(@required_params)
     |> validate_format(:email, ~r/@/)
