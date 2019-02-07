@@ -27,7 +27,7 @@ addons:
   artifacts:
     region: "eu-west-1"
     paths:
-    - ./app.tar.gz
+    - ./release.tar.gz
     target_paths:
     - unfold-server/$TRAVIS_BRANCH/latest
     - unfold-server/$TRAVIS_BRANCH/builds/$TRAVIS_BUILD_NUMBER
@@ -40,7 +40,7 @@ script:
 after_success:
   - ./scripts/travis/discord-hook.sh success $WEBHOOK_URL
 after_failure:
-  
+
   - ./scripts/travis/discord-hook.sh failure $WEBHOOK_URL
 
 env:
