@@ -45,6 +45,18 @@ environment :prod do
   )
 
   set(run_erl_env: "RUN_ERL_LOG_MAXSIZE=10000000 RUN_ERL_LOG_GENERATIONS=10")
+
+  set(
+    config_providers: [
+      {Mix.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
+    ]
+  )
+
+  set(
+    overlays: [
+      {:copy, "rel/config/config.exs", "etc/config.exs"}
+    ]
+  )
 end
 
 # You may define one or more releases in this file.
