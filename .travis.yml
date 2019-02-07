@@ -33,10 +33,10 @@ addons:
     - unfold-server/$TRAVIS_BRANCH/builds/$TRAVIS_BUILD_NUMBER
 
 script:
-- ./scripts/travis/test.sh
-
-after_success:
 - ./scripts/travis/deploy.sh
+
+# after_success:
+# - ./scripts/travis/deploy.sh
 
 env:
   global:
