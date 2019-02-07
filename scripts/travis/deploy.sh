@@ -11,6 +11,6 @@ if [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_BRANCH}" == "staging-d
   cp appspec.yml release/appspec.yml
   cp -a scripts/. release/scripts/
   cd release
-  tar  --owner=1000 --group=1000 -zcvf ../release.tar.gz .
+  tar  --owner=1000 --group=1000 -zcvf ../release.tar.gz *
   cd ..
 fi
