@@ -49,7 +49,7 @@ defmodule UserApi.MixProject do
       {:jason, "~> 1.0"},
       {:timex, "~> 3.2"},
       {:cowboy, "~> 2.5"},
-      {:media_storage, git: "git@github.com:reconizer/ex_media_storage", tag: "0.2"}
+      {:media_storage, git: "https://github.com/reconizer/ex_media_storage.git", tag: "0.2"}
     ]
   end
 
