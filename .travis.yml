@@ -16,7 +16,7 @@ cache:
     - deps
 
 addons:
-  postgresql: "10.4"
+  postgresql: "10"
   apt:
     packages:
     - postgresql-10
