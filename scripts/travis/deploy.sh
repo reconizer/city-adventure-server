@@ -2,7 +2,7 @@
 set -ev
 echo "PREPARING DEPLOYMENT"
 
-if [ "${TRAVIS_PULL_REQUEST}" == "false" ] && ([ "${TRAVIS_BRANCH}" == "staging-deployment" ] ; then
+if [ "${TRAVIS_PULL_REQUEST}" == "false" ] && [ "${TRAVIS_BRANCH}" == "staging-deployment" ] ; then
   MIX_ENV=prod mix do compile, release
   mkdir release
   mkdir release/content
