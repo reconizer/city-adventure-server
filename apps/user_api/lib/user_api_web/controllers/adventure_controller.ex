@@ -1,9 +1,7 @@
 defmodule UserApiWeb.AdventureController do
   use UserApiWeb, :controller
   alias Domain.UserAdventure.Projections.Listing, as: ListingProjection
-  alias Domain.UserAdventure.Projections.Adventure, as: AdventureProjection
   alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
-  alias Domain.UserAdventure.Projections.Ranking, as: RankingProjection
   alias UserApiWeb.AdventureContract
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do

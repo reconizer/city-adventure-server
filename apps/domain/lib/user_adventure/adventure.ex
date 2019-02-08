@@ -75,6 +75,37 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
+  def get_discovered_points(%Adventure{user_points: user_points, points: points}) do
+    discovered_points =
+      points
+      |> Enum.filter(fn point ->
+        point.show or
+          user_points
+          |> Enum.find(fn user_point -> user_point.point_id == point.id end)
+          |> case do
+            nil ->
+              false
+
+            result ->
+              result.completed
+              |> case do
+                true ->
+                  true
+
+                false ->
+                  user_points
+                  |> Enum.find(fn user_point -> user_point.point_id == point.parent_point_id end)
+                  |> Map.get(:completed)
+              end
+          end
+      end)
+
+    {:ok, discovered_points}
+  end
+
+  def get_rankings(%Adventure{rankings: rankings}) do
+  end
+
   def check_adventure_completed(%Adventure{} = adventure) do
     adventure
     |> Map.get(:completed)

@@ -26,28 +26,34 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   def get(%{adventure_id: adventure_id, user_id: user_id}) do
     Models.Adventure
     |> join(:left, [adventure], points in assoc(adventure, :points))
-    |> join(:left, [adventure, points], user_points in assoc(points, :user_points), on: user_points.user_id == ^user_id)
-    |> join(:left, [adventure, points, user_points], user_adventures in assoc(adventure, :user_adventures))
-    |> join(:left, [adventure, points, user_points, user_adventures], user_rankings in assoc(adventure, :user_rankings))
-    |> join(:inner, [adventure, points, user_points, user_adventures, user_rankings], user in assoc(user_rankings, :user))
-    |> join(:left, [adventure, points, user_points, user_adventures, user_rankings, user], avatar in assoc(user, :avatar))
-    |> join(:left, [adventure, points, user_points, user_adventures, user_rankings, user, avatar], asset in assoc(avatar, :asset))
-    |> where([_adventure, _points, _user_points, user_adventures, _user_rankings, _user, _avatar, _asset], user_adventures.user_id == ^user_id)
-    |> preload([adventure, points, user_points, user_adventures, user_rankings, user, avatar, asset], user_points: user_points)
-    |> preload([adventure, points, user_points, user_adventures, user_rankings, user, avatar, asset], user_adventures: user_adventures)
-    |> preload([adventure, points, user_points, user_adventures, user_rankings, user, avatar, asset], user_rankings: {user_rankings, asset: asset})
+    |> join(:left, [adventure, points], user_rankings in assoc(adventure, :user_rankings), on: user_rankings.user_id == ^user_id)
+    |> join(:left, [adventure, points, user_rankings], user_points in assoc(points, :user_points), on: user_points.user_id == ^user_id)
+    |> join(:left, [adventure, points, user_rankings, user_points], user_adventures in assoc(adventure, :user_adventures))
+    |> where([_adventure, _points, _user_rankings, _user_points, user_adventures], user_adventures.user_id == ^user_id)
+    |> preload([adventure, points, user_rankings, user_points, user_adventures], user_points: user_points)
+    |> preload([adventure, points, user_rankings, user_points, user_adventures], user_adventures: user_adventures)
+    |> preload(user_rankings: :asset)
     |> preload(creator: :asset)
     |> preload(images: :asset)
     |> preload(:asset)
-    |> preload(points: :clues)
+    |> preload(points: [clues: [asset: :asset_conversions]])
     |> preload(points: :answers)
     |> preload(:adventure_ratings)
     |> Repository.get(adventure_id)
-    |> IO.inspect()
     |> case do
       nil -> {:error, {:adventure, "not_founds"}}
       result -> {:ok, result |> load_adventure(user_id)}
     end
+  end
+
+  def get_rankings(%Adventure{id: id}) do
+    Models.UserRanking
+    |> join(:left, [user_rankings], user in assoc(user_rankings, :user))
+    |> join(:left, [user_rankings, user], avatar in assoc(user, :avatar))
+    |> join(:left, [user_rankings, user, avatar], asset in assoc(avatar, :asset))
+    |> where([user_rankings, user, avatar, asset], user_rankings.adventure_id == ^id)
+    |> preload([user_rankings, user, avatar, asset], user_rankings: {user_rankings, asset: asset})
+    |> Repository.one()
   end
 
   def start_adventure(%{adventure_id: adventure_id, user_id: id} = params) do
@@ -110,7 +116,6 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       rating: model.adventure_ratings |> calculate_rating(),
       rating_count: model.adventure_ratings |> Enum.count(),
       language: model.language,
-      rankings: model.user_rankings |> Enum.map(&load_user_ranking/1),
       user_ranking: model.user_rankings |> find_user_ranking(user_id) |> load_user_ranking(),
       user_rating: model.adventure_ratings |> find_user_rating(user_id) |> load_user_rating(),
       asset: model.asset |> load_asset(),
@@ -159,7 +164,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       sort: clue.sort,
       point_id: clue.point_id,
       asset_id: clue.asset_id,
-      id: clue.id
+      id: clue.id,
+      asset: clue.asset |> load_asset()
     }
   end
 
@@ -226,6 +232,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       asset_conversions: asset_model.asset_conversions
     }
   end
+
+  defp load_asset(_), do: nil
 
   def build_asset_conversions(%Models.AssetConversion{} = asset_conversion_models) do
     asset_conversion_models

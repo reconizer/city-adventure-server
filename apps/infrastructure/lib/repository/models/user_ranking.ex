@@ -13,7 +13,8 @@ defmodule Infrastructure.Repository.Models.UserRanking do
   schema "user_ranking_view" do
     belongs_to(:user, Models.User, foreign_key: :user_id)
     belongs_to(:adventure, Models.Adventure, foreign_key: :adventure_id)
-    has_one(:asset, through: [:user, avatar: [:asset]])
+    has_one(:avatar, through: [:user, :avatar])
+    has_one(:asset, through: [:avatar, :asset])
     field(:position, :integer)
     field(:nick, :string)
     field(:completion_time, :integer)

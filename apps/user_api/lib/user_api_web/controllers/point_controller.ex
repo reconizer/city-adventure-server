@@ -2,7 +2,6 @@ defmodule UserApiWeb.PointController do
   use UserApiWeb, :controller
   alias Domain.UserAdventure.Adventure, as: AdventureDomain
   alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
-  alias Domain.UserAdventure.Projections.Points, as: PointProjection
   alias UserApiWeb.PointContract
 
   def completed_points(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
@@ -10,11 +9,14 @@ defmodule UserApiWeb.PointController do
          {:ok, validate_params} <-
            conn
            |> PointContract.list_of_completed_points(context),
-         {:ok, points} <-
+         {:ok, %{user_points: user_points} = adventure} <-
            validate_params
-           |> PointProjection.get_completed_points() do
+           |> AdventureRepository.get(),
+         {:ok, completed_points} <-
+           adventure
+           |> AdventureDomain.get_discovered_points() do
       session
-      |> Session.update_context(%{"completed_points" => points})
+      |> Session.update_context(%{"completed_points" => completed_points, "user_points" => user_points})
     else
       %Session{valid?: false} ->
         session

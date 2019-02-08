@@ -1,7 +1,8 @@
 defmodule UserApiWeb.ClueController do
   use UserApiWeb, :controller
+  alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
+  alias Domain.UserAdventure.Adventure, as: AdventureDomain
   alias Domain.UserAdventure.Projections.Clues, as: CluesProjection
-  alias Domain.UserAdventure.Projections.Points, as: PointsProjection
   alias UserApiWeb.ClueContract
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
@@ -9,11 +10,14 @@ defmodule UserApiWeb.ClueController do
          {:ok, validate_params} <-
            conn
            |> ClueContract.index(context),
-         {:ok, discovered_clues} <-
+         {:ok, %{user_points: user_points} = adventure} <-
            validate_params
-           |> PointsProjection.get_completed_points_with_clues() do
+           |> AdventureRepository.get(),
+         {:ok, points} <-
+           adventure
+           |> AdventureDomain.get_discovered_points() do
       session
-      |> Session.update_context(%{"clues" => discovered_clues})
+      |> Session.update_context(%{"points" => points, "user_points" => user_points})
     else
       %Session{valid?: false} ->
         session

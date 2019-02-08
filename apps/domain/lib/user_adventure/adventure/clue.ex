@@ -1,5 +1,9 @@
 defmodule Domain.UserAdventure.Adventure.Clue do
-  alias Domain.UserAdventure.Adventure.Clue
+  alias Domain.UserAdventure.Adventure.{
+    Clue,
+    Asset
+  }
+
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -13,6 +17,7 @@ defmodule Domain.UserAdventure.Adventure.Clue do
     field(:sort, :integer)
     field(:point_id, Ecto.UUID)
     field(:asset_id, Ecto.UUID)
+    embeds_one(:asset, Asset)
   end
 
   @fields [:description, :tip, :type, :sort, :point_id, :asset_id, :id]
