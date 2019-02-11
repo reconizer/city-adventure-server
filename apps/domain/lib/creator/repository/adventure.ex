@@ -27,25 +27,17 @@ defmodule Domain.Creator.Repository.Adventure do
     end
   end
 
-  defp build_adventure(adventure_model) do
-    %Creator.Adventure{
-      id: adventure_model.id,
-      name: adventure_model.name,
-      description: adventure_model.description,
-      language: adventure_model.language,
-      show: adventure_model.show,
-      difficulty_level: adventure_model.difficulty_level,
-      max_time: adventure_model.max_time,
-      min_time: adventure_model.min_time,
-      creator_id: adventure_model.creator_id,
-      status: adventure_model.status,
-      rating: adventure_model.creator_adventure_rating |> adventure_rating(),
-      asset: adventure_model.asset |> build_asset(),
-      images: adventure_model.images |> Enum.map(&build_image/1)
-    }
-    |> Creator.Adventure.set_points(Enum.map(adventure_model.points, &build_point/1))
+  def all(filter \\ %Domain.Filter{}) do
+    Models.Adventure
+    |> preload(points: [:answers, clues: [:asset]])
+    |> preload(:asset)
+    |> preload(images: [asset: [:asset_conversions]])
+    |> preload(:creator_adventure_rating)
+    |> apply_filter(filter)
+    |> Repository.all()
+    |> Enum.map(&build_adventure/1)
     |> case do
-      {:ok, adventure} -> adventure
+      adventures -> {:ok, adventures}
     end
   end
 
@@ -144,5 +136,56 @@ defmodule Domain.Creator.Repository.Adventure do
 
   defp adventure_rating(%{rating: rating}) do
     rating
+  end
+
+  defp apply_filter(query, filter) do
+    query
+    |> apply_filters(filter)
+    |> apply_pagination(filter)
+  end
+
+  defp apply_pagination(query, filter = %Domain.Filter{}) do
+    query
+    |> limit(^Domain.Filter.limit(filter))
+    |> offset(^Domain.Filter.offset(filter))
+  end
+
+  defp apply_filters(query, filter = %Domain.Filter{}) do
+    filter
+    |> Domain.Filter.filters()
+    |> Enum.reduce(query, fn {filter_name, filter_value}, query ->
+      do_filter(query, filter_name, filter_value)
+    end)
+  end
+
+  defp do_filter(query, :by_creator, id) do
+    query
+    |> where([adventure], adventure.creator_id == ^id)
+  end
+
+  defp do_filter(query, _, _) do
+    query
+  end
+
+  defp build_adventure(adventure_model) do
+    %Creator.Adventure{
+      id: adventure_model.id,
+      name: adventure_model.name,
+      description: adventure_model.description,
+      language: adventure_model.language,
+      show: adventure_model.show,
+      difficulty_level: adventure_model.difficulty_level,
+      max_time: adventure_model.max_time,
+      min_time: adventure_model.min_time,
+      creator_id: adventure_model.creator_id,
+      status: adventure_model.status,
+      rating: adventure_model.creator_adventure_rating |> adventure_rating(),
+      asset: adventure_model.asset |> build_asset(),
+      images: adventure_model.images |> Enum.map(&build_image/1)
+    }
+    |> Creator.Adventure.set_points(Enum.map(adventure_model.points, &build_point/1))
+    |> case do
+      {:ok, adventure} -> adventure
+    end
   end
 end

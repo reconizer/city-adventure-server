@@ -1,20 +1,27 @@
-defmodule CreatorApiWeb.ClueControllerTest do
-  use CreatorApiWeb.ConnCase, async: true
+defmodule AdministrationApiWeb.ClueControllerTest do
+  use AdministrationApiWeb.ConnCase, async: true
   alias Domain.Creator.Adventure
-  alias Domain.Creator.User
+  alias Domain.Administration.User, as: Administrator
+  alias Domain.Creator.User, as: Creator
 
   alias Domain.Creator.Repository.Adventure, as: AdventureRepository
-  alias Domain.Creator.Repository.User, as: UserRepository
+  alias Domain.Administration.User.Repository, as: AdministratorUserRepository
+  alias Domain.Creator.Repository.User, as: CreatorUserRepository
 
   setup %{conn: conn} do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
     creator_id = Ecto.UUID.generate()
+    administrator_id = Ecto.UUID.generate()
     adventure_id = Ecto.UUID.generate()
     point_id = Ecto.UUID.generate()
 
-    {:ok, _creator} =
-      User.new(%{id: creator_id, email: "test@test.com", name: "Test"}, "testtest")
-      |> UserRepository.save()
+    {:ok, _} =
+      Creator.new(%{id: creator_id, email: "test@test.com", name: "Test"}, "testtest")
+      |> CreatorUserRepository.save()
+
+    {:ok, _} =
+      Administrator.new(%{id: administrator_id, email: "test@test.com", name: "Test", password: "testtest"})
+      |> AdministratorUserRepository.save()
 
     {:ok, adventure} =
       Adventure.new(%{
@@ -25,9 +32,10 @@ defmodule CreatorApiWeb.ClueControllerTest do
       })
       |> AdventureRepository.save()
 
-    token = CreatorApi.Token.create(creator_id)
+    {:ok, token} = AdministrationApi.Token.create(creator_id)
 
     [
+      administrator_id: administrator_id,
       creator_id: creator_id,
       point_id: point_id,
       adventure_id: adventure_id,
@@ -38,6 +46,8 @@ defmodule CreatorApiWeb.ClueControllerTest do
   end
 
   describe "creating new clue for adventure" do
+    @tag :integration
+
     test "works", %{conn: conn, adventure_id: adventure_id, adventure: adventure} do
       %{points: [%{id: parent_point_id}]} = adventure
       point_id = Ecto.UUID.generate()
@@ -81,6 +91,8 @@ defmodule CreatorApiWeb.ClueControllerTest do
   end
 
   describe "updating existing clue for adventure" do
+    @tag :integration
+
     test "works", %{conn: conn, adventure: adventure, adventure_id: adventure_id} do
       %{points: [%{id: parent_point_id}]} = adventure
       point_id = Ecto.UUID.generate()
@@ -132,6 +144,8 @@ defmodule CreatorApiWeb.ClueControllerTest do
   end
 
   describe "get clue for adventure" do
+    @tag :integration
+
     test "works", %{conn: conn, adventure: adventure, adventure_id: adventure_id} do
       %{points: [%{id: parent_point_id}]} = adventure
 
@@ -178,6 +192,8 @@ defmodule CreatorApiWeb.ClueControllerTest do
   end
 
   describe "delete clue from adventure" do
+    @tag :integration
+
     test "works", %{conn: conn, adventure: adventure, adventure_id: adventure_id} do
       %{points: [%{id: parent_point_id}]} = adventure
 
@@ -216,6 +232,8 @@ defmodule CreatorApiWeb.ClueControllerTest do
   end
 
   describe "reorder clues in adventure" do
+    @tag :integration
+
     test "works", %{conn: conn, adventure: adventure, adventure_id: adventure_id} do
       %{points: [%{id: parent_point_id}]} = adventure
 

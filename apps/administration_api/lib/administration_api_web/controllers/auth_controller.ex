@@ -5,16 +5,13 @@ defmodule AdministrationApiWeb.AuthController do
   alias Domain.Administration
 
   def login(conn, params) do
-    AuthContract.login(conn, params)
-    |> Administration.User.Repository.get_for_authentication()
-    |> AdministrationApi.Token.create()
-    |> case do
-      {:ok, token} ->
-        conn
-        |> render("login.json", %{token: token})
-
-      error ->
-        handle_error(conn, error)
+    with {:ok, params} <- AuthContract.login(conn, params),
+         {:ok, user} <- Administration.User.Repository.get_for_authentication(params),
+         {:ok, token} <- AdministrationApi.Token.create(user.id) do
+      conn
+      |> render("login.json", %{token: token})
+    else
+      error -> handle_error(conn, error)
     end
   end
 end
