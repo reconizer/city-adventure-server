@@ -46,16 +46,6 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     end
   end
 
-  def get_rankings(%Adventure{id: id}) do
-    Models.UserRanking
-    |> join(:left, [user_rankings], user in assoc(user_rankings, :user))
-    |> join(:left, [user_rankings, user], avatar in assoc(user, :avatar))
-    |> join(:left, [user_rankings, user, avatar], asset in assoc(avatar, :asset))
-    |> where([user_rankings, user, avatar, asset], user_rankings.adventure_id == ^id)
-    |> preload([user_rankings, user, avatar, asset], user_rankings: {user_rankings, asset: asset})
-    |> Repository.one()
-  end
-
   def start_adventure(%{adventure_id: adventure_id, user_id: id} = params) do
     Multi.new()
     |> Multi.run(:start_point, fn _, _ -> get_start_point(adventure_id) end)

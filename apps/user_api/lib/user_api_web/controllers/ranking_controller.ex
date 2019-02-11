@@ -1,8 +1,7 @@
 defmodule UserApiWeb.RankingController do
   use UserApiWeb, :controller
   alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
-  alias Domain.UserAdventure.Adventure, as: AdventureDomain
-  alias Domain.UserAdventure.Projections.Ranking, as: RankingProjection
+  alias Domain.UserAdventure.Service.Ranking, as: RankingService
   alias UserApiWeb.RankingContract
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
@@ -18,7 +17,7 @@ defmodule UserApiWeb.RankingController do
            |> AdventureRepository.get(),
          {:ok, ranking} <-
            adventure
-           |> AdventureDomain.get_ranking(paginate) do
+           |> RankingService.get_rankings_adventure(paginate) do
       session
       |> Session.update_context(%{"ranking_list" => ranking})
     else
@@ -37,11 +36,11 @@ defmodule UserApiWeb.RankingController do
          {:ok, validate_params} <-
            conn
            |> RankingContract.current_user_ranking(context),
-         {:ok, current_user_ranking} <-
+         {:ok, adventure} <-
            validate_params
-           |> RankingProjection.current_user_ranking() do
+           |> AdventureRepository.get() do
       session
-      |> Session.update_context(%{"current_user_ranking" => current_user_ranking})
+      |> Session.update_context(%{"adventure" => adventure})
     else
       %Session{valid?: false} ->
         session

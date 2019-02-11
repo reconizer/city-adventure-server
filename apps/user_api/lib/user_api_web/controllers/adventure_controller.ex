@@ -1,7 +1,8 @@
 defmodule UserApiWeb.AdventureController do
   use UserApiWeb, :controller
-  alias Domain.UserAdventure.Projections.Listing, as: ListingProjection
   alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
+  alias Domain.UserAdventure.Repository.Lisiting, as: ListingRepository
+  alias Domain.UserAdventure.Service.Ranking, as: RankingService
   alias UserApiWeb.AdventureContract
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
@@ -18,7 +19,7 @@ defmodule UserApiWeb.AdventureController do
            |> AdventureContract.index(context),
          {:ok, start_points} <-
            validate_params
-           |> ListingProjection.get_start_points() do
+           |> ListingRepository.get_all() do
       session
       |> Session.update_context(%{"adventures" => start_points})
     else
@@ -37,9 +38,12 @@ defmodule UserApiWeb.AdventureController do
          {:ok, validate_params} <-
            conn
            |> AdventureContract.show(context),
-         {:ok, adventure} <- validate_params |> AdventureRepository.get() do
+         {:ok, adventure} <- validate_params |> AdventureRepository.get(),
+         {:ok, ranking} <-
+           adventure
+           |> RankingService.top_five() do
       session
-      |> Session.update_context(%{"adventure" => adventure})
+      |> Session.update_context(%{"adventure" => adventure, "rankings" => ranking})
     else
       %Session{valid?: false} = session ->
         session
@@ -77,9 +81,12 @@ defmodule UserApiWeb.AdventureController do
            |> AdventureContract.summary(context),
          {:ok, adventure} <-
            validate_params
-           |> AdventureRepository.get() do
+           |> AdventureRepository.get(),
+         {:ok, ranking} <-
+           adventure
+           |> RankingService.top_ten() do
       session
-      |> Session.update_context(%{"adventure" => adventure})
+      |> Session.update_context(%{"adventure" => adventure, "rankings" => ranking})
     else
       %Session{valid?: false} = session ->
         session

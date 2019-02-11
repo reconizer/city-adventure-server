@@ -6,7 +6,7 @@ defmodule UserApiWeb.AdventureView do
     |> Enum.map(&render_start_points/1)
   end
 
-  def render("show.json", %{session: %Session{context: %{"adventure" => adventure}} = _session}) do
+  def render("show.json", %{session: %Session{context: %{"adventure" => adventure, "rankings" => rankings}} = _session}) do
     %{
       id: adventure.id,
       name: adventure.name,
@@ -21,7 +21,7 @@ defmodule UserApiWeb.AdventureView do
       difficulty_level: adventure.difficulty_level,
       image_url: asset_url(adventure.asset),
       gallery: generate_gallery(adventure.images),
-      top_five: adventure.rankings |> Enum.take(5) |> Enum.map(&render_ranking/1),
+      top_five: rankings |> Enum.map(&render_ranking/1),
       current_user_ranking: render_ranking(adventure.user_ranking),
       current_user_rating: adventure.user_rating |> render_rating()
     }
@@ -39,7 +39,7 @@ defmodule UserApiWeb.AdventureView do
     }
   end
 
-  def render("summary.json", %{session: %Session{context: %{"adventure" => %{rankings: rankings}}} = _session}) do
+  def render("summary.json", %{session: %Session{context: %{"rankings" => rankings}} = _session}) do
     rankings
     |> Enum.take(10)
     |> Enum.map(fn r ->
@@ -70,7 +70,7 @@ defmodule UserApiWeb.AdventureView do
 
   defp render_start_points(%{position: %{coordinates: {lng, lat}}} = adventure) do
     %{
-      adventure_id: adventure.adventure_id,
+      adventure_id: adventure.id,
       completed: adventure.completed,
       paid: adventure.paid,
       purchased: adventure.purchased,

@@ -6,7 +6,7 @@ defmodule UserApiWeb.RankingView do
     |> Enum.map(&render_ranking/1)
   end
 
-  def render("current_user.json", %{session: %Session{context: %{"current_user_ranking" => ranking}} = _session}) do
+  def render("current_user.json", %{session: %Session{context: %{"adventure" => %{user_ranking: ranking}}} = _session}) do
     ranking
     |> render_ranking()
   end
@@ -20,5 +20,4 @@ defmodule UserApiWeb.RankingView do
       avatar_url: asset_url(ranking.asset)
     }
   end
-
 end

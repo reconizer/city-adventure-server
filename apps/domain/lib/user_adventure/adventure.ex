@@ -38,7 +38,6 @@ defmodule Domain.UserAdventure.Adventure do
     embeds_one(:creator, Creator)
     embeds_one(:asset, Asset)
     embeds_many(:images, Image)
-    embeds_many(:rankings, UserRanking)
 
     aggregate_fields()
   end
@@ -101,9 +100,6 @@ defmodule Domain.UserAdventure.Adventure do
       end)
 
     {:ok, discovered_points}
-  end
-
-  def get_rankings(%Adventure{rankings: rankings}) do
   end
 
   def check_adventure_completed(%Adventure{} = adventure) do

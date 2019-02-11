@@ -6,11 +6,11 @@ defmodule UserApiWeb.RankingContract do
     |> with_user(conn)
     |> cast(%{
       user_id: Ecto.UUID,
-      id: Ecto.UUID
+      adventure_id: Ecto.UUID
     })
     |> validate(%{
       user_id: :required,
-      id: :required
+      adventure_id: :required
     })
   end
 
@@ -26,5 +26,4 @@ defmodule UserApiWeb.RankingContract do
       id: :required
     })
   end
-
 end
