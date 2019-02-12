@@ -45,7 +45,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> Repository.get(adventure_id)
     |> case do
       nil -> {:error, {:adventure, "not_founds"}}
-      result -> {:ok, result |> load_adventure(user_id)}
+      result -> {:ok, result |> load_adventure()}
     end
   end
 
@@ -96,7 +96,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     end
   end
 
-  def load_adventure(%Models.Adventure{} = model, user_id) do
+  def load_adventure(%Models.Adventure{} = model) do
     %Adventure{
       id: model.id,
       name: model.name,
@@ -107,7 +107,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       creator: model.creator |> load_creator(),
       difficulty_level: model.difficulty_level,
       language: model.language,
-      user_ranking: model.user_rankings |> find_user_ranking(user_id) |> load_user_ranking(),
+      user_ranking: model.user_rankings |> List.first() |> load_user_ranking(),
       user_rating: model.adventure_ratings |> List.first() |> load_user_rating(),
       asset: model.asset |> load_asset(),
       images: model.images |> Enum.map(&load_image/1),

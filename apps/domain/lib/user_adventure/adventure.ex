@@ -72,11 +72,24 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  def check_point_position(%Adventure{} = adventure, %{position: %{lat: lat, lng: lng}}) do
-    adventure
-    |> Map.get(:points)
-    |> Enum.find(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} ->
+  def check_point_position(%Adventure{points: points, user_points: user_points}, %{position: %{lat: lat, lng: lng}}) do
+    points
+    |> Enum.filter(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} ->
       Geocalc.within?(radius, %{lat: p_lat, lng: p_lng}, %{lat: lat, lng: lng})
+    end)
+    |> Enum.find(fn point ->
+      user_points
+      |> Enum.find(fn user_p ->
+        user_p.point_id == point.parent_point_id
+      end)
+      |> case do
+        nil ->
+          false
+
+        result ->
+          result
+          |> Map.get(:completed)
+      end
     end)
     |> case do
       nil -> {:error, {:point, "not_found"}}
@@ -84,33 +97,32 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  def get_discovered_points(%Adventure{user_points: user_points, points: points}) do
-    discovered_points =
-      points
-      |> Enum.filter(fn point ->
-        point.show or
-          user_points
-          |> Enum.find(fn user_point -> user_point.point_id == point.id end)
-          |> case do
-            nil ->
-              false
+  def get_discovered_points!(%Adventure{user_points: user_points, points: points}) do
+    points
+    |> Enum.filter(fn point ->
+      point.show or
+        user_points
+        |> Enum.find(fn user_point -> user_point.point_id == point.id end)
+        |> case do
+          nil ->
+            false
 
-            result ->
-              result.completed
-              |> case do
-                true ->
-                  true
+          result ->
+            result.completed
+            |> case do
+              true ->
+                true
 
-                false ->
-                  user_points
-                  |> Enum.find(fn user_point -> user_point.point_id == point.parent_point_id end)
-                  |> Map.get(:completed)
-              end
-          end
-      end)
-
-    {:ok, discovered_points}
+              false ->
+                user_points
+                |> Enum.find(fn user_point -> user_point.point_id == point.parent_point_id end)
+                |> Map.get(:completed)
+            end
+        end
+    end)
   end
+
+  def get_discovered_points(%Adventure{} = adventure), do: {:ok, get_discovered_points!(adventure)}
 
   def check_adventure_completed(%Adventure{} = adventure) do
     adventure

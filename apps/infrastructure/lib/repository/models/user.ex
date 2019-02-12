@@ -28,7 +28,7 @@ defmodule Infrastructure.Repository.Models.User do
     has_one(:avatar, Avatar)
 
     has_many(:rankings, Ranking)
-    has_many(:user_rankings, UserRankings)
+    has_many(:user_rankings, UserRanking)
     has_many(:user_points, UserPoint)
     has_many(:user_adventures, UserAdventure)
   end

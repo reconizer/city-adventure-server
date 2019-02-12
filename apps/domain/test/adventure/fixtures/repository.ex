@@ -31,8 +31,8 @@ defmodule Domain.Adventure.Fixtures.Repository do
       code: "1234",
       language: "PL",
       difficulty_level: 2,
-      min_time: "02:00:00",
-      max_time: "06:00:00",
+      min_time: 3000,
+      max_time: 8000,
       name: Faker.Name.name(),
       published: true,
       show: false,
@@ -86,6 +86,15 @@ defmodule Domain.Adventure.Fixtures.Repository do
       adventure: build(:adventure),
       user: build(:user),
       completion_time: 6700
+    }
+  end
+
+  def user_ranking_factory do
+    %Models.UserRanking{
+      adventure: build(:adventure),
+      user: build(:user),
+      completion_time: 6700,
+      position: Enum.random(1..10)
     }
   end
 end
