@@ -1,10 +1,15 @@
 defmodule Domain.UserAdventure.Adventure do
-  alias Domain.UserAdventure.{
-    Adventure,
+  alias Domain.UserAdventure.Adventure.{
     Point,
     UserAdventure,
-    UserPoint
+    UserPoint,
+    UserRanking,
+    Asset,
+    Image,
+    AdventureRating
   }
+
+  alias Domain.UserAdventure.Adventure
 
   use Ecto.Schema
   use Domain.Event, "UserAdventure"
@@ -16,9 +21,21 @@ defmodule Domain.UserAdventure.Adventure do
   embedded_schema do
     field(:current_point_id, Ecto.UUID)
     field(:completed, :boolean, default: false)
+    field(:name, :string)
+    field(:creator_id, Ecto.UUID)
+    field(:description, :string)
+    field(:min_time, :integer)
+    field(:max_time, :integer)
+    field(:difficulty_level, :integer)
+    field(:language, :string)
     embeds_many(:points, Point)
     embeds_many(:user_points, UserPoint)
     embeds_one(:user_adventure, UserAdventure)
+    embeds_one(:user_ranking, UserRanking)
+    embeds_one(:user_rating, AdventureRating)
+    embeds_one(:creator, Creator)
+    embeds_one(:asset, Asset)
+    embeds_many(:images, Image)
 
     aggregate_fields()
   end
@@ -34,20 +51,45 @@ defmodule Domain.UserAdventure.Adventure do
     |> cast_assoc(:points)
   end
 
-  def resolve_point(adventure, params, user, point) do
+  def resolve_point(adventure, params, point) do
     adventure
     |> set_current_point_id(point)
     |> set_answer_type_and_last_point()
-    |> add_user_point(params, user, point)
+    |> add_user_point(params, point)
     |> completed_adventure()
     |> create_ranking()
   end
 
-  def check_point_position(%Adventure{} = adventure, %{position: %{coordinates: {lng, lat}}}) do
+  def find_point(adventure, %{point_id: point_id}) do
     adventure
     |> Map.get(:points)
-    |> Enum.find(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} = _point ->
+    |> Enum.find(fn point ->
+      point.id == point_id
+    end)
+    |> case do
+      nil -> {:error, {:point, "not_found"}}
+      point -> {:ok, point}
+    end
+  end
+
+  def check_point_position(%Adventure{points: points, user_points: user_points}, %{position: %{lat: lat, lng: lng}}) do
+    points
+    |> Enum.filter(fn %{radius: radius, position: %{coordinates: {p_lng, p_lat}}} ->
       Geocalc.within?(radius, %{lat: p_lat, lng: p_lng}, %{lat: lat, lng: lng})
+    end)
+    |> Enum.find(fn point ->
+      user_points
+      |> Enum.find(fn user_p ->
+        user_p.point_id == point.parent_point_id
+      end)
+      |> case do
+        nil ->
+          false
+
+        result ->
+          result
+          |> Map.get(:completed)
+      end
     end)
     |> case do
       nil -> {:error, {:point, "not_found"}}
@@ -55,12 +97,39 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
+  def get_discovered_points!(%Adventure{user_points: user_points, points: points}) do
+    points
+    |> Enum.filter(fn point ->
+      point.show or
+        user_points
+        |> Enum.find(fn user_point -> user_point.point_id == point.id end)
+        |> case do
+          nil ->
+            false
+
+          result ->
+            result.completed
+            |> case do
+              true ->
+                true
+
+              false ->
+                user_points
+                |> Enum.find(fn user_point -> user_point.point_id == point.parent_point_id end)
+                |> Map.get(:completed)
+            end
+        end
+    end)
+  end
+
+  def get_discovered_points(%Adventure{} = adventure), do: {:ok, get_discovered_points!(adventure)}
+
   def check_adventure_completed(%Adventure{} = adventure) do
     adventure
     |> Map.get(:completed)
     |> case do
       false -> {:ok, adventure}
-      true -> {:error, {:adventure, "alredy completed"}}
+      true -> {:error, {:adventure, "alredy_completed"}}
     end
   end
 
@@ -78,7 +147,7 @@ defmodule Domain.UserAdventure.Adventure do
         result
         |> Map.get(:completed)
         |> case do
-          true -> {:error, {:point, "alredy completed"}}
+          true -> {:error, {:point, "alredy_completed"}}
           false -> {:ok, adventure}
         end
     end
@@ -179,9 +248,9 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
-  defp add_user_point(adventure, params, user, point) do
+  defp add_user_point(adventure, params, point) do
     user_point = %{
-      user_id: user.id,
+      user_id: params.user_id,
       point_id: adventure.current_point_id,
       completed: adventure |> point_completed(point, params),
       created_at: NaiveDateTime.utc_now(),

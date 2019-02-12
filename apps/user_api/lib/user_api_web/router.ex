@@ -17,9 +17,9 @@ defmodule UserApiWeb.Router do
 
     scope "/adventures" do
       get("/", AdventureController, :index)
-      get("/summary/:id", AdventureController, :summary)
-      get("/:id", AdventureController, :show)
-      get("/:id/ranking", RankingController, :index)
+      get("/summary/:adventure_id", AdventureController, :summary)
+      get("/:adventure_id", AdventureController, :show)
+      get("/:adventure_id/ranking", RankingController, :index)
       get("/:id/current_user_ranking", RankingController, :current_user_ranking)
       get("/:adventure_id/completed_points", PointController, :completed_points)
       post("/start", AdventureController, :start)
@@ -39,7 +39,6 @@ defmodule UserApiWeb.Router do
     pipe_through(:api)
 
     post("/", AuthController, :login)
-    post("/register", AuthController, :register)
   end
 
   scope "/api/ping", UserApiWeb do

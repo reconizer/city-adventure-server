@@ -2,25 +2,28 @@ defmodule UserApiWeb.PointController do
   use UserApiWeb, :controller
   alias Domain.UserAdventure.Adventure, as: AdventureDomain
   alias Domain.UserAdventure.Repository.Adventure, as: AdventureRepository
-  alias Domain.UserAdventure.Projections.Points, as: PointProjection
+  alias UserApiWeb.PointContract
 
   def completed_points(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
          {:ok, validate_params} <-
-           context
-           |> Contract.Adventure.CompletedPoints.validate(),
-         {:ok, points} <-
+           conn
+           |> PointContract.list_of_completed_points(context),
+         {:ok, %{user_points: user_points} = adventure} <-
            validate_params
-           |> PointProjection.get_completed_points(context["current_user"]) do
+           |> AdventureRepository.get(),
+         {:ok, completed_points} <-
+           adventure
+           |> AdventureDomain.get_discovered_points() do
       session
-      |> Session.update_context(%{"completed_points" => points})
+      |> Session.update_context(%{"completed_points" => completed_points, "user_points" => user_points})
     else
       %Session{valid?: false} ->
         session
 
       {:error, reason} ->
         session
-        |> Session.add_error(reason)
+        |> handle_errors(reason)
     end
     |> present(conn, UserApiWeb.PointView, "completed_points.json")
   end
@@ -28,11 +31,11 @@ defmodule UserApiWeb.PointController do
   def resolve_position_point(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
          {:ok, validate_params} <-
-           context
-           |> Contract.Adventure.PointResolve.validate(),
+           conn
+           |> PointContract.resolve_point(context),
          {:ok, adventure} <-
            validate_params
-           |> AdventureRepository.get(context["current_user"]),
+           |> AdventureRepository.get(),
          {:ok, point} <-
            adventure
            |> AdventureDomain.check_point_position(validate_params),
@@ -44,11 +47,8 @@ defmodule UserApiWeb.PointController do
            |> AdventureDomain.check_point_completed(point),
          {:ok, _} <- adventure |> AdventureDomain.check_answer_and_time(point) do
       adventure
-      |> AdventureDomain.resolve_point(validate_params, context["current_user"], point)
+      |> AdventureDomain.resolve_point(validate_params, point)
       |> case do
-        {:error, result} ->
-          session |> Session.add_error(result)
-
         {:ok, adventure} ->
           adventure
           |> AdventureRepository.save()
@@ -62,7 +62,7 @@ defmodule UserApiWeb.PointController do
 
       {:error, reason} ->
         session
-        |> Session.add_error(reason)
+        |> handle_errors(reason)
     end
     |> present(conn, UserApiWeb.PointView, "resolve_point_position.json")
   end

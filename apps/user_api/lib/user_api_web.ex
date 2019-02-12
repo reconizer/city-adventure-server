@@ -23,7 +23,6 @@ defmodule UserApiWeb do
       use UserApiWeb.ControllerHelpers
       import Plug.Conn
       import UserApiWeb.Gettext
-
       import UserApiWeb.ErrorHandler
       import UserApiWeb.Utils
       alias UserApiWeb.Router.Helpers, as: Routes
@@ -64,6 +63,7 @@ defmodule UserApiWeb do
   def contract do
     quote do
       import Contract
+      import UserApiWeb.Utils
     end
   end
 

@@ -1,15 +1,17 @@
-defmodule Domain.UserAdventure.Projections.Listing do
+defmodule Domain.UserAdventure.Repository.Lisiting do
   @moduledoc """
-  Projection of adventure start points
+  Repository listing adventure
   """
+  use Infrastructure.Repository.Models
+  use Domain.Repository
+  import Ecto.Query
+  alias Infrastructure.Repository
+  alias Domain.UserAdventure.Listing
+
+  @srid 4326
   @distance 10000
 
-  use Infrastructure.Repository.Models
-  import Ecto.Query
-
-  alias Infrastructure.Repository
-
-  def get_start_points(%{position: %Geo.Point{coordinates: {lng, lat}, srid: srid}}, %{id: id}) do
+  def get_all(%{user_id: id, position: %{lat: lat, lng: lng}}) do
     result =
       from(adventure in Models.Adventure,
         left_join: user_adventure in Models.UserAdventure,
@@ -30,11 +32,24 @@ defmodule Domain.UserAdventure.Projections.Listing do
           purchased: false
         },
         where: adventure.show == true and adventure.published == true,
-        where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^srid, start_point.position, @distance),
+        where: fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), ?)::geography, ?::geography, ?)", ^lng, ^lat, ^@srid, start_point.position, @distance),
         group_by: [adventure.id, start_point.id, user_adventure.adventure_id, user_adventure.completed]
       )
       |> Repository.all()
+      |> Enum.map(&load_adventure/1)
 
     {:ok, result}
+  end
+
+  defp load_adventure(adventure_model) do
+    %Listing{
+      id: adventure_model.adventure_id,
+      start_point_id: adventure_model.start_point_id,
+      started: adventure_model.started,
+      completed: adventure_model.completed,
+      position: adventure_model.position,
+      paid: adventure_model.paid,
+      purchased: adventure_model.purchased
+    }
   end
 end

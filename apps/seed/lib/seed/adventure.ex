@@ -97,7 +97,7 @@ defmodule Seed.Adventure do
       %{
         adventure_id: adventure.id,
         user_id: user.id,
-        completion_time: Enum.random([~T[02:10:00], ~T[02:11:00], ~T[01:52:00], ~T[02:34:00]]),
+        completion_time: Enum.random([6700, 6720, 6800, 6840]),
         inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
         updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
@@ -164,7 +164,7 @@ defmodule Seed.Adventure do
 
   defp send_asset(asset) do
     file_path = Path.join([Application.app_dir(:seed), "priv", "helpers", Enum.join([asset.name, asset.extension], ".")])
-    upload_url = Path.join([asset.type, asset.id, "original.#{asset.extension}"])
+    upload_url = Path.join([asset.type, asset.id, "#{asset.name}.#{asset.extension}"])
     send_assets_to_s3(upload_url, file_path)
   end
 
@@ -198,8 +198,8 @@ defmodule Seed.Adventure do
       show: true,
       language: "PL",
       code: "1234",
-      min_time: "03:00:00",
-      max_time: "09:00:00",
+      min_time: 3000,
+      max_time: 7800,
       creator_id: creator.id,
       asset_id: image.id,
       inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
