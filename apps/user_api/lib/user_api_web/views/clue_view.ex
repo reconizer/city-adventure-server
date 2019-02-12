@@ -5,7 +5,6 @@ defmodule UserApiWeb.ClueView do
     points
     |> Enum.map(fn point ->
       point
-      |> IO.inspect()
       |> render_point(user_points)
     end)
   end

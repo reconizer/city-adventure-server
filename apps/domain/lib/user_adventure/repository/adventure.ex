@@ -29,16 +29,19 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> join(:left, [adventure, points], user_rankings in assoc(adventure, :user_rankings), on: user_rankings.user_id == ^user_id)
     |> join(:left, [adventure, points, user_rankings], user_points in assoc(points, :user_points), on: user_points.user_id == ^user_id)
     |> join(:left, [adventure, points, user_rankings, user_points], user_adventures in assoc(adventure, :user_adventures))
-    |> where([_adventure, _points, _user_rankings, _user_points, user_adventures], user_adventures.user_id == ^user_id)
-    |> preload([adventure, points, user_rankings, user_points, user_adventures], user_points: user_points)
-    |> preload([adventure, points, user_rankings, user_points, user_adventures], user_adventures: user_adventures)
+    |> join(:left, [adventure, points, user_rankings, user_points, user_adventures], user_rating in assoc(adventure, :adventure_ratings),
+      on: user_rating.user_id == ^user_id
+    )
+    |> where([_adventure, _points, _user_rankings, _user_points, user_adventures, user_rating], user_adventures.user_id == ^user_id)
+    |> preload([adventure, points, user_rankings, user_points, user_adventures, user_rating], user_points: user_points)
+    |> preload([adventure, points, user_rankings, user_points, user_adventures, user_rating], user_adventures: user_adventures)
+    |> preload([adventure, points, user_rankings, user_points, user_adventures, user_rating], adventure_ratings: user_rating)
     |> preload(user_rankings: :asset)
     |> preload(creator: :asset)
     |> preload(images: :asset)
     |> preload(:asset)
     |> preload(points: [clues: [asset: :asset_conversions]])
     |> preload(points: :answers)
-    |> preload(:adventure_ratings)
     |> Repository.get(adventure_id)
     |> case do
       nil -> {:error, {:adventure, "not_founds"}}
@@ -103,11 +106,9 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       max_time: model.max_time,
       creator: model.creator |> load_creator(),
       difficulty_level: model.difficulty_level,
-      rating: model.adventure_ratings |> calculate_rating(),
-      rating_count: model.adventure_ratings |> Enum.count(),
       language: model.language,
       user_ranking: model.user_rankings |> find_user_ranking(user_id) |> load_user_ranking(),
-      user_rating: model.adventure_ratings |> find_user_rating(user_id) |> load_user_rating(),
+      user_rating: model.adventure_ratings |> List.first() |> load_user_rating(),
       asset: model.asset |> load_asset(),
       images: model.images |> Enum.map(&load_image/1),
       points: model.points |> Enum.map(&load_points/1),
@@ -171,19 +172,6 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> Enum.find(fn rating ->
       rating.user_id == user_id
     end)
-  end
-
-  def calculate_rating([]), do: 0
-
-  def calculate_rating(adventure_ratings) do
-    {enum, sum} =
-      adventure_ratings
-      |> Enum.map_reduce(0, fn %{rating: r} = e, acc ->
-        {e, r + acc}
-      end)
-
-    (sum / Enum.count(enum))
-    |> Float.round(2)
   end
 
   def load_user_rating(%Models.AdventureRating{} = user_rating) do

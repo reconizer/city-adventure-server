@@ -26,8 +26,6 @@ defmodule Domain.UserAdventure.Adventure do
     field(:description, :string)
     field(:min_time, :integer)
     field(:max_time, :integer)
-    field(:rating, :decimal)
-    field(:rating_count, :integer)
     field(:difficulty_level, :integer)
     field(:language, :string)
     embeds_many(:points, Point)
@@ -60,6 +58,18 @@ defmodule Domain.UserAdventure.Adventure do
     |> add_user_point(params, point)
     |> completed_adventure()
     |> create_ranking()
+  end
+
+  def find_point(adventure, %{point_id: point_id}) do
+    adventure
+    |> Map.get(:points)
+    |> Enum.find(fn point ->
+      point.id == point_id
+    end)
+    |> case do
+      nil -> {:error, {:point, "not_found"}}
+      point -> {:ok, point}
+    end
   end
 
   def check_point_position(%Adventure{} = adventure, %{position: %{lat: lat, lng: lng}}) do

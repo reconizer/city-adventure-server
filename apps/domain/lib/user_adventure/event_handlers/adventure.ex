@@ -68,7 +68,7 @@ defmodule Domain.UserAdventure.EventHandlers.Adventure do
           %Models.Ranking{}
           |> Models.Ranking.changeset(%{
             adventure_id: adventure_id,
-            completion_time: completion_time |> :calendar.seconds_to_time() |> Time.from_erl!(),
+            completion_time: completion_time,
             user_id: user_id
           })
 

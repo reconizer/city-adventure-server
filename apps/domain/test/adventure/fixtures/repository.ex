@@ -33,7 +33,7 @@ defmodule Domain.Adventure.Fixtures.Repository do
       difficulty_level: 2,
       min_time: "02:00:00",
       max_time: "06:00:00",
-      name: Faker.Name.name,
+      name: Faker.Name.name(),
       published: true,
       show: false,
       creator: build(:creator)
@@ -85,8 +85,7 @@ defmodule Domain.Adventure.Fixtures.Repository do
     %Models.Ranking{
       adventure: build(:adventure),
       user: build(:user),
-      completion_time: "01:00:00"
+      completion_time: 6700
     }
   end
-
 end

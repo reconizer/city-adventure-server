@@ -6,7 +6,7 @@ defmodule UserApiWeb.AdventureView do
     |> Enum.map(&render_start_points/1)
   end
 
-  def render("show.json", %{session: %Session{context: %{"adventure" => adventure, "rankings" => rankings}} = _session}) do
+  def render("show.json", %{session: %Session{context: %{"adventure" => adventure, "rankings" => rankings, "rating" => rating}} = _session}) do
     %{
       id: adventure.id,
       name: adventure.name,
@@ -14,8 +14,8 @@ defmodule UserApiWeb.AdventureView do
       language: adventure.language,
       min_time: adventure.min_time,
       max_time: adventure.max_time,
-      rating: adventure.rating,
-      rating_count: render_rating_count(adventure.rating_count),
+      rating: rating.rating,
+      rating_count: render_rating_count(rating.rating_count),
       author_name: adventure.creator.name,
       author_image_url: asset_url(adventure.creator.asset),
       difficulty_level: adventure.difficulty_level,
