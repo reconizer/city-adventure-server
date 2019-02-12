@@ -1,9 +1,11 @@
 defmodule UserApiWeb.RankingControllerTest do
   import Domain.Adventure.Fixtures.Repository
-  use UserApiWeb.ConnCase  
+  use UserApiWeb.ConnCase, async: true
   use Plug.Test
 
   setup do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
+
     user_1 = insert(:user, nick: "szax", password_digest: "$2b$12$skM3Rg1jb.Ot78PKE.CbD.KukhFTkylYzTCkVWVmNp5dxm4PjVvtO", id: "60781fc0-ddd0-45c2-8972-efa276ecbbe5")
     user_2 = insert(:user, nick: "ada")
     user_3 = insert(:user, nick: "paul")
@@ -30,9 +32,9 @@ defmodule UserApiWeb.RankingControllerTest do
   test "return ranking - limit 10, one page", %{conn: conn, adventure: adventure, user_1: user_1, user_2: user_2, user_3: user_3, user_4: user_4, user_5: user_5, user_6: user_6} do
     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
     conn = get conn, "/api/adventures/#{adventure.id}/ranking"
-    
+
     result = json_response(conn, 200)
-    assert Enum.count(result) == 6 
+    assert Enum.count(result) == 6
     assert result = [%{position: 1, user_id: user_1.id}, %{position: 2, user_id: user_5.id}, %{position: 3, user_id: user_4.id}, %{position: 4, user_id: user_6.id}, %{position: 5, user_id: user_3.id}, %{position: 6, user_id: user_2.id}]
   end
 
@@ -43,9 +45,9 @@ defmodule UserApiWeb.RankingControllerTest do
     }
     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
     conn = get conn, "/api/adventures/#{adventure.id}/ranking", params
-    
+
     result = json_response(conn, 200)
-    assert Enum.count(result) == 1 
+    assert Enum.count(result) == 1
     assert result = [%{position: 6, user_id: user_2.id}]
   end
 

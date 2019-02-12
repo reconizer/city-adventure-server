@@ -1,11 +1,16 @@
 defmodule UserApiWeb.PointControllerTest do
   import Domain.Adventure.Fixtures.Repository
-  use UserApiWeb.ConnCase  
+  use UserApiWeb.ConnCase, async: true
   use Plug.Test
 
+  setup do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
+  end
+
   describe "list completed points for adventure" do
-    
+
     setup do
+
       user = insert(:user, nick: "szax", password_digest: "$2b$12$skM3Rg1jb.Ot78PKE.CbD.KukhFTkylYzTCkVWVmNp5dxm4PjVvtO", id: "60781fc0-ddd0-45c2-8972-efa276ecbbe5")
       adventure = insert(:adventure, published: true, show: true)
       insert(:user_adventure, user: user, adventure: adventure)
@@ -24,7 +29,7 @@ defmodule UserApiWeb.PointControllerTest do
     test "return completed point - points exists", %{conn: conn, adventure: adventure} do
       conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
       conn = get conn, "/api/adventures/#{adventure.id}/completed_points"
-      assert Enum.count(json_response(conn, 200)) == 3 
+      assert Enum.count(json_response(conn, 200)) == 3
     end
 
     test "return completed point - with ongoing point", %{conn: conn, being_point: point, user: user, adventure: adventure} do
