@@ -12,7 +12,7 @@ defmodule Domain.Commerce.TransferRepositoryTest do
 
     {:ok, creator_data} = TestRepository.build_creator() |> TestRepository.commit()
 
-    {:ok, currency_data} = TestRepository.build_currency() |> TestRepository.commit()
+    {:ok, _currency_data} = TestRepository.build_currency() |> TestRepository.commit()
 
     {:ok, adventure_data} = TestRepository.build_adventure(%{creator_id: creator_data.creator.id}) |> TestRepository.commit()
 
@@ -22,7 +22,7 @@ defmodule Domain.Commerce.TransferRepositoryTest do
       })
       |> TestRepository.commit()
 
-    {:ok, %{transferable: item_transferable}} =
+    {:ok, %{transferable: _item_transferable}} =
       TestRepository.build_product(%{
         id: uuid()
       })

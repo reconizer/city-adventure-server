@@ -22,6 +22,16 @@ defmodule UserApiWeb.ClueView do
     }
   end
 
+  defp render_clues(%{type: "url"} = clue) do
+    %{
+      id: clue.id,
+      type: clue.type,
+      description: clue.description,
+      original_asset_url: clue.url,
+      conversion_urls: []
+    }
+  end
+
   defp render_clues(%{asset_id: nil} = clue) do
     %{
       id: clue.id,

@@ -15,6 +15,7 @@ defmodule Domain.UserAdventure.Adventure.Clue do
     field(:type, :string)
     field(:tip, :boolean)
     field(:sort, :integer)
+    field(:url, :string)
     field(:point_id, Ecto.UUID)
     field(:asset_id, Ecto.UUID)
     embeds_one(:asset, Asset)

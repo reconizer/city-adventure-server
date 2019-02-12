@@ -153,6 +153,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       type: clue.type,
       tip: clue.tip,
       sort: clue.sort,
+      url: clue.url,
       point_id: clue.point_id,
       asset_id: clue.asset_id,
       id: clue.id,
