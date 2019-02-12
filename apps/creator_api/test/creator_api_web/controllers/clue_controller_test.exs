@@ -7,41 +7,6 @@ defmodule CreatorApiWeb.ClueControllerTest do
   alias Domain.Creator.Repository.User, as: UserRepository
 
   setup %{conn: conn} do
-    # :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
-    # creator_id = Ecto.UUID.generate()
-    # adventure_id = Ecto.UUID.generate()
-    # point_id = Ecto.UUID.generate()
-    # {:ok, _creator} = Creator.new(%{id: creator_id, email: "test@test.com", password: "testtest", name: "Test"})
-
-    # {:ok, adventure} =
-    #   Adventure.new(%{id: adventure_id, creator_id: creator_id, name: "test adventure", position: %{lat: 70, lng: 80}})
-    #   |> case do
-    #     {:ok, %{points: [%{id: parent_point_id} | _]} = adventure} ->
-    #       adventure
-    #       |> Adventure.with_point(%{
-    #         id: point_id,
-    #         position: %{
-    #           lat: 10,
-    #           lng: 10
-    #         },
-    #         radius: 10,
-    #         parent_point_id: parent_point_id,
-    #         show: true
-    #       })
-    #   end
-    #   |> Adventure.save()
-
-    # token = CreatorApi.Token.create(creator_id)
-
-    # [
-    #   creator_id: creator_id,
-    #   point_id: point_id,
-    #   adventure_id: adventure_id,
-    #   token: token,
-    #   adventure: adventure,
-    #   conn: conn |> put_req_header("authorization", token)
-    # ]
-
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
     creator_id = Ecto.UUID.generate()
     adventure_id = Ecto.UUID.generate()

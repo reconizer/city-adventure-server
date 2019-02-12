@@ -9,7 +9,8 @@ defmodule Infrastructure.Repository.Models.User do
     UserPoint,
     UserAdventure,
     Avatar,
-    Commerce
+    Commerce,
+    UserRanking
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -27,6 +28,7 @@ defmodule Infrastructure.Repository.Models.User do
     has_one(:avatar, Avatar)
 
     has_many(:rankings, Ranking)
+    has_many(:user_rankings, UserRanking)
     has_many(:user_points, UserPoint)
     has_many(:user_adventures, UserAdventure)
   end
@@ -42,7 +44,7 @@ defmodule Infrastructure.Repository.Models.User do
     model
     |> cast(params, @params)
     |> cast_assoc(:user_account)
-    |> cast_assoc(:account)
     |> validate_required(@required_params)
+    |> unique_constraint(:email, name: :users_email_index)
   end
 end

@@ -5,7 +5,7 @@ defmodule Infrastructure.Repository.Migrations.CreateUserRankingView do
     """
     CREATE OR REPLACE VIEW public.user_ranking_view AS (
       SELECT
-        rank() OVER (PARTITION BY ranking.adventure_id ORDER BY (EXTRACT(EPOCH FROM ranking.completion_time::time)) ASC, ranking.inserted_at ASC) AS "position",
+      row_number() OVER (PARTITION BY ranking.adventure_id ORDER BY (EXTRACT(EPOCH FROM ranking.completion_time::time)) ASC, ranking.inserted_at ASC) AS "position",
         "user".nick AS nick,
         "user".id AS user_id,
         ranking.adventure_id AS adventure_id,

@@ -33,11 +33,10 @@ addons:
     - unfold-server/$TRAVIS_BRANCH/builds/$TRAVIS_BUILD_NUMBER
 
 script:
-- ./scripts/travis/deploy.sh
+- ./scripts/travis/test.sh
 
-# after_success:
-# - ./scripts/travis/deploy.sh
 after_success:
+- ./scripts/travis/deploy.sh
 - ./scripts/travis/discord-hook.sh success $WEBHOOK_URL
 after_failure:
 - ./scripts/travis/discord-hook.sh failure $WEBHOOK_URL

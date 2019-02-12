@@ -7,7 +7,8 @@ config :domain, :event_handlers, [
   Domain.Commerce.EventHandler,
   Domain.UserAdventure.EventHandlers.Adventure,
   Domain.Creator.EventHandler,
-  Domain.Administration.EventHandler
+  Domain.Administration.EventHandler,
+  Domain.Profile.EventHandler
 ]
 
 # This configuration is loaded before any dependency and is restricted

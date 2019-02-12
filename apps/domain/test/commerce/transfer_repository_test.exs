@@ -8,6 +8,7 @@ defmodule Domain.Commerce.TransferRepositoryTest do
   import Domain.Commerce.Fixtures.Domain, only: [uuid: 0]
 
   setup do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
     {:ok, user_data} = TestRepository.build_user() |> TestRepository.commit()
 
     {:ok, creator_data} = TestRepository.build_creator() |> TestRepository.commit()
