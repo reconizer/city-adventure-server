@@ -27,6 +27,32 @@ defmodule Contract do
     end
   end
 
+  def plug({:ok, params}, plugs), do: plug(params, plugs)
+  def plug({:error, _} = error, _), do: error
+
+  def plug(params, plugs) do
+    plugs
+    |> Enum.reduce({:ok, params}, fn
+      {plug_key, plug_fun}, {:ok, params} ->
+        params
+        |> Map.get(plug_key, :undefined)
+        |> case do
+          :undefined ->
+            {:ok, params}
+
+          value ->
+            plug_fun.(value)
+            |> case do
+              {:ok, value} -> {:ok, params |> Map.put(plug_key, value)}
+              other -> other
+            end
+        end
+
+      {_plug_key, _plug_fun}, {:error, _} = error ->
+        error
+    end)
+  end
+
   def default({:ok, params}, defaults) do
     default(params, defaults)
   end

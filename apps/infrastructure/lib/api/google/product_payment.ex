@@ -24,8 +24,8 @@ defmodule Infrastructure.Api.Google.ProductPayment do
     |> Poison.decode()
     |> case do
       {:ok, %{"error" => error}} -> {:error, error}
-      {:error, _} -> {:error, body}
       {:ok, body} -> {:ok, body}
+      {:error, _} -> {:error, body}
     end
   end
 

@@ -1,6 +1,6 @@
 defmodule UserApiWeb.AdventureControllerTest do
   import Domain.Adventure.Fixtures.Repository
-  use UserApiWeb.ConnCase  
+  use UserApiWeb.ConnCase, async: true
   use Plug.Test
 
   # describe "list adventure" do
@@ -17,20 +17,20 @@ defmodule UserApiWeb.AdventureControllerTest do
   #     insert(:point, position: %Geo.Point{coordinates: {18.587336, 53.009870}, srid: 4326}, adventure: adventure_3)
   #     [user: user, adventure: adventure_1]
   #   end
-    
+
   #   test "get adventure list", %{conn: conn} do
   #     params = %{
   #       lat: "53.009870",
   #       lng: "18.587336"
   #     }
   #     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
-  #     conn = get conn, "/api/adventures/", params 
-  #     assert Enum.count(json_response(conn, 200)) == 3 
+  #     conn = get conn, "/api/adventures/", params
+  #     assert Enum.count(json_response(conn, 200)) == 3
   #   end
 
   #   test "get empty array",  %{conn: conn} do
   #     params = %{
-  #       lat: "52.880272", 
+  #       lat: "52.880272",
   #       lng: "18.791102"
   #     }
   #     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
@@ -58,7 +58,7 @@ defmodule UserApiWeb.AdventureControllerTest do
   #     insert(:point, position: %Geo.Point{coordinates: {18.587336, 53.009870}, srid: 4326}, adventure: adventure)
   #     [adventure: adventure, user: user, adventure_pub: adventure_pub]
   #   end
-    
+
   #   test "- adventure exist", %{conn: conn, adventure: adventure} do
   #     params = %{
   #       id: adventure.id
@@ -83,10 +83,9 @@ defmodule UserApiWeb.AdventureControllerTest do
   #       id: adventure.id
   #     }
   #     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
-  #     conn = get conn, "/api/adventures/#{adventure.id}", params 
+  #     conn = get conn, "/api/adventures/#{adventure.id}", params
   #     assert json_response(conn, 422) == %{"adventure" => ["not_found"]}
   #   end
-    
-  # end
 
+  # end
 end

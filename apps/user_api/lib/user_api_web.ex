@@ -23,6 +23,7 @@ defmodule UserApiWeb do
       use UserApiWeb.ControllerHelpers
       import Plug.Conn
       import UserApiWeb.Gettext
+      import UserApiWeb.ErrorHandler
       import UserApiWeb.Utils
       alias UserApiWeb.Router.Helpers, as: Routes
     end
@@ -30,8 +31,10 @@ defmodule UserApiWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/user_api_web/templates",
-                        namespace: UserApiWeb
+      use Phoenix.View,
+        root: "lib/user_api_web/templates",
+        namespace: UserApiWeb
+
       use UserApiWeb.ViewHelpers
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]

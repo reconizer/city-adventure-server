@@ -9,6 +9,10 @@ defmodule UserApiWeb.ErrorView do
     errors
   end
 
+  def render("422.json", %{errors: errors}) do
+    errors
+  end
+
   def render("500.json", _assigns) do
     %{errors: %{detail: "Internal server error"}}
   end

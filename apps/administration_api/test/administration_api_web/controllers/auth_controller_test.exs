@@ -16,6 +16,7 @@ defmodule AdministrationApiWeb.AuthControllerTest do
   end
 
   describe "login/2" do
+    @tag :integration
     test "succeeds with correct credentials", %{conn: conn} do
       params = %{
         "email" => "test@test.com",
@@ -32,6 +33,7 @@ defmodule AdministrationApiWeb.AuthControllerTest do
              } = response
     end
 
+    @tag :integration
     test "fails with incorrect password", %{conn: conn} do
       params = %{
         "email" => "test@test.com",
@@ -46,6 +48,7 @@ defmodule AdministrationApiWeb.AuthControllerTest do
       assert %{"password" => ["invalid password"]} == response
     end
 
+    @tag :integration
     test "fails with incorrect email", %{conn: conn} do
       params = %{
         "email" => "test@test.com1",
