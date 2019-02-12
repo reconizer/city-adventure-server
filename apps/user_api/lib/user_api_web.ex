@@ -23,6 +23,7 @@ defmodule UserApiWeb do
       use UserApiWeb.ControllerHelpers
       import Plug.Conn
       import UserApiWeb.Gettext
+      import UserApiWeb.Utils
       alias UserApiWeb.Router.Helpers, as: Routes
     end
   end
@@ -53,6 +54,13 @@ defmodule UserApiWeb do
     quote do
       use Phoenix.Channel
       import UserApiWeb.Gettext
+    end
+  end
+
+  def contract do
+    quote do
+      import Contract
+      import UserApiWeb.Utils
     end
   end
 

@@ -1,9 +1,12 @@
 defmodule UserApiWeb.PointView do
   use UserApiWeb, :view
 
-  def render("completed_points.json", %{session: %Session{context: %{"completed_points" => points}} = _session}) do
+  def render("completed_points.json", %{session: %Session{context: %{"user_points" => user_points, "completed_points" => points}} = _session}) do
     points
-    |> Enum.map(&render_points/1)
+    |> Enum.map(fn point ->
+      point
+      |> render_points(user_points)
+    end)
   end
 
   def render("resolve_point_position.json", %{session: %Session{context: %{"adventure" => %{points: points, user_points: user_points} = adventure}} = _session}) do
@@ -17,14 +20,14 @@ defmodule UserApiWeb.PointView do
     }
   end
 
-  defp render_points(%{position: %{coordinates: {lng, lat}}} = point) do
+  defp render_points(%{position: %{coordinates: {lng, lat}}} = point, user_points) do
     %{
       position: %{
         lat: lat,
         lng: lng
       },
       id: point.id,
-      completed: point.completed,
+      completed: user_points |> check_completed_point(point.id),
       radius: point.radius
     }
   end
@@ -34,6 +37,12 @@ defmodule UserApiWeb.PointView do
     |> Enum.find(fn user_point ->
       user_point.point_id == current_point_id
     end)
+  end
+
+  defp check_completed_point(user_points, point_id) do
+    user_points
+    |> find_user_point(point_id)
+    |> Map.get(:completed)
   end
 
   defp find_point(points, current_point_id) do
