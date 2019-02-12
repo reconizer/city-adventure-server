@@ -1,5 +1,6 @@
 #!/bin/bash
 set -ev
+cp apps/infrastructure/config/travis.exs apps/infrastructure/config/test.exs
 
 MIX_ENV=test mix ecto.migrate -r Infrastructure.Repository
 MIX_ENV=test mix test

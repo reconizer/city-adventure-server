@@ -4,6 +4,10 @@ defmodule AdministrationApiWeb.AdventureController do
   alias AdministrationApiWeb.AdventureContract
   alias Domain.Creator.Repository.Adventure, as: AdventureRepository
 
+  @doc """
+  path: /api/adventures/
+  method: GET
+  """
   def list(conn, params) do
     with {:ok, params} <- AdventureContract.list(conn, params),
          {:ok, adventures} <- AdventureRepository.all(params.filter) do
@@ -16,6 +20,10 @@ defmodule AdministrationApiWeb.AdventureController do
     end
   end
 
+  @doc """
+  path: /api/adventures/:adventure_id
+  method: GET
+  """
   def item(conn, params) do
     with {:ok, params} <- AdventureContract.item(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do
@@ -28,6 +36,10 @@ defmodule AdministrationApiWeb.AdventureController do
     end
   end
 
+  @doc """
+  path: /api/adventures/statistics
+  method: GET
+  """
   def statistics(conn, params) do
     AdventureContract.statistics(conn, params)
     |> case do
@@ -42,6 +54,10 @@ defmodule AdministrationApiWeb.AdventureController do
     end
   end
 
+  @doc """
+  path: /api/adventures
+  method: POST
+  """
   def create(conn, params) do
     with {:ok, params} <- AdventureContract.create(conn, params),
          {:ok, _} <- Domain.Creator.Adventure.new(params) |> Domain.Creator.Repository.Adventure.save(),
@@ -55,6 +71,10 @@ defmodule AdministrationApiWeb.AdventureController do
     end
   end
 
+  @doc """
+  path: /api/adventures
+  method: PATCH
+  """
   def update(conn, params) do
     with {:ok, params} <- AdventureContract.update(conn, params) do
       AdventureRepository.get(params.adventure_id)
@@ -68,6 +88,10 @@ defmodule AdministrationApiWeb.AdventureController do
     end
   end
 
+  @doc """
+  path: /api/adventures/send_to_pending
+  method: POST
+  """
   def send_to_pending(conn, params) do
     with {:ok, params} <- AdventureContract.send_to_pending(conn, params) do
       AdventureRepository.get(params.adventure_id)
@@ -81,6 +105,10 @@ defmodule AdministrationApiWeb.AdventureController do
     end
   end
 
+  @doc """
+  path: /api/adventures/send_to_review
+  method: POST
+  """
   def send_to_review(conn, params) do
     with {:ok, params} <- AdventureContract.send_to_review(conn, params) do
       AdventureRepository.get(params.adventure_id)

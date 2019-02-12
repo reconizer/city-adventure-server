@@ -4,6 +4,10 @@ defmodule AdministrationApiWeb.AuthController do
   alias AdministrationApiWeb.AuthContract
   alias Domain.Administration
 
+  @doc """
+  path: /api/auth/login
+  method: POST
+  """
   def login(conn, params) do
     with {:ok, params} <- AuthContract.login(conn, params),
          {:ok, user} <- Administration.User.Repository.get_for_authentication(params),

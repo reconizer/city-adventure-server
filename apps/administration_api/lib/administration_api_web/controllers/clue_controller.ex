@@ -5,6 +5,10 @@ defmodule AdministrationApiWeb.ClueController do
   alias Domain.Creator.Repository.Adventure, as: AdventureRepository
   alias Domain.Creator
 
+  @doc """
+  path: /api/clues/:id
+  method: GET
+  """
   def item(conn, params) do
     with {:ok, params} <- ClueContract.item(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id),
@@ -16,6 +20,10 @@ defmodule AdministrationApiWeb.ClueController do
     end
   end
 
+  @doc """
+  path: /api/clues
+  method: POST
+  """
   def create(conn, params) do
     with {:ok, params} <- ClueContract.create(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do
@@ -53,6 +61,10 @@ defmodule AdministrationApiWeb.ClueController do
     end
   end
 
+  @doc """
+  path: /api/clues
+  method: PATCH
+  """
   def update(conn, params) do
     with {:ok, params} <- ClueContract.update(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do
@@ -65,6 +77,10 @@ defmodule AdministrationApiWeb.ClueController do
     end
   end
 
+  @doc """
+  path: /api/clues
+  method: DELETE
+  """
   def delete(conn, params) do
     with {:ok, params} <- ClueContract.delete(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do
@@ -78,6 +94,10 @@ defmodule AdministrationApiWeb.ClueController do
     end
   end
 
+  @doc """
+  path: /api/clues/reorder
+  method: PATCH
+  """
   def reorder(conn, params) do
     with {:ok, params} <- ClueContract.reorder(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do

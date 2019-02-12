@@ -5,6 +5,10 @@ defmodule AdministrationApiWeb.PointController do
   alias Domain.Creator.Repository.Adventure, as: AdventureRepository
   alias Domain.Creator
 
+  @doc """
+  path: /api/points/:id
+  method: GET
+  """
   def item(conn, params) do
     with {:ok, params} <- PointContract.item(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id),
@@ -16,6 +20,10 @@ defmodule AdministrationApiWeb.PointController do
     end
   end
 
+  @doc """
+  path: /api/points
+  method: GET
+  """
   def list(conn, params) do
     with {:ok, params} <- PointContract.list(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do
@@ -26,6 +34,10 @@ defmodule AdministrationApiWeb.PointController do
     end
   end
 
+  @doc """
+  path: /api/points
+  method: CREATE
+  """
   def create(conn, params) do
     with {:ok, params} <- PointContract.create(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do
@@ -62,6 +74,10 @@ defmodule AdministrationApiWeb.PointController do
     end
   end
 
+  @doc """
+  path: /api/points
+  method: PATCH
+  """
   def update(conn, params) do
     with {:ok, params} <- PointContract.update(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do
@@ -74,6 +90,10 @@ defmodule AdministrationApiWeb.PointController do
     end
   end
 
+  @doc """
+  path: /api/points
+  method: DELETE
+  """
   def delete(conn, params) do
     with {:ok, params} <- PointContract.delete(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do
@@ -86,6 +106,10 @@ defmodule AdministrationApiWeb.PointController do
     end
   end
 
+  @doc """
+  path: /api/points/reorder
+  method: PATCH
+  """
   def reorder(conn, params) do
     with {:ok, params} <- PointContract.reorder(conn, params),
          {:ok, adventure} <- AdventureRepository.get(params.adventure_id) do
