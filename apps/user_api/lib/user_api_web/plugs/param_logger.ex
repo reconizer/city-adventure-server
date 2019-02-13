@@ -6,11 +6,7 @@ defmodule UserApiWeb.Plugs.ParamLogger do
   def call(conn, _default) do
     Logger.metadata(app: "UserApi")
 
-    Logger.info([
-      "\n",
-      "  Parameters: #{inspect(conn.params)}\n",
-      "  Pipelines: #{inspect(conn.private.phoenix_pipelines)}"
-    ])
+    Logger.info("Params: #{inspect(conn.params)}\n")
 
     conn
   end
