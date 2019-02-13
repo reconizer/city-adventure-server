@@ -4,11 +4,14 @@ defmodule AdministrationApiWeb.Plugs.ParamLogger do
   def init(arg), do: arg
 
   def call(conn, _default) do
+    Logger.metadata(app: "AdministrationApi")
+
     Logger.info([
       "\n",
       "  Parameters: #{inspect(conn.params)}\n",
       "  Pipelines: #{inspect(conn.private.phoenix_pipelines)}"
     ])
+
     conn
   end
 end
