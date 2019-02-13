@@ -9,8 +9,12 @@ defmodule AdministrationApiWeb.Router do
     plug(AdministrationApiWeb.Plugs.Token)
   end
 
+  pipeline :logged do
+    plug(Plug.Logger)
+  end
+
   scope "/api", AdministrationApiWeb do
-    pipe_through(:api)
+    pipe_through([:api, :logged])
 
     scope "/" do
       pipe_through(:authenticated)

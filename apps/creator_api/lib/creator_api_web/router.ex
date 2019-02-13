@@ -9,8 +9,12 @@ defmodule CreatorApiWeb.Router do
     plug(CreatorApiWeb.Plugs.Token)
   end
 
+  pipeline :logged do
+    plug(Plug.Logger)
+  end
+
   scope "/api", CreatorApiWeb do
-    pipe_through(:api)
+    pipe_through([:api, :logged])
 
     scope "/" do
       pipe_through(:authenticated)
