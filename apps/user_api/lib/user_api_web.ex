@@ -29,18 +29,6 @@ defmodule UserApiWeb do
     end
   end
 
-  def silent_controller do
-    quote do
-      use Phoenix.Controller, namespace: UserApiWeb, log: false
-      use UserApiWeb.ControllerHelpers
-      import Plug.Conn
-      import UserApiWeb.Gettext
-      import UserApiWeb.ErrorHandler
-      import UserApiWeb.Utils
-      alias UserApiWeb.Router.Helpers, as: Routes
-    end
-  end
-
   def view do
     quote do
       use Phoenix.View,

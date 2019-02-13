@@ -12,6 +12,10 @@ defmodule UserApiWeb.Router do
     plug(UserApiWeb.Plugs.CreateSession)
   end
 
+  pipeline :logged do
+    plug(Plug.Logger)
+  end
+
   scope "/api", UserApiWeb do
     pipe_through(:api_jwt)
 
