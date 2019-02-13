@@ -10,5 +10,3 @@ sudo chown ubuntu /var/apps/app -R
 sudo chgrp ubuntu /var/apps/app -R
 
 rm -rf /tmp/app
-
-/var/apps/app/bin/app migrate
