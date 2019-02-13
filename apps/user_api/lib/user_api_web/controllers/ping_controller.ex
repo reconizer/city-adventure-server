@@ -1,5 +1,5 @@
 defmodule UserApiWeb.PingController do
-  use UserApiWeb, :controller
+  use UserApiWeb, :silent_controller
 
 
   def ping(conn, _) do

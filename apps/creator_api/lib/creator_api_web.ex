@@ -28,6 +28,17 @@ defmodule CreatorApiWeb do
     end
   end
 
+  def silent_controller do
+    quote do
+      use Phoenix.Controller, namespace: CreatorApiWeb, log: false
+
+      import Plug.Conn
+      import CreatorApiWeb.Gettext
+      import CreatorApiWeb.Utils
+      alias CreatorApiWeb.Router.Helpers, as: Routes
+    end
+  end
+
   def view do
     quote do
       use Phoenix.View,
