@@ -183,6 +183,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
+  def load_user_rating(_), do: nil
+
   def load_user_points(%Models.UserPoint{} = user_point) do
     %UserPoint{
       position: user_point.position,
