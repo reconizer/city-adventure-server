@@ -1,5 +1,5 @@
 defmodule AdministrationApiWeb.PingController do
-  use AdministrationApiWeb, :silent_controller
+  use AdministrationApiWeb, :controller
 
   def ping(conn, _) do
     render(conn, "ping.json", %{})

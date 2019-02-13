@@ -20,19 +20,6 @@ defmodule AdministrationApiWeb do
   def controller do
     quote do
       use Phoenix.Controller, namespace: AdministrationApiWeb
-
-      import Plug.Conn
-      import AdministrationApiWeb.Gettext
-      import AdministrationApiWeb.ErrorHandler
-      import AdministrationApiWeb.Utils
-      alias AdministrationApiWeb.Router.Helpers, as: Routes
-    end
-  end
-
-  def silent_controller do
-    quote do
-      use Phoenix.Controller, log: false
-
       import Plug.Conn
       import AdministrationApiWeb.Gettext
       import AdministrationApiWeb.ErrorHandler
