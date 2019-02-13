@@ -6,13 +6,13 @@ defmodule Worker.FileUpload.Handler.AssetUpload do
   alias Infrastructure.Repository
   alias Infrastructure.Repository.Models.Asset
 
-  @bucket Application.get_env(:worker, :asset_bucket)
-
   def process(%{body: %{"Records" => [_s3_event]}} = event, queue_name) do
+    bucket = bucket()
+
     event
     |> Helper.AssetEvent.build_from_queue()
     |> case do
-      {:ok, %{bucket: @bucket, file_name: "original"} = asset_event} ->
+      {:ok, %{bucket: bucket, file_name: "original"} = asset_event} ->
         {:ok, asset_event}
 
       {:ok, %{file_name: file_name} = asset_event} when file_name != "original" ->
@@ -132,5 +132,9 @@ defmodule Worker.FileUpload.Handler.AssetUpload do
 
   defp conversion_queue_name do
     Application.get_env(:worker, :conversion_queue_name)
+  end
+
+  defp bucket do
+    Application.get_env(:worker, :asset_bucket)
   end
 end
