@@ -7,6 +7,13 @@ defmodule UserApiWeb.ErrorView do
 
   def render("422.json", %{session: %Session{errors: errors}} = _session) do
     errors
+    |> Enum.reduce(%{}, fn map, acc ->
+      map
+      |> Enum.reduce(acc, fn {key, list}, acc ->
+        key
+        |> render_error(list, acc)
+      end)
+    end)
   end
 
   def render("422.json", %{errors: errors}) do
