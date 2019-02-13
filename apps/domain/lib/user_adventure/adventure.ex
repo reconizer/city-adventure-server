@@ -171,7 +171,7 @@ defmodule Domain.UserAdventure.Adventure do
           starting_time <= time_now and time_now <= starting_time + duration ->
             {:ok, true}
 
-          false ->
+          true ->
             {:error, :wrong_time}
         end
     end

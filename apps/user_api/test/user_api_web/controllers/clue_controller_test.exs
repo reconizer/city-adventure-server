@@ -36,12 +36,12 @@ defmodule UserApiWeb.ClueControllerTest do
   #   test "return clues", %{conn: conn, adventure: adventure} do
   #     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
   #     conn = get conn, "/api/clues/#{adventure.id}"
-  #     assert Enum.count(json_response(conn, 200)) == 3 
+  #     assert Enum.count(json_response(conn, 200)) == 3
   #   end
 
   #   test "return empty array", %{conn: conn, adventure: _adventure} do
   #     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
-  #     conn = get conn, "/api/clues/#{Ecto.UUID.generate()}" 
+  #     conn = get conn, "/api/clues/#{Ecto.UUID.generate()}"
   #     assert json_response(conn, 200) == []
   #   end
 
@@ -51,19 +51,19 @@ defmodule UserApiWeb.ClueControllerTest do
 
   #   test "return clues", %{conn: conn, adventure: adventure, point: point} do
   #     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
-  #     conn = get conn, "/api/clues/point/#{adventure.id}/#{point.id}" 
-  #     assert Enum.count(json_response(conn, 200)) == 3 
+  #     conn = get conn, "/api/clues/point/#{adventure.id}/#{point.id}"
+  #     assert Enum.count(json_response(conn, 200)) == 3
   #   end
 
   #   test "return empty array, point_id don't exist", %{conn: conn, adventure: adventure, point: _point} do
   #     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
-  #     conn = get conn, "/api/clues/point/#{adventure.id}/#{Ecto.UUID.generate()}" 
+  #     conn = get conn, "/api/clues/point/#{adventure.id}/#{Ecto.UUID.generate()}"
   #     assert json_response(conn, 200) == []
   #   end
 
   #   test "return empty array, adventure_id don't exist", %{conn: conn, adventure: _adventure, point: point} do
   #     conn = conn |> put_req_header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN6YXgyMkBnbWFpbC5jb20iLCJpZCI6IjYwNzgxZmMwLWRkZDAtNDVjMi04OTcyLWVmYTI3NmVjYmJlNSIsIm5pY2siOiJzemF4In0.ppM6LEulXHqEbFSzs1T2MTtaR8ZJ_dSfX5CaI19D0LU")
-  #     conn = get conn, "/api/clues/point/#{Ecto.UUID.generate()}/#{point.id}" 
+  #     conn = get conn, "/api/clues/point/#{Ecto.UUID.generate()}/#{point.id}"
   #     assert json_response(conn, 200) == []
   #   end
 

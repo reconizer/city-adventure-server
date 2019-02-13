@@ -408,33 +408,37 @@ defmodule Domain.Creator.Adventure do
   def set_points({:error, _} = error, _points), do: error
 
   def set_points(adventure, points) do
-    {[first_point], remaining_points} =
+    points =
       points
       |> Enum.split_with(&is_nil(&1.parent_point_id))
+      |> case do
+        {[first_point], remaining_points} ->
+          Stream.unfold(
+            {[first_point], remaining_points},
+            fn
+              {_, nil} ->
+                nil
 
-    points =
-      Stream.unfold(
-        {[first_point], remaining_points},
-        fn
-          {_, nil} ->
-            nil
+              {[last_added_point | _] = ordered_points, unordered_points} ->
+                unordered_points
+                |> Enum.split_with(&(&1.parent_point_id == last_added_point.id))
+                |> case do
+                  {[], []} ->
+                    {last_added_point, {ordered_points, nil}}
 
-          {[last_added_point | _] = ordered_points, unordered_points} ->
-            unordered_points
-            |> Enum.split_with(&(&1.parent_point_id == last_added_point.id))
-            |> case do
-              {[], []} ->
-                {last_added_point, {ordered_points, nil}}
+                  {[new_point], []} ->
+                    {last_added_point, {[new_point | ordered_points], []}}
 
-              {[new_point], []} ->
-                {last_added_point, {[new_point | ordered_points], []}}
-
-              {[new_point], new_unordered_points} ->
-                {last_added_point, {[new_point | ordered_points], new_unordered_points}}
+                  {[new_point], new_unordered_points} ->
+                    {last_added_point, {[new_point | ordered_points], new_unordered_points}}
+                end
             end
-        end
-      )
-      |> Enum.to_list()
+          )
+          |> Enum.to_list()
+
+        _ ->
+          []
+      end
 
     {:ok, %{adventure | points: points}}
   end

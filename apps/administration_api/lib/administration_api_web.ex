@@ -24,6 +24,7 @@ defmodule AdministrationApiWeb do
       import Plug.Conn
       import AdministrationApiWeb.Gettext
       import AdministrationApiWeb.ErrorHandler
+      import AdministrationApiWeb.Utils
       alias AdministrationApiWeb.Router.Helpers, as: Routes
     end
   end
@@ -39,6 +40,8 @@ defmodule AdministrationApiWeb do
 
       import AdministrationApiWeb.ErrorHelpers
       import AdministrationApiWeb.Gettext
+
+      import AdministrationApiWeb.ViewHelpers
       alias AdministrationApiWeb.Router.Helpers, as: Routes
     end
   end
@@ -61,6 +64,7 @@ defmodule AdministrationApiWeb do
   def contract do
     quote do
       import Contract
+      import AdministrationApiWeb.Contracts
     end
   end
 

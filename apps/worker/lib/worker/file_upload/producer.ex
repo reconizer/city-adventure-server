@@ -4,9 +4,6 @@ defmodule Worker.FileUpload.Producer do
   SQS. This module handles those SQS messages.
   """
 
-  @message_handlers Application.get_env(:worker, :file_upload_handlers)
-  @max_number_of_messages Application.get_env(:worker, :max_number_of_messages)
-
   require Logger
   use GenServer
 
@@ -20,7 +17,9 @@ defmodule Worker.FileUpload.Producer do
   end
 
   def handle_info(:fetch_messages, queue_name) do
-    ExAws.SQS.receive_message(queue_name, max_number_of_messages: @max_number_of_messages)
+    max_number_of_messages = max_number_of_messages()
+
+    ExAws.SQS.receive_message(queue_name, max_number_of_messages: max_number_of_messages())
     |> ExAws.request()
     |> case do
       {:ok, %{body: %{messages: messages}}} -> messages
@@ -29,7 +28,7 @@ defmodule Worker.FileUpload.Producer do
     |> Enum.map(&emit_message(&1, queue_name))
     |> Enum.count()
     |> case do
-      @max_number_of_messages ->
+      max_number_of_messages ->
         Process.send(self(), :fetch_messages, [])
 
       _ ->
@@ -40,11 +39,19 @@ defmodule Worker.FileUpload.Producer do
   end
 
   def emit_message(event, queue_name) do
-    @message_handlers
+    message_handlers()
     |> Enum.map(&Task.start(&1, :process, [event, queue_name]))
   end
 
   def parse_body(%{body: body} = message) do
     %{message | body: body |> Poison.decode!()}
+  end
+
+  def message_handlers do
+    Application.get_env(:worker, :file_upload_handlers)
+  end
+
+  def max_number_of_messages do
+    Application.get_env(:worker, :max_number_of_messages)
   end
 end

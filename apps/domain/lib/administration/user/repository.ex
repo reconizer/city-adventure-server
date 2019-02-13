@@ -42,12 +42,10 @@ defmodule Domain.Administration.User.Repository do
   def build_administrator(nil), do: {:error, "doesnt exist"}
 
   def build_administrator(administrator_model) do
-    user = %User{
+    %User{
       id: administrator_model.id,
       email: administrator_model.email,
       name: administrator_model.name
     }
-
-    {:ok, user}
   end
 end

@@ -69,8 +69,8 @@ defmodule Domain.Commerce.TransferTest do
     account = fixtures.from_account
     transfer = fixtures.transfer
 
-    assert (%Transfer{accounts: [account]} = transfer) = transfer |> Transfer.add_account!(account)
-    assert (%Transfer{accounts: [account]} = transfer) = transfer |> Transfer.add_account!(account)
+    assert (%Transfer{accounts: [^account]} = transfer) = transfer |> Transfer.add_account!(account)
+    assert (%Transfer{accounts: [^account]} = transfer) = transfer |> Transfer.add_account!(account)
   end
 
   test "get_account/2", fixtures do
@@ -79,7 +79,7 @@ defmodule Domain.Commerce.TransferTest do
 
     transfer = %{fixtures.transfer | accounts: [account]}
 
-    assert {:ok, account} = transfer |> Transfer.get_account(account.id)
+    assert {:ok, ^account} = transfer |> Transfer.get_account(account.id)
     assert :error = transfer |> Transfer.get_account(other_account.id)
   end
 
@@ -99,7 +99,7 @@ defmodule Domain.Commerce.TransferTest do
     transaction = fixtures.transaction
     transfer = %{fixtures.transfer | transactions: [transaction]}
 
-    assert {:ok, transaction} =
+    assert {:ok, ^transaction} =
              transfer
              |> Transfer.get_transaction(transaction.id)
 
@@ -128,11 +128,11 @@ defmodule Domain.Commerce.TransferTest do
 
     result = transfer |> Transfer.add_transaction(transaction)
 
-    assert {:ok, %{transactions: [transaction], events: [%{name: "TransactionAdded"}]}} = result
+    assert {:ok, %{transactions: [^transaction], events: [%{name: "TransactionAdded"}]}} = result
 
     result = transfer |> Transfer.add_transaction(transaction)
 
-    assert {:ok, %{transactions: [transaction], events: [%{name: "TransactionAdded"}]}} = result
+    assert {:ok, %{transactions: [^transaction], events: [%{name: "TransactionAdded"}]}} = result
   end
 
   test "add_transaction!/2", fixtures do
@@ -141,7 +141,7 @@ defmodule Domain.Commerce.TransferTest do
 
     result = transfer |> Transfer.add_transaction!(transaction)
 
-    assert %{transactions: [transaction], events: [%{name: "TransactionAdded"}]} = result
+    assert %{transactions: [^transaction], events: [%{name: "TransactionAdded"}]} = result
   end
 
   test "remove_transaction/2", fixtures do
@@ -168,7 +168,7 @@ defmodule Domain.Commerce.TransferTest do
 
     result = transfer |> Transfer.add_pending_transaction(transaction)
 
-    assert {:ok, %{pending_transactions: [transaction]}} = result
+    assert {:ok, %{pending_transactions: [^transaction]}} = result
   end
 
   test "add_pending_transaction!/2", fixtures do
@@ -177,7 +177,7 @@ defmodule Domain.Commerce.TransferTest do
 
     result = transfer |> Transfer.add_pending_transaction!(transaction)
 
-    assert %{pending_transactions: [transaction]} = result
+    assert %{pending_transactions: [^transaction]} = result
   end
 
   test "get_pending_transaction/2", fixtures do
@@ -186,7 +186,7 @@ defmodule Domain.Commerce.TransferTest do
 
     result = transfer |> Transfer.get_pending_transaction(transaction.id)
 
-    assert {:ok, transaction} = result
+    assert {:ok, ^transaction} = result
 
     result = transfer |> Transfer.get_pending_transaction(uuid())
 
@@ -247,9 +247,11 @@ defmodule Domain.Commerce.TransferTest do
     }
 
     assert %{
-             accounts: [^to_account, ^from_account],
-             pending_transactions: [^pending_transaction]
+             accounts: [^from_account, ^to_account],
+             pending_transactions: pending_transactions
            } = result
+
+    assert pending_transactions |> length == 1
   end
 
   test "commit/1", fixtures do
@@ -297,7 +299,7 @@ defmodule Domain.Commerce.TransferTest do
       )
       |> Transfer.commit()
 
-    assert {:ok, transfer} = result
+    assert {:ok, _} = result
 
     result =
       fixtures.transfer
