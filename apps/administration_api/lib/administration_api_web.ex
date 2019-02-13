@@ -20,7 +20,6 @@ defmodule AdministrationApiWeb do
   def controller do
     quote do
       use Phoenix.Controller, namespace: AdministrationApiWeb
-
       import Plug.Conn
       import AdministrationApiWeb.Gettext
       import AdministrationApiWeb.ErrorHandler
