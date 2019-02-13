@@ -19,7 +19,7 @@ defmodule UserApiWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: UserApiWeb
+      use Phoenix.Controller, namespace: UserApiWeb, log: :info
       use UserApiWeb.ControllerHelpers
       import Plug.Conn
       import UserApiWeb.Gettext

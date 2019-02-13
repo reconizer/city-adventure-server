@@ -28,15 +28,16 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> join(:left, [adventure], points in assoc(adventure, :points))
     |> join(:left, [adventure, points], user_rankings in assoc(adventure, :user_rankings), on: user_rankings.user_id == ^user_id)
     |> join(:left, [adventure, points, user_rankings], user_points in assoc(points, :user_points), on: user_points.user_id == ^user_id)
-    |> join(:left, [adventure, points, user_rankings, user_points], user_adventures in assoc(adventure, :user_adventures))
+    |> join(:left, [adventure, points, user_rankings, user_points], user_adventures in assoc(adventure, :user_adventures),
+      on: user_adventures.user_id == ^user_id
+    )
     |> join(:left, [adventure, points, user_rankings, user_points, user_adventures], user_rating in assoc(adventure, :adventure_ratings),
       on: user_rating.user_id == ^user_id
     )
-    |> where([_adventure, _points, _user_rankings, _user_points, user_adventures, user_rating], user_adventures.user_id == ^user_id)
     |> preload([adventure, points, user_rankings, user_points, user_adventures, user_rating], user_points: user_points)
     |> preload([adventure, points, user_rankings, user_points, user_adventures, user_rating], user_adventures: user_adventures)
     |> preload([adventure, points, user_rankings, user_points, user_adventures, user_rating], adventure_ratings: user_rating)
-    |> preload(user_rankings: :asset)
+    |> preload([adventure, points, user_rankings, user_points, user_adventures, user_rating], user_rankings: {user_rankings, :asset})
     |> preload(creator: :asset)
     |> preload(images: :asset)
     |> preload(:asset)
@@ -44,7 +45,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> preload(points: :answers)
     |> Repository.get(adventure_id)
     |> case do
-      nil -> {:error, {:adventure, "not_founds"}}
+      nil -> {:error, {:adventure, "not_found"}}
       result -> {:ok, result |> load_adventure()}
     end
   end
@@ -241,6 +242,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       asset: ranking_model.asset |> load_asset()
     }
   end
+
+  defp load_user_ranking(_), do: nil
 
   def load_user_adventure(nil), do: nil
 
