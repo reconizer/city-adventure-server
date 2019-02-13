@@ -11,6 +11,7 @@ defmodule AdministrationApiWeb.Router do
 
   pipeline :logged do
     plug(Plug.Logger)
+    plug(AdministrationApiWeb.Plugs.ParamLogger)
   end
 
   scope "/api", AdministrationApiWeb do

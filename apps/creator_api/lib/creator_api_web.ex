@@ -19,7 +19,7 @@ defmodule CreatorApiWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: CreatorApiWeb, log: :info
+      use Phoenix.Controller, namespace: CreatorApiWeb
 
       import Plug.Conn
       import CreatorApiWeb.Gettext
