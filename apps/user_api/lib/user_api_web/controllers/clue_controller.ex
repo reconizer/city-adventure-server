@@ -14,7 +14,7 @@ defmodule UserApiWeb.ClueController do
            |> AdventureRepository.get(),
          {:ok, points} <-
            adventure
-           |> AdventureDomain.get_discovered_points() do
+           |> AdventureDomain.get_added_points() do
       session
       |> Session.update_context(%{"points" => points, "user_points" => user_points})
     else
