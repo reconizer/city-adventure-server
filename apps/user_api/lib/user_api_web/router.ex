@@ -17,7 +17,7 @@ defmodule UserApiWeb.Router do
   end
 
   scope "/api", UserApiWeb do
-    pipe_through(:api_jwt)
+    pipe_through([:api_jwt, :logged])
 
     scope "/adventures" do
       get("/", AdventureController, :index)
