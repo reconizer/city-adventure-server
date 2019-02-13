@@ -76,6 +76,8 @@ defmodule UserApiWeb.ClueView do
     end)
   end
 
+  defp generate_clue_date(nil), do: 0
+
   defp generate_clue_date(user_point) do
     user_point
     |> Map.get(:inserted_at)

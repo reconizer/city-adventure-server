@@ -42,7 +42,14 @@ defmodule UserApiWeb.PointView do
   defp check_completed_point(user_points, point_id) do
     user_points
     |> find_user_point(point_id)
-    |> Map.get(:completed)
+    |> case do
+      nil ->
+        false
+
+      result ->
+        result
+        |> Map.get(:completed)
+    end
   end
 
   defp find_point(points, current_point_id) do

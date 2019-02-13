@@ -20,11 +20,22 @@ tar -zcf "$app_name".tar.gz "$app_name"
 scp -i "$key_path" /tmp/"$app_name".tar.gz $server:/home/ubuntu/"$app_name".tar.gz
 ssh -t -i "$key_path" "$server" << EOF
   cd /home/ubuntu
-  rm /var/apps/"$app_name" -rf
-  mkdir -p /var/apps/"$app_name"
-  tar -xf "$app_name".tar.gz 
-  rm /home/ubuntu/"$app_name".tar.gz
-  mv "$app_name" /var/apps/
+
+  rm /var/apps/"$app_name"_old
+  mv /var/apps/"$app_name" /var/apps/"$app_name"_old
+
+  sudo mkdir /var/apps/"$app_name" -p
+  sudo chown ubuntu /var/apps/"$app_name" -R
+  sudo chgrp ubuntu /var/apps/"$app_name" -R
+
+  tar -xf /home/ubuntu/"$app_name".tar.gz -C /var/apps/
+
+  sudo chown ubuntu /var/apps/"$app_name" -R
+  sudo chgrp ubuntu /var/apps/"$app_name" -R
+
+  rm -rf /home/ubuntu/"$app_name".tar.gz
+
   /var/apps/"$app_name"/bin/"$app_name" migrate && sudo systemctl restart "$app_name"
+
   exit
 EOF
