@@ -21,6 +21,7 @@ scp -i "$key_path" /tmp/"$app_name".tar.gz $server:/home/ubuntu/"$app_name".tar.
 ssh -t -i "$key_path" "$server" << EOF
   cd /home/ubuntu
 
+  rm /var/apps/"$app_name"_old
   mv /var/apps/"$app_name" /var/apps/"$app_name"_old
 
   sudo mkdir /var/apps/"$app_name" -p
