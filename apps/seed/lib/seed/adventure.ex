@@ -16,7 +16,7 @@ defmodule Seed.Adventure do
     |> Multi.insert_all(:gallery, Models.Asset, build_gallery(), returning: true)
     |> Multi.merge(fn %{creator: creator, user_avatar: user_avatar, creator_image: creator_image, adventure_image: image, gallery: {_, gallery}} ->
       Multi.new()
-      |> Multi.insert(:adventure, build_adventure(creator, image))
+      |> Multi.insert(:adventure, build_adventure(creator.id, image))
       |> Multi.merge(fn adventure ->
         create_adventure_image(adventure, gallery)
       end)
@@ -33,6 +33,27 @@ defmodule Seed.Adventure do
     |> Infrastructure.Repository.transaction()
   end
 
+  def seed_adventure_by_creator(creator_id) do
+    Multi.new()
+    |> Multi.insert(:adventure_image, build_adventure_image())
+    |> Multi.insert_all(:gallery, Models.Asset, build_gallery(), returning: true)
+    |> Multi.merge(fn %{adventure_image: image, gallery: {_, gallery}} ->
+      Multi.new()
+      |> Multi.insert(:adventure, build_adventure(creator_id, image))
+      |> Multi.merge(fn adventure ->
+        create_adventure_image(adventure, gallery)
+      end)
+      |> Multi.merge(fn _adventure ->
+        gallery = [image | gallery]
+
+        Multi.new()
+        |> Multi.run(:send_assets, fn _, _ -> send_assets(gallery) end)
+      end)
+    end)
+    |> Multi.merge(&create_points_without_resolve/1)
+    |> Infrastructure.Repository.transaction()
+  end
+
   defp create_adventure_image(%{adventure: adventure}, assets) do
     Multi.new()
     |> Multi.insert_all(:images, Models.Image, preper_image(assets, adventure), returning: true)
@@ -46,6 +67,20 @@ defmodule Seed.Adventure do
     |> Multi.insert_all(:user_adventure, Models.UserAdventure, build_user_adventure(adventure, users), returning: true)
     |> Multi.insert_all(:ranking, Models.Ranking, build_ranking(adventure, users), returning: true)
     |> Multi.insert_all(:rating, Models.AdventureRating, build_rating(adventure, users), returning: true)
+    |> Multi.insert_all(:assets, Models.Asset, assets, returning: true)
+    |> Multi.insert_all(:clues_inserted, Models.Clue, clues, returning: true)
+    |> Multi.insert_all(:answers, Models.Answer, answers, returning: true)
+    |> Multi.merge(fn %{assets: {_, assets}} ->
+      Multi.new()
+      |> Multi.run(:assets_send, fn _, _ -> send_assets(assets) end)
+    end)
+  end
+
+  defp create_points_without_resolve(%{adventure: adventure}) do
+    %{points: points, clues: clues, answers: answers, assets: assets} = build_points(adventure.id)
+
+    Multi.new()
+    |> Multi.insert_all(:points, Models.Point, points, returning: true)
     |> Multi.insert_all(:assets, Models.Asset, assets, returning: true)
     |> Multi.insert_all(:clues_inserted, Models.Clue, clues, returning: true)
     |> Multi.insert_all(:answers, Models.Answer, answers, returning: true)
@@ -189,7 +224,7 @@ defmodule Seed.Adventure do
     })
   end
 
-  defp build_adventure(creator, image) do
+  defp build_adventure(creator_id, image) do
     Models.Adventure.build(%{
       description: "Wyrusz w fascynującą wyprawę po Toruńskiej starówce",
       name: "śladami Kopernika",
@@ -200,7 +235,7 @@ defmodule Seed.Adventure do
       code: "1234",
       min_time: 3000,
       max_time: 7800,
-      creator_id: creator.id,
+      creator_id: creator_id,
       asset_id: image.id,
       inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
       updated_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)

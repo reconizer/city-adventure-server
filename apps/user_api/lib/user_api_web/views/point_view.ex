@@ -12,7 +12,7 @@ defmodule UserApiWeb.PointView do
   def render("resolve_point_position.json", %{session: %Session{context: %{"adventure" => %{points: points, user_points: user_points} = adventure}} = _session}) do
     %{
       position: points |> find_point(adventure.current_point_id) |> render_position(),
-      completed: user_points |> find_user_point(adventure.current_point_id) |> Map.get(:completed),
+      completed: user_points |> check_completed_point(adventure.current_point_id),
       radius: points |> find_point(adventure.current_point_id) |> Map.get(:radius),
       answer_type: points |> find_point(adventure.current_point_id) |> Map.get(:answer_type),
       last_point: points |> find_point(adventure.current_point_id) |> Map.get(:last_point),
@@ -42,7 +42,14 @@ defmodule UserApiWeb.PointView do
   defp check_completed_point(user_points, point_id) do
     user_points
     |> find_user_point(point_id)
-    |> Map.get(:completed)
+    |> case do
+      nil ->
+        false
+
+      result ->
+        result
+        |> Map.get(:completed)
+    end
   end
 
   defp find_point(points, current_point_id) do
