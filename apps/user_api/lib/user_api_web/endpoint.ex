@@ -20,6 +20,7 @@ defmodule UserApiWeb.Endpoint do
     plug(Phoenix.CodeReloader)
   end
 
+  plug(UserApiWeb.Plugs.AppName)
   plug(Plug.RequestId)
 
   plug(Plug.Parsers,

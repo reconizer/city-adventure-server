@@ -25,6 +25,7 @@ defmodule AdministrationApiWeb.Endpoint do
     plug(Phoenix.CodeReloader)
   end
 
+  plug(AdministrationApiWeb.Plugs.AppName)
   plug(Plug.RequestId)
 
   plug(Plug.Parsers,

@@ -1,10 +1,10 @@
-defmodule UserApiWeb.Plugs.ParamLogger do
+defmodule AdministrationApiWeb.Plugs.AppName do
   require Logger
 
   def init(arg), do: arg
 
   def call(conn, _default) do
-    Logger.info("Params: #{inspect(conn.params)}")
+    Logger.metadata(app: "creator")
 
     conn
   end
