@@ -60,6 +60,15 @@ defmodule Domain.UserAdventure.Adventure do
     |> create_ranking()
   end
 
+  def start_adventure(adventure, params, start_point) do
+    adventure =
+      adventure
+      |> create_user_adventure(params)
+      |> add_started_point(params, start_point)
+
+    {:ok, adventure}
+  end
+
   def find_point(adventure, %{point_id: point_id}) do
     adventure
     |> Map.get(:points)
@@ -69,6 +78,18 @@ defmodule Domain.UserAdventure.Adventure do
     |> case do
       nil -> {:error, {:point, "not_found"}}
       point -> {:ok, point}
+    end
+  end
+
+  def find_start_point(adventure) do
+    adventure
+    |> Map.get(:points)
+    |> Enum.find(fn point ->
+      point.parent_point_id == nil
+    end)
+    |> case do
+      nil -> {:error, {:point, "not_found"}}
+      result -> {:ok, result}
     end
   end
 
@@ -195,6 +216,15 @@ defmodule Domain.UserAdventure.Adventure do
           true -> {:error, {:point, "alredy_completed"}}
           false -> {:ok, adventure}
         end
+    end
+  end
+
+  def check_adventure_started(%Adventure{} = adventure) do
+    adventure
+    |> Map.get(:user_adventure)
+    |> case do
+      nil -> {:ok, adventure}
+      _result -> {:error, {:adventure, "alredy_started"}}
     end
   end
 
@@ -337,6 +367,42 @@ defmodule Domain.UserAdventure.Adventure do
           |> Map.from_struct()
         )
     end
+  end
+
+  defp create_user_adventure(adventure, params) do
+    user_adventure = %{
+      user_id: params.user_id,
+      adventure_id: adventure.id,
+      completed: false,
+      created_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+
+    %{adventure | user_adventure: user_adventure}
+    |> emit!("UserAdventureAdded", %{
+      user_id: user_adventure.user_id,
+      adventure_id: user_adventure.adventure_id,
+      created_at: NaiveDateTime.utc_now(),
+      completed: user_adventure.completed
+    })
+  end
+
+  defp add_started_point(adventure, params, point) do
+    user_point = %{
+      user_id: params.user_id,
+      point_id: point.id,
+      completed: true,
+      created_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+
+    %{adventure | user_points: adventure.user_points ++ [user_point]}
+    |> emit!("UserPointAdded", %{
+      user_id: user_point.user_id,
+      point_id: user_point.point_id,
+      created_at: NaiveDateTime.utc_now(),
+      completed: user_point.completed
+    })
   end
 
   defp point_completed(%Adventure{} = adventure, point, %{answer_text: answer_text, answer_type: answer_type}) do
