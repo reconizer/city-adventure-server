@@ -1,6 +1,10 @@
 defmodule UserApiWeb.ErrorView do
   use UserApiWeb, :view
 
+  def template_not_found(template, _assigns) do
+    %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
+  end
+
   def render("404.json", _assigns) do
     %{errors: %{detail: "Page not found"}}
   end
@@ -22,10 +26,6 @@ defmodule UserApiWeb.ErrorView do
 
   def render("500.json", _assigns) do
     %{errors: %{detail: "Internal server error"}}
-  end
-
-  def template_not_found(template, _assigns) do
-    %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
   end
 
   defp render_error(key, {message, _valid}, acc) do
