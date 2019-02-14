@@ -95,6 +95,38 @@ defmodule UserApiWeb.AdventureController do
     |> present(conn, UserApiWeb.AdventureView, "start.json")
   end
 
+  def rating(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
+    with %Session{valid?: true} <- session,
+         {:ok, validate_params} <-
+           conn
+           |> AdventureContract.rating(context),
+         {:ok, adventure} <-
+           validate_params
+           |> AdventureRepository.get(),
+         {:ok, _adventure} <-
+           adventure
+           |> AdventureDomain.can_rate?() do
+      adventure
+      |> AdventureDomain.create_adventure_rating(validate_params)
+      |> case do
+        {:ok, adventure_rating} ->
+          adventure_rating
+          |> AdventureRepository.save()
+
+          session
+          |> Session.update_context(%{"adventure" => adventure_rating})
+      end
+    else
+      %Session{valid?: false} = session ->
+        session
+
+      {:error, reason} ->
+        session
+        |> handle_errors(reason)
+    end
+    |> present(conn, UserApiWeb.AdventureView, "rating.json")
+  end
+
   def summary(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
          {:ok, validate_params} <-
