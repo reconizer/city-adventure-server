@@ -24,6 +24,10 @@ defmodule UserApiWeb.ErrorView do
     %{errors: %{detail: "Internal server error"}}
   end
 
+  def template_not_found(template, _assigns) do
+    %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
+  end
+
   defp render_error(key, {message, _valid}, acc) do
     key
     |> render_error(message, acc)
