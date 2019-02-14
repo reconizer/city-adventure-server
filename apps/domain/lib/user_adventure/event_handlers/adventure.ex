@@ -56,6 +56,33 @@ defmodule Domain.UserAdventure.EventHandlers.Adventure do
     end
   end
 
+  def process(multi, %Domain.Event{aggregate_name: "UserAdventure", name: "UserAdventureAdded"} = event) do
+    event.data
+    |> case do
+      %{
+        completed: completed,
+        created_at: created_at,
+        adventure_id: adventure_id,
+        user_id: user_id
+      } ->
+        user_adventure =
+          %Models.UserAdventure{}
+          |> Models.UserAdventure.changeset(%{
+            completed: completed,
+            inserted_at: created_at,
+            updated_at: created_at,
+            adventure_id: adventure_id,
+            user_id: user_id
+          })
+
+        multi
+        |> Ecto.Multi.insert({event.id, user_id, adventure_id, event.name}, user_adventure)
+
+      _ ->
+        multi
+    end
+  end
+
   def process(multi, %Domain.Event{aggregate_name: "UserAdventure", name: "RankingCreated"} = event) do
     event.data
     |> case do
