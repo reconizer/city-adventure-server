@@ -4,9 +4,7 @@ defmodule AdministrationApiWeb.Plugs.ParamLogger do
   def init(arg), do: arg
 
   def call(conn, _default) do
-    Logger.metadata(app: "AdministrationApi")
-
-    Logger.info("Params: #{inspect(conn.params)}\n")
+    Logger.info("Params: #{inspect(conn.params)}")
 
     conn
   end

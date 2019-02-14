@@ -4,9 +4,7 @@ defmodule CreatorApiWeb.Plugs.ParamLogger do
   def init(arg), do: arg
 
   def call(conn, _default) do
-    Logger.metadata(app: "CreatorApi")
-
-    Logger.info("Params: #{inspect(conn.params)}\n")
+    Logger.info("Params: #{inspect(conn.params)}")
 
     conn
   end

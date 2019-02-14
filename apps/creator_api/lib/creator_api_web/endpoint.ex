@@ -25,6 +25,7 @@ defmodule CreatorApiWeb.Endpoint do
     plug(Phoenix.CodeReloader)
   end
 
+  plug(CreatorApiWeb.Plugs.AppName)
   plug(Plug.RequestId)
 
   plug(Plug.Parsers,
