@@ -41,14 +41,10 @@ defmodule UserApi.MixProject do
       {:contract, in_umbrella: true},
       {:domain, in_umbrella: true},
       {:phoenix_pubsub, "~> 1.1"},
-      {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 2.11"},
-      {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:plug_cowboy, "~> 2.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:timex, "~> 3.2"},
-      {:cowboy, "~> 2.5"},
       {:media_storage, git: "https://github.com/reconizer/ex_media_storage.git", tag: "0.2"}
     ]
   end

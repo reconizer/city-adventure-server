@@ -14,6 +14,7 @@ defmodule UserApiWeb.Router do
 
   pipeline :logged do
     plug(Plug.Logger)
+    plug(UserApiWeb.Plugs.ParamLogger)
   end
 
   scope "/api", UserApiWeb do
@@ -50,9 +51,4 @@ defmodule UserApiWeb.Router do
 
     get("/", PingController, :ping)
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", UserApiWeb do
-  #   pipe_through :api
-  # end
 end
