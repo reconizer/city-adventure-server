@@ -13,7 +13,8 @@ config :user_api, UserApiWeb.Endpoint,
   http: [port: 4008],
   debug_errors: true,
   code_reloader: true,
-  check_origin: false
+  check_origin: false,
+  watchers: []
 
 # ## SSL Support
 #
@@ -40,15 +41,6 @@ config :user_api, UserApiWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :user_api, UserApiWeb.Endpoint,
-  live_reload: [
-    patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
-      ~r{priv/gettext/.*(po)$},
-      ~r{lib/user_api_web/views/.*(ex)$},
-      ~r{lib/user_api_web/templates/.*(eex)$}
-    ]
-  ]
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

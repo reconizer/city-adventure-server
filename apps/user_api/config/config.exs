@@ -13,9 +13,8 @@ config :user_api,
 config :user_api, UserApiWeb.Endpoint,
   url: [host: "127.0.0.1"],
   secret_key_base: "BaSgcc532P4RfaL79Nl3l/xWdo8XzF6fegqoOcJZnGnCFZUTR93gyPwxXzz4rADd",
-  render_errors: [view: UserApiWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: UserApi.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  render_errors: [view: UserApiWeb.ErrorView, accepts: ~w(json)],
+  pubsub: [name: UserApi.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -25,7 +24,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix and Ecto
 config :phoenix, :json_library, Jason
 
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"
