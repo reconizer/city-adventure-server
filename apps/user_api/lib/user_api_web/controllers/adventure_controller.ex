@@ -4,6 +4,7 @@ defmodule UserApiWeb.AdventureController do
   alias Domain.UserAdventure.Repository.Lisiting, as: ListingRepository
   alias Domain.UserAdventure.Service.Ranking, as: RankingService
   alias Domain.UserAdventure.Service.Rating, as: RatingService
+  alias Domain.UserAdventure.Adventure, as: AdventureDomain
   alias UserApiWeb.AdventureContract
 
   def index(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
@@ -64,9 +65,25 @@ defmodule UserApiWeb.AdventureController do
          {:ok, validate_params} <-
            conn
            |> AdventureContract.start(context),
-         {:ok, adventure} <- validate_params |> AdventureRepository.start_adventure() do
-      session
-      |> Session.update_context(%{"adventure" => adventure})
+         {:ok, adventure} <-
+           validate_params
+           |> AdventureRepository.get(),
+         {:ok, _adventure} <-
+           adventure
+           |> AdventureDomain.check_adventure_started(),
+         {:ok, start_point} <-
+           adventure
+           |> AdventureDomain.find_start_point() do
+      adventure
+      |> AdventureDomain.start_adventure(validate_params, start_point)
+      |> case do
+        {:ok, started_adventure} ->
+          started_adventure
+          |> AdventureRepository.save()
+
+          session
+          |> Session.update_context(%{"start_point" => start_point})
+      end
     else
       %Session{valid?: false} = session ->
         session
