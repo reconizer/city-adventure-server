@@ -6,6 +6,9 @@ defmodule Domain.AdventureReview.MessageTest do
   alias Domain.Creator.User, as: Creator
   alias Domain.Creator.Repository.User, as: CreatorRepository
 
+  alias Domain.Creator.Adventure, as: Adventure
+  alias Domain.Creator.Repository.Adventure, as: AdventureRepository
+
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
 
@@ -17,6 +20,15 @@ defmodule Domain.AdventureReview.MessageTest do
       Creator.new(%{email: "test@test.pl", name: "test"}, "testtest")
       |> CreatorRepository.save()
 
+    {:ok, adventure} =
+      Adventure.new(%{
+        id: Ecto.UUID.generate(),
+        position: %{lat: 1, lng: 1},
+        creator_id: creator.id,
+        name: "test"
+      })
+      |> AdventureRepository.save()
+
     [
       administrator_id: administrator.id,
       creator_id: creator.id
@@ -25,7 +37,5 @@ defmodule Domain.AdventureReview.MessageTest do
 
   @tag :wip
   test "", context do
-    context
-    |> IO.inspect()
   end
 end

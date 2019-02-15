@@ -1,7 +1,7 @@
 defmodule Domain.AdventureReview.Message do
   use Ecto.Schema
   use Domain.Event, "AdventureReview.Message"
-  import Ecto.Changeset, only: [cast: 3, validate_required: 2, cast_embed: 3, apply_changes: 1]
+  import Ecto.Changeset, only: [cast: 3, validate_required: 2, cast_embed: 2, apply_changes: 1]
 
   alias Domain.AdventureReview.Message
 
@@ -14,20 +14,21 @@ defmodule Domain.AdventureReview.Message do
   embedded_schema do
     embeds_one(:author, Message.Author)
     field(:content, :string)
+    field(:adventure_id, :binary_id)
 
     field(:created_at, :naive_datetime)
     aggregate_fields()
   end
 
-  @fields ~w(id content created_at)a
-  @required_fields ~w(id content created_at)a
+  @fields ~w(id content created_at adventure_id)a
+  @required_fields ~w(id content created_at adventure_id)a
 
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do
     struct
     |> cast(params, @fields)
     |> validate_required(@required_fields)
-    |> cast_embed(:author, required: true)
+    |> cast_embed(:author)
   end
 
   # %{id: id, content: content, created_at: created_at, author: author}) do
@@ -48,6 +49,7 @@ defmodule Domain.AdventureReview.Message do
       {:ok, message} ->
         message
         |> emit("Created", %{
+          adventure_id: message.adventure_id,
           content: message.content,
           created_at: message.created_at,
           author_id: message.author.id,
