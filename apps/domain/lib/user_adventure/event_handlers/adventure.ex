@@ -56,6 +56,33 @@ defmodule Domain.UserAdventure.EventHandlers.Adventure do
     end
   end
 
+  def process(multi, %Domain.Event{aggregate_name: "UserAdventure", name: "AdventureRatingCreated"} = event) do
+    event.data
+    |> case do
+      %{
+        rating: rating,
+        created_at: created_at,
+        adventure_id: adventure_id,
+        user_id: user_id
+      } ->
+        adventure_rating =
+          %Models.AdventureRating{}
+          |> Models.AdventureRating.changeset(%{
+            rating: rating,
+            inserted_at: created_at,
+            updated_at: created_at,
+            adventure_id: adventure_id,
+            user_id: user_id
+          })
+
+        multi
+        |> Ecto.Multi.insert({event.id, user_id, adventure_id, event.name}, adventure_rating)
+
+      _ ->
+        multi
+    end
+  end
+
   def process(multi, %Domain.Event{aggregate_name: "UserAdventure", name: "UserAdventureAdded"} = event) do
     event.data
     |> case do
@@ -126,6 +153,30 @@ defmodule Domain.UserAdventure.EventHandlers.Adventure do
 
         multi
         |> Ecto.Multi.update({event.id, user_id, point_id, event.name}, user_point)
+
+      _ ->
+        multi
+    end
+  end
+
+  def process(multi, %Domain.Event{aggregate_name: "UserAdventure", name: "AdventureRatingUpdated"} = event) do
+    event.data
+    |> case do
+      %{
+        rating: rating,
+        adventure_id: adventure_id,
+        user_id: user_id
+      } ->
+        adventure_rating =
+          from(adventure_rating in Models.AdventureRating,
+            where: adventure_rating.user_id == ^user_id,
+            where: adventure_rating.adventure_id == ^adventure_id
+          )
+          |> Repository.one()
+          |> Models.AdventureRating.changeset(%{rating: rating, updated_at: NaiveDateTime.utc_now()})
+
+        multi
+        |> Ecto.Multi.update({event.id, user_id, adventure_id, event.name}, adventure_rating)
 
       _ ->
         multi
