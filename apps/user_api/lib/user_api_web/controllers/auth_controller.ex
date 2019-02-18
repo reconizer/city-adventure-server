@@ -17,7 +17,7 @@ defmodule UserApiWeb.AuthController do
     else
       {:error, reason} ->
         session
-        |> Session.add_error(reason)
+        |> handle_errors(reason)
     end
     |> present(conn, UserApiWeb.AuthView, "login.json")
   end
