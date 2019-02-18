@@ -99,31 +99,15 @@ defmodule Domain.UserAdventure.Adventure do
       Geocalc.within?(radius, %{lat: p_lat, lng: p_lng}, %{lat: lat, lng: lng})
     end)
     |> Enum.find(fn point ->
-      user_points
-      |> Enum.find(fn user_p ->
-        user_p.point_id == point.parent_point_id
-      end)
+      point
+      |> check_parent_point_completed(user_points)
       |> case do
-        nil ->
+        false ->
           false
 
-        result ->
-          result
-          |> Map.get(:completed)
-          |> case do
-            false ->
-              false
-
-            true ->
-              user_points
-              |> Enum.find(fn user_p ->
-                user_p.point_id == point.id
-              end)
-              |> case do
-                true -> false
-                false -> true
-              end
-          end
+        true ->
+          point
+          |> check_point_completed_for_position(user_points)
       end
     end)
     |> case do
@@ -510,6 +494,40 @@ defmodule Domain.UserAdventure.Adventure do
 
       result ->
         result
+    end
+  end
+
+  defp check_parent_point_completed(point, user_points) do
+    user_points
+    |> Enum.find(fn user_p ->
+      user_p.point_id == point.parent_point_id
+    end)
+    |> case do
+      nil ->
+        false
+
+      result ->
+        result
+        |> Map.get(:completed)
+    end
+  end
+
+  defp check_point_completed_for_position(point, user_points) do
+    user_points
+    |> Enum.find(fn user_p ->
+      user_p.point_id == point.id
+    end)
+    |> case do
+      nil ->
+        true
+
+      result ->
+        result
+        |> Map.get(:completed)
+        |> case do
+          true -> false
+          false -> true
+        end
     end
   end
 
