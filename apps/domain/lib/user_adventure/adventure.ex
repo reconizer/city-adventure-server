@@ -110,6 +110,20 @@ defmodule Domain.UserAdventure.Adventure do
         result ->
           result
           |> Map.get(:completed)
+          |> case do
+            false ->
+              false
+
+            true ->
+              user_points
+              |> Enum.find(fn user_p ->
+                user_p.point_id == point.id
+              end)
+              |> case do
+                true -> false
+                false -> true
+              end
+          end
       end
     end)
     |> case do
