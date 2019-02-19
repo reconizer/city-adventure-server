@@ -25,7 +25,7 @@ defmodule UserApiWeb.Router do
       get("/summary/:adventure_id", AdventureController, :summary)
       get("/:adventure_id", AdventureController, :show)
       get("/:adventure_id/ranking", RankingController, :index)
-      get("/:id/current_user_ranking", RankingController, :current_user_ranking)
+      get("/:adventure_id/current_user_ranking", RankingController, :current_user_ranking)
       get("/:adventure_id/completed_points", PointController, :completed_points)
       post("/rating", AdventureController, :rating)
       post("/start", AdventureController, :start)
