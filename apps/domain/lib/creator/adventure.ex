@@ -18,6 +18,7 @@ defmodule Domain.Creator.Adventure do
   @type add_clue_params :: %{
           required(:id) => Ecto.UUID.t(),
           required(:point_id) => Ecto.UUID.t(),
+          required(:asset_id) => Ecto.UUID.t(),
           required(:type) => String.t(),
           required(:description) => String.t(),
           required(:tip) => :boolean,
@@ -214,6 +215,38 @@ defmodule Domain.Creator.Adventure do
           show: show,
           lat: lat,
           lng: lng
+        })
+
+      error ->
+        error
+    end
+  end
+
+  @spec add_asset_to_clue(t() | entity(), Map.t()) :: entity()
+  def add_asset_to_clue({:ok, adventure}, params), do: add_asset_to_clue(adventure, params)
+  def add_asset_to_clue({:error, _} = error, _), do: error
+
+  def add_asset_to_clue(adventure, point_id, %{
+        id: id,
+        type: type,
+        extension: extension,
+        name: name
+      }) do
+    Adventure.Asset.new(%{
+      id: id,
+      type: type,
+      extension: extension,
+      name: name
+    })
+    |> case do
+      {:ok, asset} ->
+        adventure
+        |> do_add_asset_to_clue(point_id, asset)
+        |> emit("ClueAssetAdded", %{
+          id: id,
+          type: type,
+          extension: extension,
+          name: name
         })
 
       error ->
@@ -457,6 +490,13 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
+  def set_clues(adventure, clue) do
+    adventure.points
+    |> IO.inspect()
+    |> Enum.flat_map(& &1.clues)
+    |> IO.inspect()
+  end
+
   @spec get_last_point(t() | entity()) :: Adventure.Point.entity()
   def get_last_point({:ok, adventure}), do: get_last_point(adventure)
   def get_last_point({:error, _} = error), do: error
@@ -508,6 +548,20 @@ defmodule Domain.Creator.Adventure do
           error ->
             error
         end
+
+      error ->
+        error
+    end
+  end
+
+  defp do_add_asset_to_clue(adventure, clue_id, asset) do
+    adventure
+    |> get_clue(clue_id)
+    |> case do
+      {:ok, clue} ->
+        clue
+        |> Map.put(:asset_id, asset.id)
+        |> Map.put(:asset, asset)
 
       error ->
         error

@@ -170,6 +170,29 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "ClueAssetAdded"} = event) do
+    event.data
+    |> case do
+      %{
+        id: id,
+        type: type,
+        extension: extension,
+        name: name
+      } ->
+        asset =
+          %Models.Asset{}
+          |> Models.Asset.changeset(%{
+            id: id,
+            type: type,
+            extension: extension,
+            name: name
+          })
+
+        multi
+        |> Ecto.Multi.insert({event.id, event.name}, asset)
+    end
+  end
+
   def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointClueRemoved"} = event) do
     event.data
     |> case do

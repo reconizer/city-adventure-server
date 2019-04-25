@@ -36,7 +36,7 @@ defmodule Domain.Creator.Adventure.Clue do
   end
 
   @spec new(Map.t()) :: entity()
-  def new(%{id: id, type: type, description: description, tip: tip, sort: sort, point_id: point_id, url: url}) do
+  def new(%{id: id, type: type, description: description, tip: tip, sort: sort, point_id: point_id, url: url, asset_id: asset_id}) do
     %Adventure.Clue{
       id: id
     }
@@ -46,6 +46,7 @@ defmodule Domain.Creator.Adventure.Clue do
       tip: tip,
       sort: sort,
       point_id: point_id,
+      asset_id: asset_id,
       url: url
     })
     |> case do

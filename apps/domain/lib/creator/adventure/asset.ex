@@ -2,6 +2,8 @@ defmodule Domain.Creator.Adventure.Asset do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Domain.Creator.Adventure
+
   @type t :: %__MODULE__{}
   @type ok_t :: {:ok, t()}
   @type error :: {:error, any()}
@@ -22,5 +24,24 @@ defmodule Domain.Creator.Adventure.Asset do
     struct
     |> cast(params, @fields)
     |> validate_required(@required_fields)
+  end
+
+  @spec new(Map.t()) :: entity()
+  def new(%{id: id, type: type, name: name, extension: extension}) do
+    %Adventure.Asset{
+      id: id
+    }
+    |> changeset(%{
+      type: type,
+      name: name,
+      extension: extension
+    })
+    |> case do
+      %{valid?: true} = changeset ->
+        {:ok, changeset |> apply_changes}
+
+      changeset ->
+        {:error, changeset}
+    end
   end
 end
