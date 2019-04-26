@@ -93,6 +93,28 @@ defmodule CreatorApiWeb.ClueContract do
   end
 
   def upload_file_path(conn, params) do
-    
+    params
+    |> with_creator(conn)
+    |> cast(%{
+      creator_id: Ecto.UUID,
+      adventure_id: Ecto.UUID,
+      clue_id: Ecto.UUID,
+      type: :string,
+      extension: :string,
+      name: :string
+    })
+    |> validate(%{
+      creator_id: :required,
+      adventure_id: :required,
+      clue_id: :required,
+      type: [
+        :required,
+        fn type ->
+          type in ["audio", "image", "video"]
+        end
+      ],
+      extension: :required,
+      name: :required
+    })
   end
 end

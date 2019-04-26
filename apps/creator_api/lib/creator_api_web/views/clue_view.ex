@@ -40,17 +40,24 @@ defmodule CreatorApiWeb.ClueView do
     }
   end
 
+  def render("upload_asset.json", %{asset: asset}) do
+    %{
+      url: asset |> asset_upload_url()
+    }
+  end
+
   defp render_thumb(conversions) do
     conversions
-    |> Enum.find(fn conversion -> 
+    |> Enum.find(fn conversion ->
       conversion.name == "thumb"
     end)
     |> case do
-      nil -> nil
+      nil ->
+        nil
+
       result ->
         result
         |> asset_url()
     end
   end
-
 end

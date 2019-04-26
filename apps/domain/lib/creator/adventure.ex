@@ -226,11 +226,12 @@ defmodule Domain.Creator.Adventure do
   def add_asset_to_clue({:ok, adventure}, params), do: add_asset_to_clue(adventure, params)
   def add_asset_to_clue({:error, _} = error, _), do: error
 
-  def add_asset_to_clue(adventure, point_id, %{
+  def add_asset_to_clue(adventure, %{
         id: id,
         type: type,
         extension: extension,
-        name: name
+        name: name,
+        clue_id: clue_id
       }) do
     Adventure.Asset.new(%{
       id: id,
@@ -241,7 +242,7 @@ defmodule Domain.Creator.Adventure do
     |> case do
       {:ok, asset} ->
         adventure
-        |> do_add_asset_to_clue(point_id, asset)
+        |> do_add_asset_to_clue(clue_id, asset)
         |> emit("ClueAssetAdded", %{
           id: id,
           type: type,
@@ -490,13 +491,6 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  def set_clues(adventure, clue) do
-    adventure.points
-    |> IO.inspect()
-    |> Enum.flat_map(& &1.clues)
-    |> IO.inspect()
-  end
-
   @spec get_last_point(t() | entity()) :: Adventure.Point.entity()
   def get_last_point({:ok, adventure}), do: get_last_point(adventure)
   def get_last_point({:error, _} = error), do: error
@@ -559,9 +553,13 @@ defmodule Domain.Creator.Adventure do
     |> get_clue(clue_id)
     |> case do
       {:ok, clue} ->
-        clue
-        |> Map.put(:asset_id, asset.id)
-        |> Map.put(:asset, asset)
+        clue =
+          clue
+          |> Map.put(:asset_id, asset.id)
+          |> Map.put(:asset, asset)
+
+        do_replace_clue(adventure, clue.point_id, clue)
+        |> emit("ClueAssetAdded", clue)
 
       error ->
         error

@@ -122,7 +122,19 @@ defmodule CreatorApiWeb.ClueController do
     ClueContract.upload_file_path(conn, params)
     |> case do
       {:ok, params} ->
-        Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
+        adventure =
+          Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
+          |> Domain.Creator.Adventure.add_asset_to_clue(params)
+          |> Domain.Creator.Repository.Adventure.save()
+
+        {:ok, clue} = Domain.Creator.Adventure.get_clue(adventure, params.clue_id)
+
+        conn
+        |> render("upload_asset.json", %{clue: clue})
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
     end
   end
 end
