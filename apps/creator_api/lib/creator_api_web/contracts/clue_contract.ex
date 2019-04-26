@@ -91,4 +91,8 @@ defmodule CreatorApiWeb.ClueContract do
       adventure_id: :required
     })
   end
+
+  def upload_file_path(conn, params) do
+    
+  end
 end

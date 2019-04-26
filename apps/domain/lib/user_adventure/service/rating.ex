@@ -27,8 +27,14 @@ defmodule Domain.UserAdventure.Service.Rating do
 
   def load_rating(result) do
     %{
-      rating: Decimal.to_float(result.rating) |> Float.round(2),
+      rating: parse_rating(result.rating),
       rating_count: result.rating_count
     }
+  end
+
+  defp parse_rating(nil), do: nil
+
+  defp parse_rating(rating) do
+    Decimal.to_float(rating) |> Float.round(2)
   end
 end

@@ -47,6 +47,14 @@ defmodule UserApiWeb.AdventureView do
     end)
   end
 
+  def render("rating.json", %{session: %Session{context: %{"adventure" => %{user_rating: rating}}} = _session}) do
+    %{
+      user_id: rating.user_id,
+      adventure_id: rating.adventure_id,
+      rating: rating.rating
+    }
+  end
+
   defp generate_gallery([]), do: []
 
   defp generate_gallery(images) do

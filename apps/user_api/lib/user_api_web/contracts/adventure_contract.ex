@@ -52,4 +52,19 @@ defmodule UserApiWeb.AdventureContract do
       user_id: :required
     })
   end
+
+  def rating(conn, params) do
+    params
+    |> with_user(conn)
+    |> cast(%{
+      adventure_id: Ecto.UUID,
+      user_id: Ecto.UUID,
+      rating: :integer
+    })
+    |> validate(%{
+      adventure_id: :required,
+      user_id: :required,
+      rating: :required
+    })
+  end
 end

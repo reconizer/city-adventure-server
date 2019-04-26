@@ -143,6 +143,54 @@ defmodule Domain.UserAdventure.Adventure do
     end
   end
 
+  def can_rate?(%Adventure{} = adventure) do
+    adventure
+    |> Map.get(:completed)
+    |> case do
+      true -> {:ok, adventure}
+      false -> {:error, {:adventure, "not_completed"}}
+    end
+  end
+
+  def create_adventure_rating(adventure, params) do
+    adventure_rating = %{
+      user_id: params.user_id,
+      adventure_id: adventure.id,
+      rating: params.rating,
+      created_at: NaiveDateTime.utc_now(),
+      updated_at: NaiveDateTime.utc_now()
+    }
+
+    adventure =
+      adventure
+      |> Map.get(:user_rating)
+      |> case do
+        nil ->
+          %{adventure | user_rating: adventure_rating}
+          |> emit!("AdventureRatingCreated", %{
+            user_id: adventure_rating.user_id,
+            adventure_id: adventure_rating.adventure_id,
+            created_at: NaiveDateTime.utc_now(),
+            rating: adventure_rating.rating
+          })
+
+        result ->
+          user_rating = result |> Map.put(:rating, adventure_rating.rating)
+
+          %{adventure | user_rating: user_rating}
+          |> emit!(
+            "AdventureRatingUpdated",
+            %{
+              rating: user_rating.rating,
+              user_id: result.user_id,
+              adventure_id: result.adventure_id
+            }
+          )
+      end
+
+    {:ok, adventure}
+  end
+
   def completed_points(user_points, point) do
     user_points
     |> Enum.find(fn user_point -> user_point.point_id == point.id end)

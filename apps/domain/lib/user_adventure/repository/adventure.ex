@@ -57,6 +57,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       description: model.description,
       min_time: model.min_time,
       max_time: model.max_time,
+      completed: model.user_adventures |> set_completed(),
       creator: model.creator |> load_creator(),
       difficulty_level: model.difficulty_level,
       language: model.language,
@@ -155,6 +156,19 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       sort: image_model.sort,
       asset: image_model.asset |> load_asset()
     }
+  end
+
+  defp set_completed(user_adventures) do
+    user_adventures
+    |> List.first()
+    |> case do
+      nil ->
+        false
+
+      result ->
+        result
+        |> Map.get(:completed)
+    end
   end
 
   defp load_asset(%Models.Asset{} = asset_model) do

@@ -117,4 +117,12 @@ defmodule CreatorApiWeb.ClueController do
         |> handle_errors(errors)
     end
   end
+
+  def upload_file_path(conn, params) do
+    ClueContract.upload_file_path(conn, params)
+    |> case do
+      {:ok, params} ->
+        Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
+    end
+  end
 end
