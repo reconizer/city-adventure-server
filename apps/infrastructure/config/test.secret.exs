@@ -6,6 +6,8 @@ config :infrastructure, Infrastructure.Repository,
   password: "developer",
   database: "gameinn_2_test",
   hostname: "localhost",
-  port: 5433,
+  port: 5432,
   types: Infrastructure.Repository.PostgresTypes,
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :infrastructure, :asset_bucket, "gameinn-2-assets"

@@ -40,7 +40,7 @@ defmodule CreatorApiWeb.ClueView do
     }
   end
 
-  def render("upload_asset.json", %{asset: asset}) do
+  def render("upload_asset.json", %{clue: %{asset: asset}}) do
     %{
       url: asset |> asset_upload_url()
     }
