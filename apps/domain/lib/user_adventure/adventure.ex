@@ -524,10 +524,7 @@ defmodule Domain.UserAdventure.Adventure do
       result ->
         result
         |> Map.get(:completed)
-        |> case do
-          true -> false
-          false -> true
-        end
+        |> Kernel.not()
     end
   end
 

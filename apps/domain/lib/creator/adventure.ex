@@ -18,6 +18,7 @@ defmodule Domain.Creator.Adventure do
   @type add_clue_params :: %{
           required(:id) => Ecto.UUID.t(),
           required(:point_id) => Ecto.UUID.t(),
+          required(:asset_id) => Ecto.UUID.t(),
           required(:type) => String.t(),
           required(:description) => String.t(),
           required(:tip) => :boolean,
@@ -215,6 +216,39 @@ defmodule Domain.Creator.Adventure do
           lat: lat,
           lng: lng
         })
+
+      error ->
+        error
+    end
+  end
+
+  @spec add_asset_to_clue(t() | entity(), Map.t()) :: entity()
+  def add_asset_to_clue({:ok, adventure}, params), do: add_asset_to_clue(adventure, params)
+  def add_asset_to_clue({:error, _} = error, _), do: error
+
+  def add_asset_to_clue(adventure, %{
+        id: id,
+        type: type,
+        extension: extension,
+        name: name,
+        clue_id: clue_id
+      }) do
+    Adventure.Asset.new(%{
+      id: id,
+      type: type,
+      extension: extension,
+      name: name
+    })
+    |> case do
+      {:ok, asset} ->
+        adventure
+        |> emit("ClueAssetAdded", %{
+          id: id,
+          type: type,
+          extension: extension,
+          name: name
+        })
+        |> do_add_asset_to_clue(clue_id, asset)
 
       error ->
         error
@@ -508,6 +542,24 @@ defmodule Domain.Creator.Adventure do
           error ->
             error
         end
+
+      error ->
+        error
+    end
+  end
+
+  defp do_add_asset_to_clue(adventure, clue_id, asset) do
+    adventure
+    |> get_clue(clue_id)
+    |> case do
+      {:ok, clue} ->
+        clue =
+          clue
+          |> Map.put(:asset_id, asset.id)
+          |> Map.put(:asset, asset)
+
+        do_replace_clue(adventure, clue.point_id, clue)
+        |> emit("ClueChangedAsset", clue)
 
       error ->
         error

@@ -25,10 +25,10 @@ defmodule Infrastructure.Service.AssetManagement do
     |> MediaStorage.download_url(bucket: bucket())
   end
 
-  @spec upload_url(String.t(), String.t(), String.t()) :: {:error, String.t()} | {:ok, String.t()}
-  def upload_url(type, id, extension) do
+  @spec upload_url(String.t(), String.t(), String.t(), String.t()) :: {:error, String.t()} | {:ok, String.t()}
+  def upload_url(type, id, extension, name) do
     path =
-      [type, id, "original"]
+      [type, id, name]
       |> Path.join()
 
     "#{path}.#{extension}"

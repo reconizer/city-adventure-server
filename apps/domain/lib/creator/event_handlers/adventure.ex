@@ -170,6 +170,48 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "ClueChangedAsset"} = event) do
+    event.data
+    |> case do
+      %{
+        id: id,
+        asset_id: asset_id
+      } ->
+        clue =
+          Models.Clue
+          |> Repository.get(id)
+          |> Models.Clue.changeset(%{asset_id: asset_id})
+
+        multi
+        |> Ecto.Multi.update({event.id, event.name}, clue)
+    end
+  end
+
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "ClueAssetAdded"} = event) do
+    event.data
+    |> case do
+      %{
+        id: id,
+        type: type,
+        extension: extension,
+        name: name
+      } ->
+        asset =
+          %Models.Asset{}
+          |> Models.Asset.changeset(%{
+            id: id,
+            type: type,
+            extension: extension,
+            name: name,
+            inserted_at: NaiveDateTime.utc_now(),
+            updated_at: NaiveDateTime.utc_now()
+          })
+
+        multi
+        |> Ecto.Multi.insert({event.id, event.name}, asset)
+    end
+  end
+
   def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointClueRemoved"} = event) do
     event.data
     |> case do
