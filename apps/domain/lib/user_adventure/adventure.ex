@@ -461,7 +461,7 @@ defmodule Domain.UserAdventure.Adventure do
       results ->
         results
         |> Enum.filter(fn %{details: %{"password" => password, "password_type" => type}} ->
-          ["number_push_lock_3", "number_push_lock_5", "number_push_lock_6"]
+          ["number_push_lock_6", "number_push_lock_8", "number_push_lock_10"]
           |> Enum.any?(fn list_type -> list_type == type end)
           |> case do
             true ->
