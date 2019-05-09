@@ -3,6 +3,12 @@ defmodule Domain.Profile.Repository.User do
   alias Infrastructure.Repository
   use Infrastructure.Repository.Models
 
+  alias Domain.Profile.{
+    Profile,
+    Avatar,
+    Asset
+  }
+
   def get_by_email(email) do
     from(u in Models.User,
       where: u.email == ^email
@@ -14,15 +20,47 @@ defmodule Domain.Profile.Repository.User do
     end
   end
 
+  def get_by_id(%{user_id: id}) do
+    Models.User
+    |> preload(avatar: :asset)
+    |> Repository.get(id)
+    |> case do
+      nil -> {:error, {:base, "not_found"}}
+      result -> {:ok, result |> load_user()}
+    end
+  end
+
   def get_by_id(id) do
-    from(u in Models.User,
-      where: u.id == ^id
-    )
-    |> Repository.one()
+    Models.User
+    |> Repository.get(id)
     |> case do
       nil -> {:error, {:base, "not_found"}}
       result -> {:ok, result}
     end
   end
 
+  defp load_user(%Models.User{} = user_model) do
+    %Profile{
+      id: user_model.id,
+      nick: user_model.nick,
+      email: user_model.email,
+      avatar: user_model.avatar |> load_avatar()
+    }
+  end
+
+  defp load_avatar(%Models.Avatar{} = avatar_model) do
+    %Avatar{
+      user_id: avatar_model.user_id,
+      asset: avatar_model.asset |> load_asset()
+    }
+  end
+
+  defp load_asset(%Models.Asset{} = asset_model) do
+    %Asset{
+      id: asset_model.id,
+      type: asset_model.type,
+      name: asset_model.name,
+      extension: asset_model.extension
+    }
+  end
 end
