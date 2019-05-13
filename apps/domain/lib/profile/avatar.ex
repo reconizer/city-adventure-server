@@ -14,7 +14,7 @@ defmodule Domain.Profile.Avatar do
     embeds_one(:asset, Asset)
   end
 
-  @fields [:user_id]
+  @fields [:user_id, :asset_id]
   @required_fields @fields
 
   @spec changeset(Avatar.t(), map()) :: Ecto.Changeset.t()
