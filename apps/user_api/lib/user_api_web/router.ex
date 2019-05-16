@@ -36,6 +36,7 @@ defmodule UserApiWeb.Router do
     end
 
     scope "/creator" do
+      get("/adventures", CreatorController, :adventure_list)
       get("/:creator_id", CreatorController, :show)
     end
 

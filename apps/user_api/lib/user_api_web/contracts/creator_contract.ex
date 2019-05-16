@@ -13,4 +13,33 @@ defmodule UserApiWeb.CreatorContract do
       user_id: :required
     })
   end
+
+  def adventure_list(conn, params) do
+    params
+    |> with_user(conn)
+    |> cast(%{
+      creator_id: Ecto.UUID,
+      filter: Domain.Filter.Type
+    })
+    |> default(%{
+      filter: Domain.Filter.new()
+    })
+    |> plug(%{
+      filter: &list_filters/1
+    })
+    |> validate(%{
+      filter: :required,
+      creator_id: :required
+    })
+  end
+
+  defp list_filters(filter) do
+    result =
+      filter
+      |> default(%{
+        offset: Domain.Filter.offset(filter)
+      })
+
+    {:ok, result}
+  end
 end

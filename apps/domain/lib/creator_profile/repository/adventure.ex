@@ -10,16 +10,20 @@ defmodule Domain.CreatorProfile.Repository.Adventure do
     Asset
   }
 
-  def get_by_creator_id(creator_id) do
-    Models.Adventure
-    |> join(:left, [adventure], asset in assoc(adventure, :asset))
-    |> join(:left, [adventure, asset], creator_rating in assoc(adventure, :creator_adventure_rating))
-    |> where([adventure, asset, creator_rating], adventure.creator_id == ^creator_id)
-    |> where([adventure, asset, creator_rating], adventure.published == true)
-    |> preload([adventure, asset, creator_rating], asset: asset)
-    |> preload([adventure, asset, creator_rating], creator_adventure_rating: creator_rating)
-    |> Repository.all()
-    |> Enum.map(&build_adventure/1)
+  def get_by_creator_id(creator_id, paginate) do
+    result =
+      Models.Adventure
+      |> join(:left, [adventure], asset in assoc(adventure, :asset))
+      |> join(:left, [adventure, asset], creator_rating in assoc(adventure, :creator_adventure_rating))
+      |> where([adventure, asset, creator_rating], adventure.creator_id == ^creator_id)
+      |> where([adventure, asset, creator_rating], adventure.published == true)
+      |> preload([adventure, asset, creator_rating], asset: asset)
+      |> preload([adventure, asset, creator_rating], creator_adventure_rating: creator_rating)
+      |> paginate(paginate)
+      |> Repository.all()
+      |> Enum.map(&build_adventure/1)
+
+    {:ok, result}
   end
 
   defp build_adventure(adventure_model) do
@@ -33,9 +37,12 @@ defmodule Domain.CreatorProfile.Repository.Adventure do
     }
   end
 
+  defp get_rating(nil), do: nil
+
   defp get_rating(model_rating) do
     model_rating
     |> Map.get(:rating)
+    |> Decimal.round(1)
   end
 
   defp build_asset(nil), do: nil
