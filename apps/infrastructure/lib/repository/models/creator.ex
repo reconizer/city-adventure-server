@@ -6,7 +6,8 @@ defmodule Infrastructure.Repository.Models.Creator do
 
   alias Infrastructure.Repository.Models.{
     Adventure,
-    Asset
+    Asset,
+    CreatorFollower
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -27,6 +28,7 @@ defmodule Infrastructure.Repository.Models.Creator do
     timestamps()
 
     has_many(:adventures, Adventure)
+    has_many(:creator_followers, CreatorFollower)
     belongs_to(:asset, Asset)
   end
 
