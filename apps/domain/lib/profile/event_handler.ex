@@ -1,6 +1,7 @@
 defmodule Domain.Profile.EventHandler do
   @handlers [
-    Domain.Profile.EventHandlers.Registration
+    Domain.Profile.EventHandlers.Registration,
+    Domain.Profile.EventHandler.CreatorFollower
   ]
 
   def process(multi, event) do
