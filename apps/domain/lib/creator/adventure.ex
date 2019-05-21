@@ -242,13 +242,13 @@ defmodule Domain.Creator.Adventure do
     |> case do
       {:ok, asset} ->
         adventure
-        |> do_add_asset_to_clue(clue_id, asset)
         |> emit("ClueAssetAdded", %{
           id: id,
           type: type,
           extension: extension,
           name: name
         })
+        |> do_add_asset_to_clue(clue_id, asset)
 
       error ->
         error
@@ -559,7 +559,7 @@ defmodule Domain.Creator.Adventure do
           |> Map.put(:asset, asset)
 
         do_replace_clue(adventure, clue.point_id, clue)
-        |> emit("ClueAssetAdded", clue)
+        |> emit("ClueChangedAsset", clue)
 
       error ->
         error

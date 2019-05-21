@@ -12,3 +12,5 @@ config :ex_aws, :s3,
   access_key_id: "",
   secret_access_key: "",
   region: ""
+
+import_config "#{Mix.env()}.secret.exs"

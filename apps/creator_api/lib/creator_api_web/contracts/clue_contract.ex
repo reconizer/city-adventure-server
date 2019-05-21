@@ -103,10 +103,14 @@ defmodule CreatorApiWeb.ClueContract do
       extension: :string,
       name: :string
     })
+    |> default(%{
+      id: Ecto.UUID.generate()
+    })
     |> validate(%{
       creator_id: :required,
       adventure_id: :required,
       clue_id: :required,
+      id: :required,
       type: [
         :required,
         fn type ->
