@@ -39,6 +39,7 @@ defmodule CreatorApiWeb.Router do
         get("/:id", ClueController, :item)
         post("/", ClueController, :create)
         patch("/", ClueController, :update)
+        post("/upload_asset", ClueController, :upload_file_path)
         delete("/", ClueController, :delete)
         patch("/reorder", ClueController, :reorder)
       end

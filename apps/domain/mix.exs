@@ -40,7 +40,7 @@ defmodule Domain.MixProject do
       {:contract, in_umbrella: true},
       {:joken, "~> 1.5"},
       {:comeonin, "~> 4.1"},
-      {:bcrypt_elixir, "~> 0.12"},
+      {:bcrypt_elixir, "~> 1.0"},
       {:ex_machina, "~> 2.2", only: :test},
       {:faker, "~> 0.11"},
       {:geocalc, "~> 0.5"}

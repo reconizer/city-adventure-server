@@ -295,4 +295,175 @@ defmodule CreatorApiWeb.ClueControllerTest do
       end)
     end
   end
+
+  describe "add asset to clue and generate upload url" do
+    test "works", %{conn: conn, adventure: adventure, adventure_id: _adventure_id} do
+      %{points: [%{id: parent_point_id}]} = adventure
+
+      point_id = Ecto.UUID.generate()
+      clue_id = Ecto.UUID.generate()
+
+      {:ok, _adventure} =
+        adventure
+        |> Adventure.add_point(%{
+          id: point_id,
+          parent_point_id: parent_point_id,
+          position: %{
+            lat: 10,
+            lng: 10
+          },
+          radius: 10,
+          show: false
+        })
+        |> Adventure.add_clue(%{
+          id: clue_id,
+          point_id: point_id,
+          type: "image",
+          description: "testtest",
+          tip: false
+        })
+        |> AdventureRepository.save()
+
+      response =
+        conn
+        |> post("/api/clues/upload_asset", %{"clue_id" => clue_id, "adventure_id" => adventure.id, "extension" => "jpg", "name" => "name", "type" => "image"})
+        |> json_response(200)
+
+      assert %{"url" => _} = response
+    end
+
+    test "error - not clue", %{conn: conn, adventure: adventure, adventure_id: _adventure_id} do
+      %{points: [%{id: parent_point_id}]} = adventure
+
+      point_id = Ecto.UUID.generate()
+      clue_id = Ecto.UUID.generate()
+
+      {:ok, _adventure} =
+        adventure
+        |> Adventure.add_point(%{
+          id: point_id,
+          parent_point_id: parent_point_id,
+          position: %{
+            lat: 10,
+            lng: 10
+          },
+          radius: 10,
+          show: false
+        })
+        |> AdventureRepository.save()
+
+      response =
+        conn
+        |> post("/api/clues/upload_asset", %{"clue_id" => clue_id, "adventure_id" => adventure.id, "extension" => "jpg", "name" => "name", "type" => "image"})
+        |> json_response(422)
+
+      assert %{"clue_id" => "not found in adventure"} == response
+    end
+
+    test "error - not adventure", %{conn: conn, adventure: adventure, adventure_id: _adventure_id} do
+      %{points: [%{id: parent_point_id}]} = adventure
+
+      point_id = Ecto.UUID.generate()
+      clue_id = Ecto.UUID.generate()
+
+      {:ok, _adventure} =
+        adventure
+        |> Adventure.add_point(%{
+          id: point_id,
+          parent_point_id: parent_point_id,
+          position: %{
+            lat: 10,
+            lng: 10
+          },
+          radius: 10,
+          show: false
+        })
+        |> Adventure.add_clue(%{
+          id: clue_id,
+          point_id: point_id,
+          type: "image",
+          description: "testtest",
+          tip: false
+        })
+        |> AdventureRepository.save()
+
+      response =
+        conn
+        |> post("/api/clues/upload_asset", %{
+          "clue_id" => clue_id,
+          "adventure_id" => Ecto.UUID.generate(),
+          "extension" => "jpg",
+          "name" => "name",
+          "type" => "image"
+        })
+        |> json_response(422)
+
+      assert %{"adventure_id" => "not found in user"} == response
+    end
+
+    test "error - type can't be blank", %{conn: conn, adventure: adventure, adventure_id: _adventure_id} do
+      clue_id = Ecto.UUID.generate()
+
+      response =
+        conn
+        |> post("/api/clues/upload_asset", %{
+          "clue_id" => clue_id,
+          "adventure_id" => adventure.id,
+          "extension" => "jpg",
+          "name" => "name"
+        })
+        |> json_response(422)
+
+      assert %{"type" => ["can't be blank"]} == response
+    end
+
+    test "error - type is invalid", %{conn: conn, adventure: adventure, adventure_id: _adventure_id} do
+      clue_id = Ecto.UUID.generate()
+
+      response =
+        conn
+        |> post("/api/clues/upload_asset", %{
+          "clue_id" => clue_id,
+          "adventure_id" => adventure.id,
+          "extension" => "jpg",
+          "name" => "name",
+          "type" => "asds"
+        })
+        |> json_response(422)
+
+      assert %{"type" => ["is invalid"]} == response
+    end
+
+    test "error - name can't be blank", %{conn: conn, adventure: adventure, adventure_id: _adventure_id} do
+      clue_id = Ecto.UUID.generate()
+
+      response =
+        conn
+        |> post("/api/clues/upload_asset", %{
+          "clue_id" => clue_id,
+          "adventure_id" => adventure.id,
+          "extension" => "jpg",
+          "type" => "image"
+        })
+        |> json_response(422)
+
+      assert %{"name" => ["can't be blank"]} == response
+    end
+
+    test "error - extension can't be blank", %{conn: conn, adventure: adventure, adventure_id: _adventure_id} do
+      clue_id = Ecto.UUID.generate()
+
+      response =
+        conn
+        |> post("/api/clues/upload_asset", %{
+          "clue_id" => clue_id,
+          "adventure_id" => adventure.id,
+          "type" => "image",
+          "name" => "name"
+        })
+        |> json_response(422)
+
+      assert %{"extension" => ["can't be blank"]} == response
+    end
+  end
 end

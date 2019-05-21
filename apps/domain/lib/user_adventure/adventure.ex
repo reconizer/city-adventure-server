@@ -461,7 +461,17 @@ defmodule Domain.UserAdventure.Adventure do
       results ->
         results
         |> Enum.filter(fn %{details: %{"password" => password, "password_type" => type}} ->
-          password == answer_text and type == answer_type
+          ["number_push_lock_6", "number_push_lock_8", "number_push_lock_10"]
+          |> Enum.any?(fn list_type -> list_type == type end)
+          |> case do
+            true ->
+              answer_text = answer_text |> String.to_integer() |> Integer.digits() |> Enum.sort()
+              password = password |> String.to_integer() |> Integer.digits() |> Enum.sort()
+              password == answer_text and type == answer_type
+
+            false ->
+              password == answer_text and type == answer_type
+          end
         end)
         |> case do
           [] -> false
@@ -524,10 +534,7 @@ defmodule Domain.UserAdventure.Adventure do
       result ->
         result
         |> Map.get(:completed)
-        |> case do
-          true -> false
-          false -> true
-        end
+        |> Kernel.not()
     end
   end
 

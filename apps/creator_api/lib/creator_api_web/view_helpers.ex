@@ -24,4 +24,8 @@ defmodule CreatorApiWeb.ViewHelpers do
     nil
   end
 
+  def asset_upload_url(%{type: type, extension: extension, id: id, name: name}) do
+    {:ok, url} = AssetManagement.upload_url(type, id, extension, name)
+    url
+  end
 end

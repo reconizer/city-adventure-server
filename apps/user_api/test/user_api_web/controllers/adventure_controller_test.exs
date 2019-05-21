@@ -1,7 +1,38 @@
 defmodule UserApiWeb.AdventureControllerTest do
-  import Domain.Adventure.Fixtures.Repository
+  import UserApiWeb.Fixtures.Setup
   use UserApiWeb.ConnCase, async: true
-  use Plug.Test
+
+  setup %{conn: conn} do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Infrastructure.Repository)
+    creator_id = Ecto.UUID.generate()
+    adventure_id = Ecto.UUID.generate()
+    point_id = Ecto.UUID.generate()
+    point_1_id = Ecto.UUID.generate()
+    clue_id = Ecto.UUID.generate()
+    clue_1_id = Ecto.UUID.generate()
+
+    creator = Setup.create_cretor(creator_id)
+    adventure = Setup.create_adventure(adventure_id, creator.id)
+    adventure |> Setup.add_point(point_id, nil)
+    adventure |> Setup.add_point(point_1_id, point_id)
+    adventure |> Setup.add_clue(point_id, clue_id)
+    adventure |> Setup.add_clue(point_1_id, clue_1_id)
+  end
+
+  describe "start adventure" do
+  end
+
+  describe "list adventure" do
+  end
+
+  describe "show adventure" do
+  end
+
+  describe "rating adventure" do
+  end
+
+  describe "summary adventure" do
+  end
 
   # describe "list adventure" do
 
