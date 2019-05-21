@@ -4,7 +4,6 @@ defmodule UserApiWeb.CreatorController do
   alias Domain.CreatorProfile.Repository.Adventure, as: AdventureRepository
   alias Domain.Profile.CreatorProfile, as: CreatorProfileDomain
   alias UserApiWeb.CreatorContract
-  alias Domain.Profile.Repository.CreatorFollower, as: CreatorFollowerRepository
 
   def show(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
@@ -42,27 +41,5 @@ defmodule UserApiWeb.CreatorController do
         |> handle_errors(reason)
     end
     |> present(conn, UserApiWeb.CreatorView, "adventure_list.json")
-  end
-
-  def follow(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
-    with %Session{valid?: true} <- session,
-         {:ok, validate_params} <-
-           conn
-           |> CreatorContract.follow_unfollow(context),
-         {:ok, creator_follower} <- validate_params |> CreatorProfileDomain.follow() do
-      creator_follower
-      |> CreatorFollowerRepository.save()
-      |> handle_repository_action(conn)
-    else
-      %Session{valid?: false} = session ->
-        session
-
-      {:error, reason} ->
-        session
-        |> handle_errors(reason)
-    end
-  end
-
-  def unfollow(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
   end
 end

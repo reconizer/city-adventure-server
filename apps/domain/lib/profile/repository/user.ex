@@ -2,11 +2,13 @@ defmodule Domain.Profile.Repository.User do
   import Ecto.Query
   alias Infrastructure.Repository
   use Infrastructure.Repository.Models
+  use Domain.Repository
 
   alias Domain.Profile.{
     Profile,
     Avatar,
-    Asset
+    Asset,
+    CreatorFollower
   }
 
   def get_by_email(email) do
@@ -23,6 +25,7 @@ defmodule Domain.Profile.Repository.User do
   def get_by_id(%{user_id: id}) do
     Models.User
     |> preload(avatar: :asset)
+    |> preload(:creator_followers)
     |> Repository.get(id)
     |> case do
       nil -> {:error, {:base, "not_found"}}
@@ -44,7 +47,8 @@ defmodule Domain.Profile.Repository.User do
       id: user_model.id,
       nick: user_model.nick,
       email: user_model.email,
-      avatar: user_model.avatar |> load_avatar()
+      avatar: user_model.avatar |> load_avatar(),
+      creator_followers: user_model.creator_followers |> Enum.map(&load_follower/1)
     }
   end
 
@@ -61,6 +65,13 @@ defmodule Domain.Profile.Repository.User do
       type: asset_model.type,
       name: asset_model.name,
       extension: asset_model.extension
+    }
+  end
+
+  defp load_follower(%Models.CreatorFollower{} = creator_follower_model) do
+    %CreatorFollower{
+      user_id: creator_follower_model.user_id,
+      creator_id: creator_follower_model.creator_id
     }
   end
 end

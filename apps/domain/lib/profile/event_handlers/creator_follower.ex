@@ -2,14 +2,18 @@ defmodule Domain.Profile.EventHandlers.CreatorFollower do
   use Domain.EventHandler
   use Infrastructure.Repository.Models
 
-  def process(multi, %Domain.Event{aggregate_name: "Profile.CreatorProfile", name: "Follow"} = event) do
+  alias Infrastructure.Repository
+
+  import Ecto.Query
+
+  def process(multi, %Domain.Event{aggregate_name: "Profile", name: "FollowCreator"} = event) do
     creator_follower = Models.CreatorFollower.build(event.data)
 
     multi
     |> Ecto.Multi.insert({event.id, event.name}, creator_follower)
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Profile.CreatorProfile", name: "Unfollow"} = event) do
+  def process(multi, %Domain.Event{aggregate_name: "Profile", name: "UnfollowCreator"} = event) do
     event.data
     |> case do
       %{
@@ -17,9 +21,9 @@ defmodule Domain.Profile.EventHandlers.CreatorFollower do
         user_id: user_id
       } ->
         creator_follower =
-          from(creator_follower in Models.CreatorFollower,
-            where: creator_follower.creator_id == ^creator_id,
-            where: creator_follower.user_id == ^user_id
+          from(follower in Models.CreatorFollower,
+            where: follower.creator_id == ^creator_id,
+            where: follower.user_id == ^user_id
           )
           |> Repository.one()
 
