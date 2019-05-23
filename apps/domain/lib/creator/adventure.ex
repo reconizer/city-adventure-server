@@ -234,7 +234,7 @@ defmodule Domain.Creator.Adventure do
       }) do
     Adventure.Asset.new(%{
       id: id,
-      type: type,
+      type: "clue_#{type}",
       extension: extension,
       name: "original"
     })
@@ -243,7 +243,7 @@ defmodule Domain.Creator.Adventure do
         adventure
         |> emit("ClueAssetAdded", %{
           id: id,
-          type: type,
+          type: "clue_#{type}",
           extension: extension,
           name: "original"
         })

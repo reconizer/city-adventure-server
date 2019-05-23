@@ -113,7 +113,7 @@ defmodule CreatorApiWeb.ClueContract do
       type: [
         :required,
         fn type ->
-          type in ["clue_audio", "clue_image", "clue_video"]
+          type in ["audio", "image", "video"]
         end
       ],
       extension: :required
