@@ -100,8 +100,7 @@ defmodule CreatorApiWeb.ClueContract do
       adventure_id: Ecto.UUID,
       clue_id: Ecto.UUID,
       type: :string,
-      extension: :string,
-      name: :string
+      extension: :string
     })
     |> default(%{
       id: Ecto.UUID.generate()
@@ -114,11 +113,10 @@ defmodule CreatorApiWeb.ClueContract do
       type: [
         :required,
         fn type ->
-          type in ["audio", "image", "video"]
+          type in ["clue_audio", "clue_image", "clue_video"]
         end
       ],
-      extension: :required,
-      name: :required
+      extension: :required
     })
   end
 end

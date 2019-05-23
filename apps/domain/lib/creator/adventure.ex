@@ -230,14 +230,13 @@ defmodule Domain.Creator.Adventure do
         id: id,
         type: type,
         extension: extension,
-        name: name,
         clue_id: clue_id
       }) do
     Adventure.Asset.new(%{
       id: id,
       type: type,
       extension: extension,
-      name: name
+      name: "original"
     })
     |> case do
       {:ok, asset} ->
@@ -246,7 +245,7 @@ defmodule Domain.Creator.Adventure do
           id: id,
           type: type,
           extension: extension,
-          name: name
+          name: "original"
         })
         |> do_add_asset_to_clue(clue_id, asset)
 
