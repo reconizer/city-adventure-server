@@ -9,7 +9,7 @@ defmodule Domain.Creator.Repository.Adventure do
 
   def get(id) do
     Models.Adventure
-    |> preload(points: [:answers, clues: [:asset]])
+    |> preload(points: [:answers, clues: [asset: [:asset_conversions]]])
     |> preload(:asset)
     |> preload(images: [asset: [:asset_conversions]])
     |> preload(:creator_adventure_rating)
@@ -107,17 +107,24 @@ defmodule Domain.Creator.Repository.Adventure do
     }
   end
 
-  def build_asset_conversions(%Models.AssetConversion{} = asset_conversion_models) do
+  def build_asset_conversions(asset_conversion_models) do
     asset_conversion_models
-    |> Enum.map(fn conversion_model ->
-      %Creator.Adventure.AssetConversion{
-        id: conversion_model.id,
-        type: conversion_model.type,
-        name: conversion_model.name,
-        extension: conversion_model.extension,
-        asset_id: conversion_model.asset_id
-      }
-    end)
+    |> case do
+      result when is_list(result) ->
+        result
+        |> Enum.map(fn conversion_model ->
+          %Creator.Adventure.AssetConversion{
+            id: conversion_model.id,
+            type: conversion_model.type,
+            name: conversion_model.name,
+            extension: conversion_model.extension,
+            asset_id: conversion_model.asset_id
+          }
+        end)
+
+      _ ->
+        []
+    end
   end
 
   def build_asset_conversions(_), do: []
