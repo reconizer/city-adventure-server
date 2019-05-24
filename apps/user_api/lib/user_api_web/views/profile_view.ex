@@ -9,4 +9,8 @@ defmodule UserApiWeb.ProfileView do
       avatar_url: asset_url(profile.avatar.asset)
     }
   end
+
+  def render("follow_unfollow.json", %{session: %Session{} = _session}) do
+    %{}
+  end
 end

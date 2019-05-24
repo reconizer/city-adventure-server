@@ -29,18 +29,26 @@ defmodule UserApiWeb.ProfileController do
            conn
            |> ProfileContract.follow_unfollow(context),
          {:ok, profile} <- validate_params |> UserRepository.get_by_id(),
+         {:ok, :creator_follower_not_found} <- profile |> ProfileDomain.check_follower_creator(validate_params),
          {:ok, creator_follower} <- profile |> ProfileDomain.follow(validate_params) do
       creator_follower
       |> UserRepository.save()
-      |> handle_repository_action(conn)
+
+      session
+      |> Session.update_context(%{"profile" => creator_follower})
     else
       %Session{valid?: false} = session ->
         session
+
+      {:ok, :creator_follower_exists} ->
+        session
+        |> handle_errors({:creator_follower, "exist"})
 
       {:error, reason} ->
         session
         |> handle_errors(reason)
     end
+    |> present(conn, UserApiWeb.ProfileView, "follow_unfollow.json")
   end
 
   def unfollow(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
@@ -49,17 +57,25 @@ defmodule UserApiWeb.ProfileController do
            conn
            |> ProfileContract.follow_unfollow(context),
          {:ok, profile} <- validate_params |> UserRepository.get_by_id(),
+         {:ok, :creator_follower_exists} <- profile |> ProfileDomain.check_follower_creator(validate_params),
          {:ok, creator_follower} <- profile |> ProfileDomain.unfollow(validate_params) do
       creator_follower
       |> UserRepository.save()
-      |> handle_repository_action(conn)
+
+      session
+      |> Session.update_context(%{"profile" => creator_follower})
     else
       %Session{valid?: false} = session ->
         session
+
+      {:ok, :creator_follower_not_found} ->
+        session
+        |> handle_errors({:creator_follower, "not_found"})
 
       {:error, reason} ->
         session
         |> handle_errors(reason)
     end
+    |> present(conn, UserApiWeb.ProfileView, "follow_unfollow.json")
   end
 end

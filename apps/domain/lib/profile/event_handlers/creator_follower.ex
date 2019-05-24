@@ -25,10 +25,10 @@ defmodule Domain.Profile.EventHandlers.CreatorFollower do
             where: follower.creator_id == ^creator_id,
             where: follower.user_id == ^user_id
           )
-          |> Repository.one()
 
         multi
-        |> Ecto.Multi.delete({event.id, event.name}, creator_follower)
+        |> Ecto.Multi.delete_all({event.id, event.name}, creator_follower)
+        |> IO.inspect()
 
       _ ->
         multi
