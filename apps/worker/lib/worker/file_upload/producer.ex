@@ -16,6 +16,10 @@ defmodule Worker.FileUpload.Producer do
     {:ok, queue_name}
   end
 
+  def handle_info({:ssl_closed, _}, state) do
+    {:noreply, state}
+  end
+
   def handle_info(:fetch_messages, queue_name) do
     max_number_of_messages = max_number_of_messages()
 
