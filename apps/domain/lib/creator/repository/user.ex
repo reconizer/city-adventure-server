@@ -12,11 +12,14 @@ defmodule Domain.Creator.Repository.User do
     |> join(:left, [creator], adventures in assoc(creator, :adventures))
     |> join(:left, [creator, adventures], asset in assoc(adventures, :asset))
     |> join(:left, [creator, adventures, asset], rating in assoc(adventures, :creator_adventure_rating))
-    |> preload([creator, adventures, asset, rating], [adventures: {adventures, [asset: asset, creator_adventure_rating: rating]}])
+    |> preload([creator, adventures, asset, rating], adventures: {adventures, [asset: asset, creator_adventure_rating: rating]})
     |> Repository.get(id)
     |> case do
-      nil -> {:error, :not_found}
-      user -> {:ok, user |> build_creator}
+      nil ->
+        {:error, :not_found}
+
+      user ->
+        {:ok, user |> build_creator}
     end
   end
 
@@ -33,7 +36,7 @@ defmodule Domain.Creator.Repository.User do
     |> join(:left, [creator, adventures], asset in assoc(adventures, :asset))
     |> join(:left, [creator, adventures, asset], rating in assoc(adventures, :creator_adventure_rating))
     |> where([creator, adventures, asset, rating], ilike(creator.email, ^email))
-    |> preload([creator, adventures, asset, rating], [adventures: {adventures, [asset: asset, creator_adventure_rating: rating]}])
+    |> preload([creator, adventures, asset, rating], adventures: {adventures, [asset: asset, creator_adventure_rating: rating]})
     |> Repository.one()
     |> case do
       nil ->
@@ -71,6 +74,7 @@ defmodule Domain.Creator.Repository.User do
   end
 
   defp build_asset(nil), do: nil
+
   defp build_asset(asset_model) do
     %Creator.User.Asset{
       id: asset_model.id,
@@ -81,8 +85,8 @@ defmodule Domain.Creator.Repository.User do
   end
 
   defp adventure_rating(nil), do: nil
+
   defp adventure_rating(%{rating: rating}) do
     rating
   end
-
 end

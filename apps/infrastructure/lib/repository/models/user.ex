@@ -10,7 +10,8 @@ defmodule Infrastructure.Repository.Models.User do
     UserAdventure,
     Avatar,
     Commerce,
-    UserRanking
+    UserRanking,
+    CreatorFollower
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -31,6 +32,7 @@ defmodule Infrastructure.Repository.Models.User do
     has_many(:user_rankings, UserRanking)
     has_many(:user_points, UserPoint)
     has_many(:user_adventures, UserAdventure)
+    has_many(:creator_followers, CreatorFollower)
   end
 
   def build(params) do

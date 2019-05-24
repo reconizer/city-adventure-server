@@ -46,6 +46,14 @@ defmodule Domain.Repository do
             other
         end
       end
+
+      def paginate(query, %{offset: offset, limit: limit}) do
+        import Ecto.Query
+
+        query
+        |> offset(^offset)
+        |> limit(^limit)
+      end
     end
   end
 end
