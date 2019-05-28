@@ -42,6 +42,19 @@ defmodule Domain.Profile.Repository.User do
     end
   end
 
+  def get_asset(%{asset_id: asset_id}) do
+    Models.Asset
+    |> Repository.get(asset_id)
+    |> case do
+      nil -> {:error, {:avatar, "not_found"}}
+      result -> {:ok, result |> load_asset}
+    end
+  end
+
+  def get_asset(_) do
+    {:ok, nil}
+  end
+
   defp load_user(%Models.User{} = user_model) do
     %Profile{
       id: user_model.id,

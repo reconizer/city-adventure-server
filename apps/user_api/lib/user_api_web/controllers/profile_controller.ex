@@ -29,7 +29,8 @@ defmodule UserApiWeb.ProfileController do
            conn
            |> ProfileContract.update(context),
          {:ok, profile} <- validate_params |> UserRepository.get_by_id(),
-         {:ok, updated_profile} <- profile |> ProfileDomain.update_profile() do
+         {:ok, asset} <- validate_params |> UserRepository.get_asset(),
+         {:ok, updated_profile} <- profile |> ProfileDomain.update_profile(validate_params, asset) do
       updated_profile
       |> UserRepository.save()
 

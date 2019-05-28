@@ -11,6 +11,7 @@ defmodule Domain.Profile.Avatar do
   @primary_key false
   embedded_schema do
     field(:user_id, Ecto.UUID)
+    field(:asset_id, Ecto.UUID)
     embeds_one(:asset, Asset)
   end
 
