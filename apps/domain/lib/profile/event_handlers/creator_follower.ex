@@ -28,7 +28,6 @@ defmodule Domain.Profile.EventHandlers.CreatorFollower do
 
         multi
         |> Ecto.Multi.delete_all({event.id, event.name}, creator_follower)
-        |> IO.inspect()
 
       _ ->
         multi

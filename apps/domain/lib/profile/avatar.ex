@@ -11,10 +11,11 @@ defmodule Domain.Profile.Avatar do
   @primary_key false
   embedded_schema do
     field(:user_id, Ecto.UUID)
+    field(:asset_id, Ecto.UUID)
     embeds_one(:asset, Asset)
   end
 
-  @fields [:user_id]
+  @fields [:user_id, :asset_id]
   @required_fields @fields
 
   @spec changeset(Avatar.t(), map()) :: Ecto.Changeset.t()
