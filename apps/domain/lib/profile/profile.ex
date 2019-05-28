@@ -24,6 +24,61 @@ defmodule Domain.Profile.Profile do
     aggregate_fields()
   end
 
+  @fields ~w(nick)a
+
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  def changeset(struct, params) do
+    struct
+    |> cast(params, @fields)
+  end
+
+  def update_profile(profile, params, new_asset) do
+    profile
+    |> update_nick(params)
+    |> update_avatar(new_asset)
+  end
+
+  def update_nick(profile, params) do
+    profile
+    |> changeset(params)
+    |> case do
+      %{valid?: true} = changeset ->
+        changeset
+        |> apply_changes
+        |> emit("NickChanged", changeset.changes)
+
+      changeset ->
+        {:error, changeset}
+    end
+  end
+
+  defp update_avatar({:ok, %{avatar: avatar} = profile}, %{id: _asset_id} = asset) do
+    profile.avatar
+    |> Avatar.changeset(%{
+      asset_id: asset.id
+    })
+    |> case do
+      %{valid?: true} ->
+        profile
+        |> do_change_avatar(asset)
+        |> emit("AvatarChanged", %{
+          user_id: avatar.user_id,
+          asset_id: asset.id
+        })
+
+      changeset ->
+        {:error, changeset}
+    end
+  end
+
+  defp update_avatar({:ok, _profile} = result, nil) do
+    result
+  end
+
+  defp update_avatar({:error, _} = error, _) do
+    error
+  end
+
   def check_follower_creator(profile, %{user_id: user_id, creator_id: creator_id}) do
     profile
     |> Map.get(:creator_followers)
@@ -36,7 +91,7 @@ defmodule Domain.Profile.Profile do
     end
   end
 
-  def follow(profile, %{user_id: user_id, creator_id: creator_id} = params) do
+  def follow(profile, params) do
     %CreatorFollower{}
     |> CreatorFollower.changeset(params)
     |> case do
@@ -63,7 +118,7 @@ defmodule Domain.Profile.Profile do
     end
   end
 
-  def unfollow(profile, %{user_id: user_id, creator_id: creator_id} = params) do
+  def unfollow(profile, params) do
     %CreatorFollower{}
     |> CreatorFollower.changeset(params)
     |> case do
@@ -96,5 +151,16 @@ defmodule Domain.Profile.Profile do
       end)
 
     %{profile | creator_followers: creator_followers}
+  end
+
+  defp do_change_avatar(profile, new_asset) do
+    avatar =
+      profile
+      |> Map.get(:avatar)
+      |> Map.put(:asset_id, new_asset.id)
+      |> Map.put(:asset, new_asset)
+
+    profile
+    |> Map.put(:avatar, avatar)
   end
 end

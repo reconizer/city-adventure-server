@@ -1,9 +1,9 @@
 defmodule Infrastructure.Repository.Models.Avatar do
-
   @type t :: %__MODULE__{}
 
   use Ecto.Schema
   import Ecto.Changeset
+
   alias Infrastructure.Repository.Models.{
     User,
     Asset
@@ -15,8 +15,8 @@ defmodule Infrastructure.Repository.Models.Avatar do
   schema "avatars" do
     timestamps()
 
-    belongs_to :user, User
-    belongs_to :asset, Asset
+    belongs_to(:user, User, primary_key: true)
+    belongs_to(:asset, Asset)
   end
 
   def build(params) do
@@ -33,5 +33,4 @@ defmodule Infrastructure.Repository.Models.Avatar do
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:asset_id)
   end
-
 end
