@@ -31,6 +31,17 @@ defmodule UserApiWeb.Router do
       post("/start", AdventureController, :start)
     end
 
+    scope "/profile" do
+      get("/", ProfileController, :show)
+      post("/:creator_id/follow", ProfileController, :follow)
+      post("/:creator_id/unfollow", ProfileController, :unfollow)
+    end
+
+    scope "/creator" do
+      get("/adventures", CreatorController, :adventure_list)
+      get("/:creator_id", CreatorController, :show)
+    end
+
     scope "/clues" do
       get("/:adventure_id", ClueController, :index)
       get("/point/:adventure_id/:point_id", ClueController, :list_for_point)
