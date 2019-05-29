@@ -116,4 +116,27 @@ defmodule CreatorApiWeb.AdventureController do
         |> handle_errors(errors)
     end
   end
+
+  def upload_asset(conn, params) do
+    AdventureContract.upload_image(conn, params)
+    |> case do
+      {:ok, validate_params} ->
+        Creator.Service.Adventure.get_creator_adventure(validate_params.creator_id, validate_params.adventure_id)
+        |> Domain.Creator.Adventure.main_image(validate_params)
+        |> Domain.Creator.Repository.Adventure.save()
+        |> case do
+          {:ok, adventure} ->
+            conn
+            |> render("upload_asset.json", %{adventure: adventure})
+
+          {:error, errors} ->
+            conn
+            |> handle_errors(errors)
+        end
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
 end

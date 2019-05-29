@@ -241,7 +241,7 @@ defmodule Domain.Creator.Adventure do
     |> case do
       {:ok, asset} ->
         adventure
-        |> emit("ClueAssetAdded", %{
+        |> emit("AssetAdded", %{
           id: id,
           type: "clue_#{type}",
           extension: extension,
@@ -252,6 +252,14 @@ defmodule Domain.Creator.Adventure do
       error ->
         error
     end
+  end
+
+  def main_image(adventure, params) do
+    {:ok, asset} = new_asset(params)
+
+    adventure
+    |> add_asset(asset)
+    |> add_asset_to_adventure(asset)
   end
 
   @spec change_point(t() | entity(), Map.t()) :: entity()
@@ -563,6 +571,44 @@ defmodule Domain.Creator.Adventure do
       error ->
         error
     end
+  end
+
+  defp do_add_asset_to_adventure({:error, _} = error, _), do: error
+
+  defp do_add_asset_to_adventure(adventure, new_asset) do
+    adventure
+    |> Map.put(:asset_id, new_asset.id)
+    |> Map.put(:asset, new_asset)
+    |> emit("AdventureAssetAdded", %{
+      id: adventure.id,
+      asset_id: new_asset.id
+    })
+  end
+
+  defp new_asset(%{type: type, id: id, extension: extension}) do
+    Adventure.Asset.new(%{
+      id: id,
+      type: type,
+      extension: extension,
+      name: "original"
+    })
+  end
+
+  defp add_asset(_adventure, {:error, _} = error), do: error
+
+  defp add_asset(adventure, new_asset) do
+    adventure
+    |> emit("AssetAdded", %{
+      id: new_asset.id,
+      type: new_asset.type,
+      extension: new_asset.extension,
+      name: new_asset.name
+    })
+  end
+
+  defp add_asset_to_adventure(adventure, asset) do
+    adventure
+    |> do_add_asset_to_adventure(asset)
   end
 
   @spec do_replace_clue(t() | entity(), Ecto.UUID.t(), Adventure.Clue.t()) :: entity()

@@ -285,7 +285,7 @@ defmodule Domain.UserAdventure.Adventure do
       nil ->
         {:ok, true}
 
-      %{details: %{"starting_time" => starting_time, "duration" => duration}} ->
+      %{details: %{"start_time" => starting_time, "duration" => duration}} ->
         time_now = Time.utc_now() |> Time.to_erl() |> :calendar.time_to_seconds()
 
         cond do

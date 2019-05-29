@@ -102,4 +102,25 @@ defmodule CreatorApiWeb.AdventureContract do
       adventure_id: :required
     })
   end
+
+  def upload_image(conn, params) do
+    params
+    |> with_creator(conn)
+    |> cast(%{
+      creator_id: Ecto.UUID,
+      adventure_id: Ecto.UUID,
+      extension: :string
+    })
+    |> default(%{
+      id: Ecto.UUID.generate(),
+      type: "image"
+    })
+    |> validate(%{
+      creator_id: :required,
+      adventure_id: :required,
+      id: :required,
+      type: :required,
+      extension: :required
+    })
+  end
 end
