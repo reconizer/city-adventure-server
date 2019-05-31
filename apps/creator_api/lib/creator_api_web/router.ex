@@ -24,8 +24,8 @@ defmodule CreatorApiWeb.Router do
         get("/", AdventureController, :list)
         get("/statistics", AdventureController, :statistics)
         get("/:adventure_id", AdventureController, :item)
-        post("/main_image_path", AdventureController, :upload_asset)
-        post("/gallery_image/upload", AdventureController, :gallery_image_path)
+        post("/main_image_url", AdventureController, :upload_asset)
+        post("/gallery_image/upload_url", AdventureController, :gallery_image_path)
 
         patch("/", AdventureController, :update)
         post("/", AdventureController, :create)
