@@ -285,7 +285,7 @@ defmodule Domain.UserAdventure.Adventure do
       nil ->
         {:ok, true}
 
-      %{details: %{"starting_time" => starting_time, "duration" => duration}} ->
+      %{details: %{"start_time" => starting_time, "duration" => duration}} ->
         time_now = Time.utc_now() |> Time.to_erl() |> :calendar.time_to_seconds()
 
         cond do
@@ -465,8 +465,8 @@ defmodule Domain.UserAdventure.Adventure do
           |> Enum.any?(fn list_type -> list_type == type end)
           |> case do
             true ->
-              answer_text = answer_text |> String.to_integer() |> Integer.digits() |> Enum.sort()
-              password = password |> String.to_integer() |> Integer.digits() |> Enum.sort()
+              answer_text = answer_text |> prepare_text()
+              password = password |> prepare_text()
               password == answer_text and type == answer_type
 
             false ->
@@ -559,5 +559,11 @@ defmodule Domain.UserAdventure.Adventure do
       nil -> false
       result -> result.completed
     end
+  end
+
+  defp prepare_text(nil), do: nil
+
+  defp prepare_text(answer_text) do
+    answer_text |> String.to_integer() |> Integer.digits() |> Enum.sort()
   end
 end

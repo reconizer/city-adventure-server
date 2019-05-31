@@ -187,7 +187,7 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "ClueAssetAdded"} = event) do
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "AssetAdded"} = event) do
     event.data
     |> case do
       %{
@@ -210,6 +210,43 @@ defmodule Domain.Creator.EventHandlers.Adventure do
         multi
         |> Ecto.Multi.insert({event.id, event.name}, asset)
     end
+  end
+
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "ImageAdded"} = event) do
+    event.data
+    |> case do
+      %{
+        id: id,
+        asset_id: asset_id,
+        adventure_id: adventure_id,
+        sort: sort
+      } ->
+        image =
+          %Models.Image{}
+          |> Models.Image.changeset(%{
+            id: id,
+            sort: sort,
+            asset_id: asset_id,
+            adventure_id: adventure_id,
+            inserted_at: NaiveDateTime.utc_now(),
+            updated_at: NaiveDateTime.utc_now()
+          })
+
+        multi
+        |> Ecto.Multi.insert({event.id, event.name}, image)
+    end
+  end
+
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "AdventureAssetAdded"} = event) do
+    updates = event.data
+
+    adventure =
+      Models.Adventure
+      |> Repository.get(event.data.id)
+      |> Models.Adventure.changeset(updates)
+
+    multi
+    |> Ecto.Multi.update({event.id, event.name}, adventure)
   end
 
   def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointClueRemoved"} = event) do
