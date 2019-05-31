@@ -18,6 +18,20 @@ defmodule CreatorApiWeb.AdventureView do
     }
   end
 
+  def render("upload_asset.json", %{adventure: %{asset: asset}}) do
+    %{
+      url: asset |> asset_upload_url()
+    }
+  end
+
+  def render("upload_image.json", %{adventure: %{images: images}}) do
+    asset = images |> get_asset_by_sort()
+
+    %{
+      url: asset |> asset_upload_url()
+    }
+  end
+
   def render("list.json", %{list: list}) do
     list
     |> Enum.map(&adventure_list_item/1)
@@ -35,6 +49,7 @@ defmodule CreatorApiWeb.AdventureView do
   end
 
   defp render_rating(nil), do: nil
+
   defp render_rating(val) do
     val
     |> Decimal.to_float()
@@ -42,6 +57,7 @@ defmodule CreatorApiWeb.AdventureView do
   end
 
   defp render_image(nil), do: nil
+
   defp render_image(image) do
     %{
       id: image.id,
@@ -51,6 +67,7 @@ defmodule CreatorApiWeb.AdventureView do
   end
 
   defp render_duration(nil, nil), do: nil
+
   defp render_duration(min, max) do
     %{
       min: min,
@@ -58,4 +75,9 @@ defmodule CreatorApiWeb.AdventureView do
     }
   end
 
+  defp get_asset_by_sort(images) do
+    images
+    |> Enum.max_by(fn image -> image.sort end)
+    |> Map.get(:asset)
+  end
 end

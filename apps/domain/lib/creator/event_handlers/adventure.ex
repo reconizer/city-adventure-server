@@ -212,6 +212,31 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "ImageAdded"} = event) do
+    event.data
+    |> case do
+      %{
+        id: id,
+        asset_id: asset_id,
+        adventure_id: adventure_id,
+        sort: sort
+      } ->
+        image =
+          %Models.Image{}
+          |> Models.Image.changeset(%{
+            id: id,
+            sort: sort,
+            asset_id: asset_id,
+            adventure_id: adventure_id,
+            inserted_at: NaiveDateTime.utc_now(),
+            updated_at: NaiveDateTime.utc_now()
+          })
+
+        multi
+        |> Ecto.Multi.insert({event.id, event.name}, image)
+    end
+  end
+
   def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "AdventureAssetAdded"} = event) do
     updates = event.data
 

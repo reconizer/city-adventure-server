@@ -255,11 +255,29 @@ defmodule Domain.Creator.Adventure do
   end
 
   def main_image(adventure, params) do
-    {:ok, asset} = new_asset(params)
+    new_asset(params)
+    |> case do
+      {:ok, asset} ->
+        adventure
+        |> add_asset(asset)
+        |> add_asset_to_adventure(asset)
 
-    adventure
-    |> add_asset(asset)
-    |> add_asset_to_adventure(asset)
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  def gallery_image(adventure, params) do
+    new_asset(params)
+    |> case do
+      {:ok, asset} ->
+        adventure
+        |> add_asset(asset)
+        |> add_asset_to_image(asset)
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   @spec change_point(t() | entity(), Map.t()) :: entity()
@@ -573,8 +591,6 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
-  defp do_add_asset_to_adventure({:error, _} = error, _), do: error
-
   defp do_add_asset_to_adventure(adventure, new_asset) do
     adventure
     |> Map.put(:asset_id, new_asset.id)
@@ -594,8 +610,6 @@ defmodule Domain.Creator.Adventure do
     })
   end
 
-  defp add_asset(_adventure, {:error, _} = error), do: error
-
   defp add_asset(adventure, new_asset) do
     adventure
     |> emit("AssetAdded", %{
@@ -606,9 +620,33 @@ defmodule Domain.Creator.Adventure do
     })
   end
 
-  defp add_asset_to_adventure(adventure, asset) do
+  defp add_asset_to_adventure({:error, _} = error, _), do: error
+
+  defp add_asset_to_adventure({:ok, adventure}, asset) do
     adventure
     |> do_add_asset_to_adventure(asset)
+  end
+
+  defp add_asset_to_image({:error, _} = error, _), do: error
+
+  defp add_asset_to_image({:ok, adventure}, asset) do
+    Adventure.Image.new(%{adventure_id: adventure.id, asset_id: asset.id, sort: sort_for_image_gallery(adventure)})
+    |> case do
+      {:ok, image} ->
+        image = image |> update_image_asset(asset)
+        adventure = adventure |> add_image_to_adventure(image)
+
+        adventure
+        |> emit("ImageAdded", %{
+          id: image.id,
+          asset_id: image.asset.id,
+          adventure_id: image.adventure_id,
+          sort: image.sort
+        })
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   @spec do_replace_clue(t() | entity(), Ecto.UUID.t(), Adventure.Clue.t()) :: entity()
@@ -675,5 +713,23 @@ defmodule Domain.Creator.Adventure do
     |> case do
       points -> {:ok, %{adventure | points: points}}
     end
+  end
+
+  defp add_image_to_adventure(%{images: images} = adventure, image) do
+    new_images = images ++ [image]
+    %{adventure | images: new_images}
+  end
+
+  defp update_image_asset(image, asset) do
+    image
+    |> Map.put(:asset, asset)
+  end
+
+  defp sort_for_image_gallery(adventure) do
+    result =
+      adventure.images
+      |> Enum.count()
+
+    result + 1
   end
 end
