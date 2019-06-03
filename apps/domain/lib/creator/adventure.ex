@@ -516,6 +516,24 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
+  def remove_image(adventure, image_id) do
+    adventure
+    |> get_image(image_id)
+    |> case do
+      %{id: id, adventure_id: adventure_id} = image ->
+        adventure
+        |> do_remove_image(id)
+        |> emit("GalleryImageRemoved", %{
+          adventure_id: adventure_id,
+          id: id
+        })
+        |> remove_asset(image)
+
+      nil ->
+        {:error, {:image, "not_found"}}
+    end
+  end
+
   @spec get_last_point(t() | entity()) :: Adventure.Point.entity()
   def get_last_point({:ok, adventure}), do: get_last_point(adventure)
   def get_last_point({:error, _} = error), do: error
@@ -527,6 +545,14 @@ defmodule Domain.Creator.Adventure do
       [last_point | _] -> {:ok, last_point}
       _ -> {:error, "no points in adventure"}
     end
+  end
+
+  defp get_image(adventure, image_id) do
+    adventure
+    |> Map.get(:images)
+    |> Enum.find(fn image ->
+      image.id == image_id
+    end)
   end
 
   @spec do_add_clue(t() | entity(), Ecto.UUID.t(), Adventure.Clue.t()) :: entity()
@@ -713,6 +739,27 @@ defmodule Domain.Creator.Adventure do
     |> case do
       points -> {:ok, %{adventure | points: points}}
     end
+  end
+
+  defp do_remove_image(adventure, image_id) do
+    new_images =
+      adventure
+      |> Map.get(:images)
+      |> Enum.filter(fn image ->
+        image.id != image_id
+      end)
+
+    {:ok, %{adventure | images: new_images}}
+  end
+
+  defp remove_asset({:error, _} = error, _), do: error
+
+  defp remove_asset({:ok, adventure}, image) do
+    adventure
+    |> emit("GalleryAssetRemoved", %{
+      image_id: image.id,
+      id: image.asset_id
+    })
   end
 
   defp add_image_to_adventure(%{images: images} = adventure, image) do

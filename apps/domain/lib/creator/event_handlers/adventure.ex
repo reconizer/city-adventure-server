@@ -8,6 +8,42 @@ defmodule Domain.Creator.EventHandlers.Adventure do
 
   def process(
         multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "GalleryImageRemoved"} = event
+      ) do
+    event.data
+    |> case do
+      %{
+        id: id
+      } ->
+        image =
+          Models.Image
+          |> Repository.get(id)
+
+        multi
+        |> Ecto.Multi.delete({event.id, event.name}, image)
+    end
+  end
+
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "GalleryAssetRemoved"} = event
+      ) do
+    event.data
+    |> case do
+      %{
+        id: id
+      } ->
+        asset =
+          Models.Asset
+          |> Repository.get(id)
+
+        multi
+        |> Ecto.Multi.delete({event.id, event.name}, asset)
+    end
+  end
+
+  def process(
+        multi,
         %Domain.Event{aggregate_name: "Creator.Adventure", name: "SentToReview"} = event
       ) do
     adventure =

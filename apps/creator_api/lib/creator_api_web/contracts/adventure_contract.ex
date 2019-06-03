@@ -123,4 +123,19 @@ defmodule CreatorApiWeb.AdventureContract do
       extension: :required
     })
   end
+
+  def remove_image(conn, params) do
+    params
+    |> with_creator(conn)
+    |> cast(%{
+      creator_id: Ecto.UUID,
+      adventure_id: Ecto.UUID,
+      image_id: Ecto.UUID
+    })
+    |> validate(%{
+      creator_id: :required,
+      adventure_id: :required,
+      image_id: :required
+    })
+  end
 end

@@ -164,5 +164,18 @@ defmodule CreatorApiWeb.AdventureController do
   end
 
   def remove_gallery_image(conn, params) do
+    with {:ok, %{creator_id: creator_id, adventure_id: adventure_id, image_id: image_id}} <-
+           conn
+           |> AdventureContract.remove_image(params),
+         {:ok, creator_adventure} <- creator_id |> Creator.Service.Adventure.get_creator_adventure(adventure_id),
+         {:ok, adventure} <- creator_adventure |> Domain.Creator.Adventure.remove_image(image_id),
+         {:ok, adventure} <- adventure |> Domain.Creator.Repository.Adventure.save() do
+      conn
+      |> render("item.json", %{item: adventure})
+    else
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
   end
 end
