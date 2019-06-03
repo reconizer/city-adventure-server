@@ -6,7 +6,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
 
   alias Infrastructure.Repository
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "SentToReview"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "SentToReview"} = event
+      ) do
     adventure =
       Models.Adventure
       |> Repository.get(event.aggregate_id)
@@ -16,7 +19,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     |> Ecto.Multi.update({event.id, event.name}, adventure)
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "SentToPending"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "SentToPending"} = event
+      ) do
     adventure =
       Models.Adventure
       |> Repository.get(event.aggregate_id)
@@ -68,7 +74,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     |> Ecto.Multi.update({event.id, event.name}, adventure)
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointChanged"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointChanged"} = event
+      ) do
     updates =
       event.data
       |> Map.take([
@@ -99,7 +108,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     |> Ecto.Multi.update({event.id, event.name}, point)
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointAdded"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointAdded"} = event
+      ) do
     event.data
     |> case do
       %{
@@ -126,7 +138,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointRemoved"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointRemoved"} = event
+      ) do
     event.data
     |> case do
       %{
@@ -141,7 +156,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointClueAdded"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointClueAdded"} = event
+      ) do
     event.data
     |> case do
       %{
@@ -170,7 +188,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "ClueChangedAsset"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "ClueChangedAsset"} = event
+      ) do
     event.data
     |> case do
       %{
@@ -187,7 +208,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "AssetAdded"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "AssetAdded"} = event
+      ) do
     event.data
     |> case do
       %{
@@ -212,7 +236,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "ImageAdded"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "ImageAdded"} = event
+      ) do
     event.data
     |> case do
       %{
@@ -237,7 +264,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "AdventureAssetAdded"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "AdventureAssetAdded"} = event
+      ) do
     updates = event.data
 
     adventure =
@@ -249,7 +279,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     |> Ecto.Multi.update({event.id, event.name}, adventure)
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointClueRemoved"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointClueRemoved"} = event
+      ) do
     event.data
     |> case do
       %{
@@ -264,7 +297,10 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
-  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointClueChanged"} = event) do
+  def process(
+        multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "PointClueChanged"} = event
+      ) do
     updates =
       event.data
       |> Map.take([

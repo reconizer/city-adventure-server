@@ -162,4 +162,7 @@ defmodule CreatorApiWeb.AdventureController do
         |> handle_errors(errors)
     end
   end
+
+  def remove_gallery_image(conn, params) do
+  end
 end

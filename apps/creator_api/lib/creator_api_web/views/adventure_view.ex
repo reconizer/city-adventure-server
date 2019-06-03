@@ -75,8 +75,13 @@ defmodule CreatorApiWeb.AdventureView do
     }
   end
 
+  defp get_asset_by_sort([]) do
+    nil
+  end
+
   defp get_asset_by_sort(images) do
     images
+    |> Enum.filter(fn image -> image.sort != nil end)
     |> Enum.max_by(fn image -> image.sort end)
     |> Map.get(:asset)
   end
