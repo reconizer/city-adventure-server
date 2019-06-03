@@ -135,6 +135,7 @@ defmodule Domain.Creator.Repository.Adventure do
     %Creator.Adventure.Image{
       id: image_model.id,
       sort: image_model.sort,
+      asset_id: image_model.asset_id,
       asset: image_model.asset |> build_asset()
     }
   end
