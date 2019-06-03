@@ -530,7 +530,7 @@ defmodule Domain.Creator.Adventure do
         |> remove_asset(image)
 
       nil ->
-        {:error, {:image, "not_Found"}}
+        {:error, {:image, "not_found"}}
     end
   end
 
