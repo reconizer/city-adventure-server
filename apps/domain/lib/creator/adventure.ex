@@ -394,6 +394,36 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
+  def reorder_images(adventure, image_orders) do
+    image_orders
+    |> Enum.reduce({:ok, adventure}, fn
+      _, {:error, _} = error ->
+        error
+
+      image_order_params, adventure ->
+        adventure
+        |> change_image(image_order_params)
+    end)
+  end
+
+  def change_image({:ok, adventure}, params), do: change_image(adventure, params)
+  def change_image({:error, _} = error, _), do: error
+
+  def change_image(adventure, %{id: image_id} = params) do
+    adventure
+    |> get_image(image_id)
+    |> Adventure.Image.update(params)
+    |> case do
+      {:ok, {image, image_changes}} ->
+        adventure
+        |> do_replace_image(image)
+        |> emit("GalleryImageChanged", image_changes |> Map.put(:id, image.id))
+
+      error ->
+        error
+    end
+  end
+
   @spec change_clue(t() | entity(), Map.t()) :: entity()
   def change_clue({:ok, adventure}, params), do: change_clue(adventure, params)
   def change_clue({:error, _} = error, _), do: error
@@ -656,7 +686,7 @@ defmodule Domain.Creator.Adventure do
   defp add_asset_to_image({:error, _} = error, _), do: error
 
   defp add_asset_to_image({:ok, adventure}, asset) do
-    Adventure.Image.new(%{adventure_id: adventure.id, asset_id: asset.id, sort: sort_for_image_gallery(adventure)})
+    Adventure.Image.new(%{adventure_id: adventure.id, asset_id: asset.id, sort: sort_for_image_gallery(adventure.images)})
     |> case do
       {:ok, image} ->
         image = image |> update_image_asset(asset)
@@ -741,6 +771,17 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
+  defp do_replace_image(adventure, %{id: image_id} = image) do
+    adventure.images
+    |> Enum.map(fn
+      %{id: ^image_id} -> image
+      image -> image
+    end)
+    |> case do
+      images -> {:ok, %{adventure | images: images}}
+    end
+  end
+
   defp do_remove_image(adventure, image_id) do
     new_images =
       adventure
@@ -772,11 +813,22 @@ defmodule Domain.Creator.Adventure do
     |> Map.put(:asset, asset)
   end
 
-  defp sort_for_image_gallery(adventure) do
-    result =
-      adventure.images
-      |> Enum.count()
+  defp sort_for_image_gallery([]), do: 1
 
-    result + 1
+  defp sort_for_image_gallery(images) do
+    images
+    |> Enum.filter(fn image -> image.sort != nil end)
+    |> case do
+      [] ->
+        1
+
+      result ->
+        sort =
+          result
+          |> Enum.max_by(fn image -> image.sort end)
+          |> Map.get(:sort)
+
+        sort + 1
+    end
   end
 end

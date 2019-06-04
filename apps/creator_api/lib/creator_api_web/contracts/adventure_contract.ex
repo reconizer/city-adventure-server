@@ -138,4 +138,19 @@ defmodule CreatorApiWeb.AdventureContract do
       image_id: :required
     })
   end
+
+  def reorder_gallery(conn, params) do
+    params
+    |> with_creator(conn)
+    |> cast(%{
+      creator_id: Ecto.UUID,
+      adventure_id: Ecto.UUID,
+      image_order: {:array, CreatorApi.Type.ImageOrder}
+    })
+    |> validate(%{
+      creator_id: :required,
+      adventure_id: :required,
+      image_order: :required
+    })
+  end
 end
