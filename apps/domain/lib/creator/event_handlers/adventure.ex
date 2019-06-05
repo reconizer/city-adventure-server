@@ -42,6 +42,20 @@ defmodule Domain.Creator.EventHandlers.Adventure do
     end
   end
 
+  def process(multi, %Domain.Event{aggregate_name: "Creator.Adventure", name: "GalleryImageChanged"} = event) do
+    updates =
+      event.data
+      |> Map.take([:sort])
+
+    image =
+      Models.Image
+      |> Repository.get(event.data.id)
+      |> Models.Image.changeset(updates)
+
+    multi
+    |> Ecto.Multi.update({event.id, event.name}, image)
+  end
+
   def process(
         multi,
         %Domain.Event{aggregate_name: "Creator.Adventure", name: "SentToReview"} = event
