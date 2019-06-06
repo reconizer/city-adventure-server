@@ -136,6 +136,7 @@ defmodule Domain.Creator.Repository.Adventure do
       id: image_model.id,
       sort: image_model.sort,
       asset_id: image_model.asset_id,
+      adventure_id: image_model.adventure_id,
       asset: image_model.asset |> build_asset()
     }
   end

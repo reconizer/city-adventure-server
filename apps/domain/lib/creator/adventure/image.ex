@@ -43,4 +43,19 @@ defmodule Domain.Creator.Adventure.Image do
         {:error, changeset}
     end
   end
+
+  def update({:ok, image}, image_params), do: update(image, image_params)
+  def update({:error, _} = error, _), do: error
+
+  def update(image, image_params) do
+    image
+    |> changeset(image_params)
+    |> case do
+      %{valid?: true} = changeset ->
+        {:ok, {changeset |> apply_changes, changeset.changes}}
+
+      changeset ->
+        {:error, changeset}
+    end
+  end
 end
