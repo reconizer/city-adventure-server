@@ -35,6 +35,33 @@ defmodule UserApiWeb.AdventureController do
     |> present(conn, UserApiWeb.AdventureView, "index.json")
   end
 
+  def user_list(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
+    filters = %{
+      "filters" => %{
+        completed: context |> Map.get("completed", false),
+        paid: context |> Map.get("paid", false)
+      },
+      "page" => context |> Map.get("page", 1)
+    }
+
+    context = context |> Map.put("filter", filters)
+
+    with %Session{valid?: true} <- session,
+         {:ok, validate_params} <- conn |> AdventureContract.user_list(context),
+         {:ok, adventures} <- validate_params |> AdventureRepository.user_list() do
+      session
+      |> Session.update_context(%{"adventures" => adventures})
+    else
+      %Session{valid?: false} = session ->
+        session
+
+      {:error, reason} ->
+        session
+        |> handle_errors(reason)
+    end
+    |> present(conn, UserApiWeb.AdventureView, "user_list.json")
+  end
+
   def show(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
          {:ok, validate_params} <-

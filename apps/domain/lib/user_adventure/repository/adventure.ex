@@ -49,6 +49,26 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     end
   end
 
+  def user_list(%{user_id: user_id, filter: %{filters: filters} = option}) do
+    result =
+      Models.Adventure
+      |> join(:left, [adventure], user_rankings in assoc(adventure, :user_rankings), on: user_rankings.user_id == ^user_id)
+      |> join(:inner, [adventure, user_rankings], user_adventures in assoc(adventure, :user_adventures))
+      |> join(:left, [adventure, user_rankings, user_adventures], user_rating in assoc(adventure, :adventure_ratings))
+      |> preload([adventure, user_rankings, user_adventures, user_rating], user_adventures: user_adventures)
+      |> preload([adventure, user_rankings, user_adventures, user_rating], adventure_ratings: user_rating)
+      |> preload([adventure, user_rankings, user_adventures, user_rating], user_rankings: user_rankings)
+      |> preload(creator: :asset)
+      |> preload(:asset)
+      |> where([adventure, user_rankings, user_adventures, user_rating], user_adventures.user_id == ^user_id)
+      |> filter_adventure(filters)
+      |> paginate(option)
+      |> Repository.all()
+      |> Enum.map(&load_adventure/1)
+
+    {:ok, result}
+  end
+
   def load_adventure(%Models.Adventure{} = model) do
     %Adventure{
       id: model.id,
@@ -64,10 +84,10 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       user_ranking: model.user_rankings |> List.first() |> load_user_ranking(),
       user_rating: model.adventure_ratings |> List.first() |> load_user_rating(),
       asset: model.asset |> load_asset(),
-      images: model.images |> Enum.map(&load_image/1),
-      points: model.points |> Enum.map(&load_points/1),
+      images: model.images |> enum_load_images(),
+      points: model.points |> enum_load_points(),
       user_adventure: model.user_adventures |> List.first() |> load_user_adventure(),
-      user_points: model.user_points |> Enum.map(&load_user_points/1)
+      user_points: model.user_points |> enum_load_user_points()
     }
   end
 
@@ -91,6 +111,13 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       clues: point.clues |> Enum.map(&load_clues/1)
     }
   end
+
+  def enum_load_points(points) when is_list(points) do
+    points
+    |> Enum.map(&load_points/1)
+  end
+
+  def enum_load_points(_points), do: []
 
   def load_answers(%Models.Answer{} = answer) do
     %Answer{
@@ -150,6 +177,12 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
+  def enum_load_user_points(user_points) when is_list(user_points) do
+    user_points |> Enum.map(&load_user_points/1)
+  end
+
+  def enum_load_user_points(_), do: []
+
   defp load_image(%Models.Image{} = image_model) do
     %Image{
       id: image_model.id,
@@ -157,6 +190,12 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       asset: image_model.asset |> load_asset()
     }
   end
+
+  defp enum_load_images(images) when is_list(images) do
+    images |> Enum.map(&load_image/1)
+  end
+
+  defp enum_load_images(_), do: []
 
   defp set_completed(user_adventures) do
     user_adventures
@@ -219,5 +258,18 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       user_id: user_adventure.user_id,
       adventure_id: user_adventure.adventure_id
     }
+  end
+
+  defp filter_adventure(query, %{completed: completed}) do
+    query
+    |> where([adventure, user_rankings, user_adventures, user_rating], user_adventures.completed == ^completed)
+  end
+
+  defp filter_adventure(query, %{paid: true}) do
+    query
+  end
+
+  defp filter_adventure(query, _) do
+    query
   end
 end

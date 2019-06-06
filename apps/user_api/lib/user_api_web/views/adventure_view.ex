@@ -6,6 +6,11 @@ defmodule UserApiWeb.AdventureView do
     |> Enum.map(&render_start_points/1)
   end
 
+  def render("user_list.json", %{session: %Session{context: %{"adventures" => adventures}} = _session}) do
+    adventures
+    |> Enum.map(&render_user_adventure/1)
+  end
+
   def render("show.json", %{session: %Session{context: %{"adventure" => adventure, "rankings" => rankings, "rating" => rating}} = _session}) do
     %{
       id: adventure.id,
@@ -90,6 +95,22 @@ defmodule UserApiWeb.AdventureView do
       started: adventure.started
     }
   end
+
+  defp render_user_adventure(adventure) do
+    %{
+      id: adventure.id,
+      name: adventure.name,
+      image_url: asset_url(adventure.asset),
+      completion_time: adventure.user_ranking |> render_completion_time(),
+      position: adventure.user_ranking |> render_position
+    }
+  end
+
+  defp render_completion_time(nil), do: nil
+  defp render_completion_time(user_ranking), do: user_ranking.completion_time
+
+  defp render_position(nil), do: nil
+  defp render_position(user_ranking), do: user_ranking.position
 
   defp render_rating_count(nil), do: 0
   defp render_rating_count(rating), do: rating
