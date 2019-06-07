@@ -41,7 +41,7 @@ defmodule UserApiWeb.AdventureController do
         completed: context |> Map.get("completed", false),
         paid: context |> Map.get("paid", false)
       },
-      "page" => context |> Map.get("page", 1)
+      "page" => context |> Map.get("page", "1")
     }
 
     context = context |> Map.put("filter", filters)

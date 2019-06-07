@@ -154,8 +154,10 @@ defmodule Seed.Adventure do
 
   defp preper_image(assets, adventure) do
     assets
-    |> Enum.map(fn asset ->
+    |> Enum.with_index(1)
+    |> Enum.map(fn {asset, sort} ->
       %{
+        sort: sort,
         asset_id: asset.id,
         adventure_id: adventure.id,
         inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),

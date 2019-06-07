@@ -93,6 +93,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
 
   def load_creator(%Models.Creator{} = creator_model) do
     %Creator{
+      id: creator_model.id,
       name: creator_model.name,
       asset: creator_model.asset |> load_asset()
     }

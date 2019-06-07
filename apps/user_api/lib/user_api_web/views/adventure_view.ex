@@ -21,6 +21,7 @@ defmodule UserApiWeb.AdventureView do
       max_time: adventure.max_time,
       rating: rating.rating,
       rating_count: render_rating_count(rating.rating_count),
+      author_id: adventure.creator.id,
       author_name: adventure.creator.name,
       author_image_url: asset_url(adventure.creator.asset),
       difficulty_level: adventure.difficulty_level,
