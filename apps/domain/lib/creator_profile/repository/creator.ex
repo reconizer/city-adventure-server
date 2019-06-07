@@ -13,6 +13,7 @@ defmodule Domain.CreatorProfile.Repository.Creator do
   def get(id) do
     Models.Creator
     |> preload(:asset)
+    |> preload(:creator_followers)
     |> Repository.get(id)
     |> case do
       nil ->
@@ -27,6 +28,7 @@ defmodule Domain.CreatorProfile.Repository.Creator do
     %Creator{
       id: creator_model.id,
       name: creator_model.name,
+      followers_count: creator_model.creator_followers |> count_followers(),
       description: creator_model.description,
       asset: creator_model.asset |> build_asset()
     }
@@ -42,4 +44,10 @@ defmodule Domain.CreatorProfile.Repository.Creator do
       extension: asset_model.extension
     }
   end
+
+  defp count_followers(followers) when is_list(followers) do
+    Enum.count(followers)
+  end
+
+  defp count_followers(_), do: 0
 end

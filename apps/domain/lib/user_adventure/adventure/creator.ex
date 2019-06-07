@@ -8,13 +8,13 @@ defmodule Domain.UserAdventure.Adventure.Creator do
 
   @type t :: %__MODULE__{}
 
-  @primary_key false
+  @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
     field(:name, :string)
     embeds_one(:asset, Asset)
   end
 
-  @fields [:name]
+  @fields [:name, :id]
   @required_fields @fields
 
   @spec changeset(Creator.t(), map()) :: Ecto.Changeset.t()

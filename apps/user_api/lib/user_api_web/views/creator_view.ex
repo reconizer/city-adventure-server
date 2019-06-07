@@ -6,6 +6,7 @@ defmodule UserApiWeb.CreatorView do
       name: creator.name,
       description: creator.description,
       id: creator.id,
+      followers_count: creator.followers_count,
       image_url: asset_url(creator.asset)
     }
   end

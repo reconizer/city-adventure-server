@@ -14,6 +14,25 @@ defmodule UserApiWeb.AdventureContract do
     })
   end
 
+  def user_list(conn, params) do
+    params
+    |> with_user(conn)
+    |> cast(%{
+      user_id: Ecto.UUID,
+      filter: Domain.Filter.Type
+    })
+    |> default(%{
+      filter: Domain.Filter.new()
+    })
+    |> plug(%{
+      filter: &list_filters/1
+    })
+    |> validate(%{
+      user_id: :required,
+      filter: :required
+    })
+  end
+
   def show(conn, params) do
     params
     |> with_user(conn)
@@ -66,5 +85,29 @@ defmodule UserApiWeb.AdventureContract do
       user_id: :required,
       rating: :required
     })
+  end
+
+  defp list_filters(filter) do
+    filter =
+      filter
+      |> default(%{
+        offset: Domain.Filter.offset(filter)
+      })
+
+    filter.filters
+    |> cast(%{
+      completed: :boolean,
+      paid: :boolean
+    })
+    |> default(%{
+      completed: false
+    })
+    |> validate(%{
+      completed: :required
+    })
+    |> case do
+      {:ok, filters} -> {:ok, %{filter | filters: filters}}
+      error -> error
+    end
   end
 end
