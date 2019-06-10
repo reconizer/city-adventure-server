@@ -11,6 +11,11 @@ defmodule UserApiWeb.AdventureView do
     |> Enum.map(&render_user_adventure/1)
   end
 
+  def render("index_filter.json", %{session: %Session{context: %{"adventures" => adventures}} = _session}) do
+    adventures
+    |> Enum.map(&render_filter_adventure/1)
+  end
+
   def render("show.json", %{session: %Session{context: %{"adventure" => adventure, "rankings" => rankings, "rating" => rating}} = _session}) do
     %{
       id: adventure.id,
@@ -104,6 +109,14 @@ defmodule UserApiWeb.AdventureView do
       image_url: asset_url(adventure.asset),
       completion_time: adventure.user_ranking |> render_completion_time(),
       position: adventure.user_ranking |> render_position
+    }
+  end
+
+  defp render_filter_adventure(adventure) do
+    %{
+      id: adventure.id,
+      name: adventure.name,
+      image_url: asset_url(adventure.asset)
     }
   end
 
