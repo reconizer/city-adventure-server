@@ -38,8 +38,8 @@ defmodule Domain.CreatorProfile.Repository.Creator do
       nil ->
         {:error, :not_found}
 
-      user ->
-        {:ok, user |> build_creator}
+      creators ->
+        {:ok, creators |> Enum.map(&build_creator/1)}
     end
   end
 
@@ -86,8 +86,8 @@ defmodule Domain.CreatorProfile.Repository.Creator do
 
   defp filter_range(query, %{range: true}, %{lat: lat, lng: lng}) do
     query
-    |> join(:inner, [creator], adventure in assoc(creator, :adventure), as: :adventure)
-    |> join(:inner, [creator, adventure: adventure], start_point in assoc(adventure, :points), on: is_nil(start_point.parent_point_id), as: :start_point)
+    |> join(:inner, [creator], adventures in assoc(creator, :adventures), as: :adventures)
+    |> join(:inner, [creator, adventures: adventures], start_point in assoc(adventures, :points), on: is_nil(start_point.parent_point_id), as: :start_point)
     |> where(
       [creator, start_point: start_point],
       fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), 4326)::geography, ?::geography, ?)", ^lng, ^lat, start_point.position, 1000)
@@ -109,8 +109,8 @@ defmodule Domain.CreatorProfile.Repository.Creator do
 
       false ->
         query
-        |> join(:inner, [creator], adventure in assoc(creator, :adventure), as: :adventure)
-        |> join(:inner, [creator, adventure: adventure], start_point in assoc(adventure, :points), on: is_nil(start_point.parent_point_id), as: :start_point)
+        |> join(:inner, [creator], adventures in assoc(creator, :adventures), as: :adventures)
+        |> join(:inner, [creator, adventures: adventures], start_point in assoc(adventures, :points), on: is_nil(start_point.parent_point_id), as: :start_point)
         |> order_by(
           [creator, start_point: start_point],
           fragment("st_distance(st_setsrid(st_makepoint(?, ?), 4326)::geography, ?::geography)", ^lng, ^lat, start_point.position)
@@ -120,11 +120,11 @@ defmodule Domain.CreatorProfile.Repository.Creator do
 
   defp sort_creator(query, :rating, _) do
     query
-    |> has_named_binding?(:adventure)
+    |> has_named_binding?(:adventures)
     |> case do
       true ->
         query
-        |> join(:left, [creator, adventure: adventure], adventure_rating in assoc(adventure, :adventure_ratings), as: :adventure_rating)
+        |> join(:left, [creator, adventures: adventures], adventure_rating in assoc(adventures, :adventure_ratings), as: :adventure_rating)
         |> order_by([creator, adventure_rating: adventure_rating],
           desc:
             fragment(
@@ -136,8 +136,8 @@ defmodule Domain.CreatorProfile.Repository.Creator do
 
       false ->
         query
-        |> join(:inner, [creator], adventure in assoc(creator, :adventure), as: :adventure)
-        |> join(:left, [creator, adventure: adventure], adventure_rating in assoc(adventure, :adventure_ratings), as: :adventure_rating)
+        |> join(:inner, [creator], adventures in assoc(creator, :adventures), as: :adventure)
+        |> join(:left, [creator, adventures: adventures], adventure_rating in assoc(adventures, :adventure_ratings), as: :adventure_rating)
         |> order_by([creator, adventure_rating: adventure_rating],
           desc:
             fragment(
