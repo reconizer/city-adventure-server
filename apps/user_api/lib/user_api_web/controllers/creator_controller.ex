@@ -7,10 +7,10 @@ defmodule UserApiWeb.CreatorController do
 
   def show(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
-         {:ok, %{creator_id: creator_id}} <-
+         {:ok, validate_params} <-
            conn
            |> CreatorContract.show(context),
-         {:ok, creator} <- creator_id |> CreatorRepository.get() do
+         {:ok, creator} <- validate_params |> CreatorRepository.get() do
       session
       |> Session.update_context(%{"creator" => creator})
     else

@@ -10,7 +10,7 @@ defmodule Domain.CreatorProfile.Repository.Creator do
     Asset
   }
 
-  def get(id) do
+  def get(%{creator_id: id, user_id: user_id}) do
     Models.Creator
     |> preload(:asset)
     |> preload(:creator_followers)
@@ -20,11 +20,11 @@ defmodule Domain.CreatorProfile.Repository.Creator do
         {:error, :not_found}
 
       user ->
-        {:ok, user |> build_creator}
+        {:ok, user |> build_creator(user_id)}
     end
   end
 
-  def all(%{filter: %{filters: filters, orders: orders} = option, position: position}) do
+  def all(%{filter: %{filters: filters, orders: orders} = option, user_id: user_id, position: position}) do
     Models.Creator
     |> preload(:asset)
     |> preload(:creator_followers)
@@ -39,14 +39,15 @@ defmodule Domain.CreatorProfile.Repository.Creator do
         {:error, :not_found}
 
       creators ->
-        {:ok, creators |> Enum.map(&build_creator/1)}
+        {:ok, creators |> Enum.map(fn creator -> creator |> build_creator(user_id) end)}
     end
   end
 
-  defp build_creator(creator_model) do
+  defp build_creator(creator_model, user_id) do
     %Creator{
       id: creator_model.id,
       name: creator_model.name,
+      follow: creator_model.creator_followers |> check_follow(user_id),
       followers_count: creator_model.creator_followers |> count_followers(),
       adventures_count: creator_model.adventures |> count_adventures(),
       description: creator_model.description,
@@ -67,6 +68,9 @@ defmodule Domain.CreatorProfile.Repository.Creator do
 
   defp count_followers(followers) when is_list(followers) do
     Enum.count(followers)
+  end
+
+  defp check_follow(followers, user_id) do
   end
 
   defp count_followers(_), do: 0
