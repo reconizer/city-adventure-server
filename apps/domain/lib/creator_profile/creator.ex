@@ -7,6 +7,7 @@ defmodule Domain.CreatorProfile.Creator do
     field(:name, :string)
     field(:description, :string)
     field(:followers_count, :integer)
+    field(:adventures_count, :integer)
     embeds_one(:asset, Asset)
   end
 end

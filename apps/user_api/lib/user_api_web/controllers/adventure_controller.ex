@@ -41,9 +41,15 @@ defmodule UserApiWeb.AdventureController do
       "lng" => context |> Map.get("lng", nil)
     }
 
+    filters = %{
+      "filters" => context |> Map.get("filters", %{}),
+      "orders" => context |> Map.get("orders", []),
+      "page" => context |> Map.get("page", "1")
+    }
+
     with %Session{valid?: true, context: context} <-
            session
-           |> Session.update_context(%{"position" => position}),
+           |> Session.update_context(%{"position" => position, "filter" => filters}),
          {:ok, validate_params} <-
            conn
            |> AdventureContract.index_filter(context),

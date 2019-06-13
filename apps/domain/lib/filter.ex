@@ -1,6 +1,6 @@
 defmodule Domain.Filter do
   defstruct filters: %{},
-            orders: [],
+            orders: nil,
             page: 1,
             limit: 20
 
@@ -121,5 +121,19 @@ defmodule Domain.Filter.Type do
 
   defp fetch_order({{:ok, params}, data}), do: fetch_order({params, data})
   defp fetch_order({{:error, _} = error, data}), do: {error, data}
-  defp fetch_order({params, data}), do: {{:ok, params}, data}
+
+  defp fetch_order({params, data}) do
+    params =
+      data
+      |> fetch_field("orders")
+      |> case do
+        :undefined ->
+          {:ok, params}
+
+        order ->
+          {:ok, params |> Map.put(:orders, order)}
+      end
+
+    {params, data}
+  end
 end

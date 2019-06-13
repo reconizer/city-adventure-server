@@ -338,6 +338,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
   end
 
   defp list_filter(query, %{range: range}, %{lat: lat, lng: lng}) do
+    range = range * 1000
+
     query
     |> where(
       [adventure, user_rating, start_point],
@@ -349,7 +351,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     query
   end
 
-  defp sort_adventure(query, [:range], %{lat: lat, lng: lng}) do
+  defp sort_adventure(query, "range", %{lat: lat, lng: lng}) do
     query
     |> order_by(
       [adventure, user_rating, start_point],
@@ -357,7 +359,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     )
   end
 
-  defp sort_adventure(query, [:difficulty_level], _) do
+  defp sort_adventure(query, "difficulty_level", _) do
     query
     |> order_by(
       [adventure, user_rating, start_point],
@@ -365,7 +367,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     )
   end
 
-  defp sort_adventure(query, [:rating], _) do
+  defp sort_adventure(query, "rating", _) do
     query
     |> order_by(
       [adventure, user_rating, start_point],
