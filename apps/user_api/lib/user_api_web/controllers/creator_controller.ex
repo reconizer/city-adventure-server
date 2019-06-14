@@ -2,7 +2,6 @@ defmodule UserApiWeb.CreatorController do
   use UserApiWeb, :controller
   alias Domain.CreatorProfile.Repository.Creator, as: CreatorRepository
   alias Domain.CreatorProfile.Repository.Adventure, as: AdventureRepository
-  alias Domain.Profile.CreatorProfile, as: CreatorProfileDomain
   alias UserApiWeb.CreatorContract
 
   def show(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
