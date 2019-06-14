@@ -6,6 +6,6 @@ config :infrastructure, Infrastructure.Repository,
   database: "city_adventure_test",
   hostname: "localhost",
   password: "",
-  port: 5433,
+  port: 5432,
   types: Infrastructure.Repository.PostgresTypes,
   pool: Ecto.Adapters.SQL.Sandbox
