@@ -35,6 +35,40 @@ defmodule UserApiWeb.AdventureController do
     |> present(conn, UserApiWeb.AdventureView, "index.json")
   end
 
+  def index_with_filter(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
+    position = %{
+      "lat" => context |> Map.get("lat", nil),
+      "lng" => context |> Map.get("lng", nil)
+    }
+
+    filters = %{
+      "filters" => context |> Map.get("filters", %{}),
+      "orders" => context |> Map.get("orders", []),
+      "page" => context |> Map.get("page", "1")
+    }
+
+    with %Session{valid?: true, context: context} <-
+           session
+           |> Session.update_context(%{"position" => position, "filter" => filters}),
+         {:ok, validate_params} <-
+           conn
+           |> AdventureContract.index_filter(context),
+         {:ok, adventures} <-
+           validate_params
+           |> AdventureRepository.index_with_filters() do
+      session
+      |> Session.update_context(%{"adventures" => adventures})
+    else
+      %Session{valid?: false} = session ->
+        session
+
+      {:error, reason} ->
+        session
+        |> handle_errors(reason)
+    end
+    |> present(conn, UserApiWeb.AdventureView, "index_filter.json")
+  end
+
   def user_list(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     filters = %{
       "filters" => %{

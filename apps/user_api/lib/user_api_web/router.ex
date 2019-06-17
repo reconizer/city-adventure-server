@@ -22,6 +22,7 @@ defmodule UserApiWeb.Router do
 
     scope "/adventures" do
       get("/", AdventureController, :index)
+      get("/filters", AdventureController, :index_with_filter)
       get("/user", AdventureController, :user_list)
       get("/summary/:adventure_id", AdventureController, :summary)
       get("/:adventure_id", AdventureController, :show)
@@ -41,6 +42,7 @@ defmodule UserApiWeb.Router do
 
     scope "/creator" do
       get("/adventures", CreatorController, :adventure_list)
+      get("/filters", CreatorController, :creator_list)
       get("/:creator_id", CreatorController, :show)
     end
 

@@ -434,22 +434,6 @@ defmodule CreatorApiWeb.ClueControllerTest do
       assert %{"type" => ["is invalid"]} == response
     end
 
-    test "error - name can't be blank", %{conn: conn, adventure: adventure, adventure_id: _adventure_id} do
-      clue_id = Ecto.UUID.generate()
-
-      response =
-        conn
-        |> post("/api/clues/upload_asset", %{
-          "clue_id" => clue_id,
-          "adventure_id" => adventure.id,
-          "extension" => "jpg",
-          "type" => "image"
-        })
-        |> json_response(422)
-
-      assert %{"name" => ["can't be blank"]} == response
-    end
-
     test "error - extension can't be blank", %{conn: conn, adventure: adventure, adventure_id: _adventure_id} do
       clue_id = Ecto.UUID.generate()
 
