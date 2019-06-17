@@ -3,6 +3,8 @@ defmodule AdministrationApiWeb.QAController do
 
   alias AdministrationApiWeb.QAContract
   alias Domain.AdventureReview
+  alias Domain.AdventureReview.Message, as: ReviewMessage
+  alias Domain.Administration.User.Repository, as: AdministrationRepository
 
   @doc """
   path: /api/points
@@ -20,13 +22,15 @@ defmodule AdministrationApiWeb.QAController do
 
   @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(conn, params) do
-    QAContract.create(conn, params)
-    |> case do
-      {:ok, _params} ->
-        conn
-        |> resp(200, "OK")
-
-      error ->
+    with {:ok, %{administrator_id: administrator_id} = validate_params} <- QAContract.create(conn, params),
+         %{email: email, id: id, name: name} <- administrator_id |> AdministrationRepository.get(),
+         {:ok, message} <- validate_params |> Map.put(:author, %{email: email, id: id, type: "administrator", name: name}) |> ReviewMessage.new() do
+      message
+      |> IO.inspect()
+      |> AdventureReview.Repository.Message.save()
+      |> handle_repository_action(conn)
+    else
+      {:error, error} ->
         conn
         |> handle_error(error)
     end
