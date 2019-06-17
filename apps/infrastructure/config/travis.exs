@@ -9,3 +9,5 @@ config :infrastructure, Infrastructure.Repository,
   port: 5432,
   types: Infrastructure.Repository.PostgresTypes,
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :infrastructure, :asset_bucket, "gameinn-2-assets"
