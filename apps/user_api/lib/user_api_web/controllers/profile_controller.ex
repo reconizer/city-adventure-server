@@ -23,6 +23,22 @@ defmodule UserApiWeb.ProfileController do
     |> present(conn, UserApiWeb.ProfileView, "show.json")
   end
 
+  def avatar_list(%{assigns: %{session: %Session{} = session}} = conn, _) do
+    with %Session{valid?: true} <- session,
+         {:ok, avatar_list} <- UserRepository.get_avatar_list() do
+      session
+      |> Session.update_context(%{"avatar_list" => avatar_list})
+    else
+      %Session{valid?: false} = session ->
+        session
+
+      {:error, reason} ->
+        session
+        |> handle_errors(reason)
+    end
+    |> present(conn, UserApiWeb.ProfileView, "avatar_list.json")
+  end
+
   def update(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
     with %Session{valid?: true} <- session,
          {:ok, validate_params} <-
