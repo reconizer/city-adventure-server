@@ -33,7 +33,7 @@ defmodule Contract do
   def plug(params, plugs) do
     plugs
     |> Enum.reduce({:ok, params}, fn
-      {plug_key, plug_fun}, {:ok, params} ->
+      {plug_key, plug_fun}, {:ok, params} when is_function(plug_fun, 1) ->
         params
         |> Map.get(plug_key, :undefined)
         |> case do
@@ -42,6 +42,21 @@ defmodule Contract do
 
           value ->
             plug_fun.(value)
+            |> case do
+              {:ok, value} -> {:ok, params |> Map.put(plug_key, value)}
+              other -> other
+            end
+        end
+
+      {plug_key, plug_fun}, {:ok, params} when is_function(plug_fun, 2) ->
+        params
+        |> Map.get(plug_key, :undefined)
+        |> case do
+          :undefined ->
+            {:ok, params}
+
+          value ->
+            plug_fun.(value, params)
             |> case do
               {:ok, value} -> {:ok, params |> Map.put(plug_key, value)}
               other -> other
