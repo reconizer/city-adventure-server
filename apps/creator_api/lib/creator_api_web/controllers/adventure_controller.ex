@@ -116,4 +116,82 @@ defmodule CreatorApiWeb.AdventureController do
         |> handle_errors(errors)
     end
   end
+
+  def upload_asset(conn, params) do
+    AdventureContract.upload_image(conn, params)
+    |> case do
+      {:ok, validate_params} ->
+        Creator.Service.Adventure.get_creator_adventure(validate_params.creator_id, validate_params.adventure_id)
+        |> Domain.Creator.Adventure.main_image(validate_params)
+        |> Domain.Creator.Repository.Adventure.save()
+        |> case do
+          {:ok, adventure} ->
+            conn
+            |> render("upload_asset.json", %{adventure: adventure})
+
+          {:error, errors} ->
+            conn
+            |> handle_errors(errors)
+        end
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
+
+  def gallery_image_path(conn, params) do
+    AdventureContract.upload_image(conn, params)
+    |> case do
+      {:ok, validate_params} ->
+        Creator.Service.Adventure.get_creator_adventure(validate_params.creator_id, validate_params.adventure_id)
+        |> Domain.Creator.Adventure.gallery_image(validate_params)
+        |> Domain.Creator.Repository.Adventure.save()
+        |> case do
+          {:ok, adventure} ->
+            conn
+            |> render("upload_image.json", %{adventure: adventure})
+
+          {:error, errors} ->
+            conn
+            |> handle_errors(errors)
+        end
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
+
+  def remove_gallery_image(conn, params) do
+    with {:ok, %{creator_id: creator_id, adventure_id: adventure_id, image_id: image_id}} <-
+           conn
+           |> AdventureContract.remove_image(params),
+         {:ok, creator_adventure} <- creator_id |> Creator.Service.Adventure.get_creator_adventure(adventure_id),
+         {:ok, adventure} <- creator_adventure |> Domain.Creator.Adventure.remove_image(image_id),
+         {:ok, adventure} <- adventure |> Domain.Creator.Repository.Adventure.save() do
+      conn
+      |> render("item.json", %{item: adventure})
+    else
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
+
+  def reorder_gallery_image(conn, params) do
+    with {:ok, %{creator_id: creator_id, adventure_id: adventure_id, image_order: image_order}} <-
+           conn
+           |> AdventureContract.reorder_gallery(params),
+         {:ok, creator_adventure} <- creator_id |> Creator.Service.Adventure.get_creator_adventure(adventure_id),
+         {:ok, adventure} <- creator_adventure |> Domain.Creator.Adventure.reorder_images(image_order),
+         {:ok, adventure} <- adventure |> Domain.Creator.Repository.Adventure.save() do
+      conn
+      |> render("item.json", %{item: adventure})
+    else
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
 end

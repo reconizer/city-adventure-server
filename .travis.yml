@@ -44,4 +44,4 @@ after_failure:
 env:
   global:
   - MIX_ENV=test
-  - PGPORT=5433
+  - PGPORT=5432

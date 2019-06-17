@@ -1,6 +1,6 @@
-defmodule Domain.UserAdventure.Adventure.Creator do
-  alias Domain.UserAdventure.Adventure.{
-    Creator
+defmodule Domain.Profile.Avatar do
+  alias Domain.Profile.{
+    Asset
   }
 
   use Ecto.Schema
@@ -8,16 +8,17 @@ defmodule Domain.UserAdventure.Adventure.Creator do
 
   @type t :: %__MODULE__{}
 
-  @primary_key {:id, :binary_id, autogenerate: false}
+  @primary_key false
   embedded_schema do
-    field(:name, :string)
+    field(:user_id, Ecto.UUID)
+    field(:asset_id, Ecto.UUID)
     embeds_one(:asset, Asset)
   end
 
-  @fields [:name, :id]
+  @fields [:user_id, :asset_id]
   @required_fields @fields
 
-  @spec changeset(Creator.t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(Avatar.t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do
     struct
     |> cast(params, @fields)

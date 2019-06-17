@@ -1,23 +1,22 @@
-defmodule Domain.UserAdventure.Adventure.Creator do
-  alias Domain.UserAdventure.Adventure.{
-    Creator
-  }
-
+defmodule Domain.Profile.Asset do
   use Ecto.Schema
   import Ecto.Changeset
 
   @type t :: %__MODULE__{}
+  @type ok_t :: {:ok, t()}
+  @type error :: {:error, any()}
+  @type entity :: ok_t() | error()
 
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
+    field(:type, :string)
     field(:name, :string)
-    embeds_one(:asset, Asset)
+    field(:extension, :string)
   end
 
-  @fields [:name, :id]
+  @fields ~w(id type name extension)a
   @required_fields @fields
 
-  @spec changeset(Creator.t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do
     struct
     |> cast(params, @fields)
