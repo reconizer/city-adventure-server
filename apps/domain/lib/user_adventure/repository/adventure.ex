@@ -40,6 +40,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> preload(creator: :asset)
     |> preload(images: :asset)
     |> preload(:asset)
+    |> preload(:creator_adventure_rating)
     |> preload(points: [clues: [asset: :asset_conversions]])
     |> preload(points: :answers)
     |> Repository.get(adventure_id)
@@ -60,6 +61,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       |> preload([adventure, user_rankings, user_adventures, user_rating], user_rankings: user_rankings)
       |> preload(creator: :asset)
       |> preload(:asset)
+      |> preload(:creator_adventure_rating)
       |> where([adventure, user_rankings, user_adventures, user_rating], user_adventures.user_id == ^user_id)
       |> filter_adventure(filters)
       |> paginate(option)
@@ -77,6 +79,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       |> preload([adventure, user_rating, start_point], adventure_ratings: user_rating)
       |> preload(creator: :asset)
       |> preload(:asset)
+      |> preload(:creator_adventure_rating)
       |> name_filter(filters)
       |> list_filter(filters, position)
       |> sort_adventure(orders, position)
@@ -95,6 +98,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       description: model.description,
       min_time: model.min_time,
       max_time: model.max_time,
+      rating: model.creator_adventure_rating |> load_rating(),
       completed: model.user_adventures |> set_completed(),
       creator: model.creator |> load_creator(),
       difficulty_level: model.difficulty_level,
@@ -108,6 +112,12 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       user_points: model.user_points |> enum_load_user_points()
     }
   end
+
+  def load_rating(%Models.CreatorAdventureRating{} = model_rating) do
+    model_rating.rating |> Decimal.to_float() |> Float.round(2)
+  end
+
+  def load_rating(_), do: 0
 
   def load_creator(%Models.Creator{} = creator_model) do
     %Creator{

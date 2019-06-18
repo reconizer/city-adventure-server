@@ -116,6 +116,11 @@ defmodule UserApiWeb.AdventureView do
     %{
       id: adventure.id,
       name: adventure.name,
+      difficulty_level: adventure.difficulty_level,
+      rating: adventure.rating,
+      type: adventure.type,
+      min_time: adventure.min_time,
+      max_time: adventure.max_time,
       image_url: asset_url(adventure.asset)
     }
   end

@@ -2,7 +2,6 @@ defmodule UserApiWeb.CreatorController do
   use UserApiWeb, :controller
   alias Domain.CreatorProfile.Repository.Creator, as: CreatorRepository
   alias Domain.CreatorProfile.Repository.Adventure, as: AdventureRepository
-  alias Domain.Profile.CreatorProfile, as: CreatorProfileDomain
   alias UserApiWeb.CreatorContract
 
   def show(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
@@ -42,11 +41,11 @@ defmodule UserApiWeb.CreatorController do
          {:ok, validate_params} <-
            conn
            |> CreatorContract.index_filter(context),
-         {:ok, adventures} <-
+         {:ok, creators} <-
            validate_params
            |> CreatorRepository.all() do
       session
-      |> Session.update_context(%{"adventures" => adventures})
+      |> Session.update_context(%{"creators" => creators})
     else
       %Session{valid?: false} = session ->
         session
@@ -55,7 +54,7 @@ defmodule UserApiWeb.CreatorController do
         session
         |> handle_errors(reason)
     end
-    |> present(conn, UserApiWeb.AdventureView, "index_filter.json")
+    |> present(conn, UserApiWeb.CreatorView, "index_filter.json")
   end
 
   def adventure_list(%{assigns: %{session: %Session{context: context} = session}} = conn, _) do
