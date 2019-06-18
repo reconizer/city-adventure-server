@@ -8,6 +8,7 @@ defmodule Domain.CreatorProfile.Adventure do
     field(:difficulty_level, :integer)
     field(:min_time, :integer)
     field(:max_time, :integer)
+    field(:name, :integer)
     field(:rating, :decimal)
     embeds_one(:asset, Asset)
   end
