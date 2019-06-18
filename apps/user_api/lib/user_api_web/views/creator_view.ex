@@ -29,6 +29,7 @@ defmodule UserApiWeb.CreatorView do
       image_url: asset_url(adventure.asset),
       difficulty_level: adventure.difficulty_level,
       id: adventure.id,
+      name: adventure.name,
       max_time: adventure.max_time,
       min_time: adventure.min_time,
       rating: adventure.rating
