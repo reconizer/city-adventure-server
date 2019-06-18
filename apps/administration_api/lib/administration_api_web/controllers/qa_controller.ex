@@ -26,7 +26,6 @@ defmodule AdministrationApiWeb.QAController do
          %{email: email, id: id, name: name} <- administrator_id |> AdministrationRepository.get(),
          {:ok, message} <- validate_params |> Map.put(:author, %{email: email, id: id, type: "administrator", name: name}) |> ReviewMessage.new() do
       message
-      |> IO.inspect()
       |> AdventureReview.Repository.Message.save()
       |> handle_repository_action(conn)
     else

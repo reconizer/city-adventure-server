@@ -8,7 +8,8 @@ defmodule Domain.AdventureReview.EventHandler.Message do
     params = %{
       id: event.aggregate_id,
       content: event.data.content,
-      inserted_at: event.data.created_at
+      inserted_at: event.data.created_at,
+      adventure_id: event.data.adventure_id
     }
 
     model =
@@ -16,11 +17,17 @@ defmodule Domain.AdventureReview.EventHandler.Message do
       |> case do
         "administrator" ->
           %Models.AdministratorAdventureMessage{}
-          |> Models.AdministratorAdventureMessage.changeset(params |> Map.put(:administrator_id, event.data.author_id))
+          |> Models.AdministratorAdventureMessage.changeset(
+            params
+            |> Map.put(:administrator_id, event.data.author_id)
+          )
 
         "creator" ->
           %Models.CreatorAdventureMessage{}
-          |> Models.CreatorAdventureMessage.changeset(params |> Map.put(:creator_id, event.data.author_id))
+          |> Models.CreatorAdventureMessage.changeset(
+            params
+            |> Map.put(:creator_id, event.data.author_id)
+          )
       end
 
     multi

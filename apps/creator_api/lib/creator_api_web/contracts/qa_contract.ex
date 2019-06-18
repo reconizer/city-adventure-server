@@ -23,7 +23,8 @@ defmodule CreatorApiWeb.QAContract do
       content: :string
     })
     |> default(%{
-      id: Ecto.UUID.generate()
+      id: Ecto.UUID.generate(),
+      created_at: NaiveDateTime.utc_now()
     })
     |> validate(%{
       id: :required,
