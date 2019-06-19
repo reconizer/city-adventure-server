@@ -15,13 +15,13 @@ defmodule Domain.AdventureReview.Repository.Message do
 
     creators =
       logs
-      |> Enum.filter(&(&1.author_type == "creator"))
+      |> Enum.filter(&(&1.type == "creator_message"))
       |> Enum.map(& &1.author_id)
       |> fetch_authors(:creator)
 
     administrators =
       logs
-      |> Enum.filter(&(&1.author_type == "administrator"))
+      |> Enum.filter(&(&1.type == "administrator_message"))
       |> Enum.map(& &1.author_id)
       |> fetch_authors(:administrator)
 
@@ -36,14 +36,14 @@ defmodule Domain.AdventureReview.Repository.Message do
     Models.Administrator
     |> where([administrator], administrator.id in ^ids)
     |> Repository.all()
-    |> Enum.map(&build_author(&1, :administrator))
+    |> Enum.map(&build_author(&1, :administrator_message))
   end
 
   def fetch_authors(ids, :creator) do
     Models.Creator
     |> where([creator], creator.id in ^ids)
     |> Repository.all()
-    |> Enum.map(&build_author(&1, :creator))
+    |> Enum.map(&build_author(&1, :creator_message))
   end
 
   def fetch_authors(_, _) do
@@ -68,32 +68,34 @@ defmodule Domain.AdventureReview.Repository.Message do
     }
   end
 
-  defp build_log(%{content: content, created_at: created_at, adventure_id: adventure_id, author_type: author_type, author_id: author_id}, related_data)
-       when author_type in ["administrator", "creator"] do
+  defp build_log(%{id: id, content: nil, created_at: created_at, adventure_id: adventure_id, type: type, author_id: nil}, _) do
+    %AdventureReview.Message{
+      id: id,
+      content: nil,
+      created_at: created_at,
+      adventure_id: adventure_id,
+      author: type
+    }
+  end
+
+  defp build_log(%{id: id, content: content, created_at: created_at, adventure_id: adventure_id, type: type, author_id: author_id}, related_data)
+       when type in ["administrator_message", "creator_message"] do
     administrators = Keyword.get(related_data, :administrators, [])
     creators = Keyword.get(related_data, :creators, [])
 
     author =
-      author_type
+      type
       |> case do
-        "administrator" -> administrators |> Enum.find(&(&1.id == author_id))
-        "creator" -> creators |> Enum.find(&(&1.id == author_id))
+        "administrator_message" -> administrators |> Enum.find(&(&1.id == author_id))
+        "creator_message" -> creators |> Enum.find(&(&1.id == author_id))
       end
 
     %AdventureReview.Message{
+      id: id,
       content: content,
       created_at: created_at,
       adventure_id: adventure_id,
       author: author
-    }
-  end
-
-  defp build_log(%{content: content, created_at: created_at, adventure_id: adventure_id, author_type: nil, author_id: nil}, _) do
-    %AdventureReview.Message{
-      content: content,
-      created_at: created_at,
-      adventure_id: adventure_id,
-      author: build_author(nil, "event")
     }
   end
 
@@ -115,6 +117,11 @@ defmodule Domain.AdventureReview.Repository.Message do
     |> Enum.reduce(query, fn {filter_name, filter_value}, query ->
       do_filter(query, filter_name, filter_value)
     end)
+  end
+
+  defp do_filter(query, :timestamp, timestamp) do
+    query
+    |> where([logs], logs.created_at <= ^(timestamp |> Timex.from_unix()))
   end
 
   defp do_filter(query, :adventure_id, id) do

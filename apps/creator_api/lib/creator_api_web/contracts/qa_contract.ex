@@ -6,7 +6,8 @@ defmodule CreatorApiWeb.QAContract do
     |> with_creator(conn)
     |> cast(%{
       creator_id: Ecto.UUID,
-      adventure_id: Ecto.UUID
+      adventure_id: Ecto.UUID,
+      author: CreatorApi.Type.Author
     })
     |> validate(%{
       creator_id: :required,
@@ -15,16 +16,20 @@ defmodule CreatorApiWeb.QAContract do
   end
 
   def create(conn, params) do
+    params =
+      params
+      |> with_creator(conn)
+
     params
-    |> with_creator(conn)
     |> cast(%{
       creator_id: Ecto.UUID,
       adventure_id: Ecto.UUID,
+      author: AdministrationApi.Type.Author,
       content: :string
     })
     |> default(%{
       id: Ecto.UUID.generate(),
-      created_at: NaiveDateTime.utc_now()
+      author: CreatorApi.Type.Author.new(params)
     })
     |> validate(%{
       id: :required,

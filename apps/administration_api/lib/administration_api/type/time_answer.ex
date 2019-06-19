@@ -28,8 +28,8 @@ defmodule AdministrationApi.Type.TimeAnswer do
       changeset.valid? ->
         {:ok,
          %{
-           start_time: start_time,
-           duration: duration
+           start_time: changeset.changes.start_time,
+           duration: changeset.changes.duration
          }}
 
       true ->

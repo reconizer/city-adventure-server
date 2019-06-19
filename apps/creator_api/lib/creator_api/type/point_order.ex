@@ -28,8 +28,8 @@ defmodule CreatorApi.Type.PointOrder do
       changeset.valid? ->
         {:ok,
          %{
-           id: id,
-           parent_point_id: parent_point_id
+           id: changeset.changes.id,
+           parent_point_id: changeset.changes.parent_point_id
          }}
 
       true ->

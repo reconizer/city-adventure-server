@@ -8,13 +8,13 @@ defmodule Infrastructure.Repository.Models.AdventureLog do
   use Ecto.Schema
   alias Infrastructure.Repository.Models.Adventure
 
-  @primary_key false
+  @primary_key {:id, :binary_id, autogenerate: false}
   @foreign_key_type :binary_id
 
   schema "adventure_logs" do
     field(:content, :string)
     field(:author_id, :binary_id)
-    field(:author_type, :string)
+    field(:type, :string)
     field(:created_at, :naive_datetime)
 
     belongs_to(:adventure, Adventure)

@@ -8,7 +8,6 @@ defmodule Domain.AdventureReview.EventHandler.Message do
     params = %{
       id: event.aggregate_id,
       content: event.data.content,
-      inserted_at: event.data.created_at,
       adventure_id: event.data.adventure_id
     }
 

@@ -15,13 +15,12 @@ defmodule Domain.AdventureReview.Message do
     embeds_one(:author, Message.Author)
     field(:content, :string)
     field(:adventure_id, :binary_id)
-
     field(:created_at, :naive_datetime)
     aggregate_fields()
   end
 
-  @fields ~w(id content created_at adventure_id)a
-  @required_fields ~w(id content created_at adventure_id)a
+  @fields ~w(id content adventure_id)a
+  @required_fields ~w(id content adventure_id)a
 
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do
@@ -31,7 +30,7 @@ defmodule Domain.AdventureReview.Message do
     |> cast_embed(:author)
   end
 
-  # %{id: id, content: content, created_at: created_at, author: author}) do
+  # %{id: id, content: content, author: author}) do
   def new(params) do
     %Message{}
     |> changeset(params)

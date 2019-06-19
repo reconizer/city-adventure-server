@@ -18,7 +18,7 @@ defmodule Domain.AdventureReview.Message.Author do
   end
 
   @fields ~w(id name email type)a
-  @required_fields ~w(id name email type)a
+  @required_fields ~w(id type)a
 
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do

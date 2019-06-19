@@ -25,8 +25,8 @@ defmodule Infrastructure.Repository.Models.CreatorAdventureMessage do
     changeset(%__MODULE__{}, params)
   end
 
-  @params ~w(id content creator_id inserted_at updated_at adventure_id)a
-  @required_params ~w(id content creator_id inserted_at adventure_id)a
+  @params ~w(id content creator_id adventure_id)a
+  @required_params ~w(id content creator_id adventure_id)a
 
   def changeset(model, params \\ %{}) do
     model

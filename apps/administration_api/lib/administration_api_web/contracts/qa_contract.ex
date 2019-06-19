@@ -6,6 +6,7 @@ defmodule AdministrationApiWeb.QAContract do
     |> cast(%{
       by_creator: Ecto.UUID,
       adventure_id: Ecto.UUID,
+      timestamp: :integer,
       is_creator: :boolean,
       is_administrator: :boolean,
       is_event: :boolean,
@@ -23,6 +24,7 @@ defmodule AdministrationApiWeb.QAContract do
     |> with_administrator(conn)
     |> cast(%{
       administrator_id: Ecto.UUID,
+      adventure_id: Ecto.UUID,
       filter: Domain.Filter.Type
     })
     |> default(%{
@@ -32,21 +34,26 @@ defmodule AdministrationApiWeb.QAContract do
       filter: &list_filters/1
     })
     |> validate(%{
+      adventure_id: :required,
       administrator_id: :required
     })
   end
 
   def create(conn, params) do
+    params =
+      params
+      |> with_administrator(conn)
+
     params
-    |> with_administrator(conn)
     |> cast(%{
       administrator_id: Ecto.UUID,
       adventure_id: Ecto.UUID,
+      author: AdministrationApi.Type.Author,
       content: :string
     })
     |> default(%{
       id: Ecto.UUID.generate(),
-      created_at: NaiveDateTime.utc_now()
+      author: AdministrationApi.Type.Author.new(params)
     })
     |> validate(%{
       id: :required,

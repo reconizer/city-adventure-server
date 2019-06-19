@@ -4,11 +4,9 @@ defmodule CreatorApiWeb.QAController do
   alias CreatorApiWeb.QAContract
   alias Domain.AdventureReview
   alias Domain.AdventureReview.Message, as: ReviewMessage
-  alias Domain.Creator.Repository.User, as: CreatorRepository
 
-  def list(conn, params) do
-    with {:ok, params} <- QAContract.list(conn, params),
-         {:ok, messages} <- AdventureReview.Repository.Message.all(params.filter) do
+  def list(conn, _params) do
+    with {:ok, messages} <- AdventureReview.Repository.Message.all() do
       conn
       |> render("list.json", %{list: messages})
     else
@@ -17,9 +15,8 @@ defmodule CreatorApiWeb.QAController do
   end
 
   def create(conn, params) do
-    with {:ok, %{creator_id: creator_id} = validate_params} <- QAContract.create(conn, params),
-         %{email: email, id: id, name: name} <- creator_id |> CreatorRepository.get!(),
-         {:ok, message} <- validate_params |> Map.put(:author, %{email: email, id: id, type: "creator", name: name}) |> ReviewMessage.new() do
+    with {:ok, validate_params} <- QAContract.create(conn, params),
+         {:ok, message} <- validate_params |> ReviewMessage.new() do
       message
       |> AdventureReview.Repository.Message.save()
       |> handle_repository_action(conn)
