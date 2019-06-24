@@ -1,35 +1,35 @@
 defmodule AdministrationApiWeb.QAController do
-  use AdministrationApiWeb, :contract
+  use AdministrationApiWeb, :controller
 
+  alias AdministrationApiWeb.QAContract
+  alias Domain.AdventureReview
+  alias Domain.AdventureReview.Message, as: ReviewMessage
+
+  @doc """
+  path: /api/points
+  method: GET
+  """
   def list(conn, params) do
-    params
-    |> with_administrator(conn)
-    |> cast(%{
-      creator_id: Ecto.UUID,
-      adventure_id: Ecto.UUID
-    })
-    |> validate(%{
-      creator_id: :required,
-      adventure_id: :required
-    })
+    with {:ok, params} <- QAContract.list(conn, params),
+         {:ok, messages} <- AdventureReview.Repository.Message.all(params.filter) do
+      conn
+      |> render("list.json", %{list: messages})
+    else
+      error -> handle_error(conn, error)
+    end
   end
 
+  @spec create(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def create(conn, params) do
-    params
-    |> with_administrator(conn)
-    |> cast(%{
-      creator_id: Ecto.UUID,
-      adventure_id: Ecto.UUID,
-      content: :string
-    })
-    |> default(%{
-      id: Ecto.UUID.generate()
-    })
-    |> validate(%{
-      id: :required,
-      creator_id: :required,
-      adventure_id: :required,
-      content: :string
-    })
+    with {:ok, validate_params} <- QAContract.create(conn, params),
+         {:ok, message} <- validate_params |> ReviewMessage.new() do
+      message
+      |> AdventureReview.Repository.Message.save()
+      |> handle_repository_action(conn)
+    else
+      {:error, error} ->
+        conn
+        |> handle_error(error)
+    end
   end
 end

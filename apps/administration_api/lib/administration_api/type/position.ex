@@ -28,8 +28,8 @@ defmodule AdministrationApi.Type.Position do
       changeset.valid? ->
         {:ok,
          %{
-           lat: lat,
-           lng: lng
+           lat: changeset.changes.lat,
+           lng: changeset.changes.lng
          }}
 
       true ->
