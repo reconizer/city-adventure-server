@@ -117,6 +117,21 @@ defmodule CreatorApiWeb.AdventureController do
     end
   end
 
+  def publish(conn, params) do
+    AdventureContract.publish(conn, params)
+    |> case do
+      {:ok, params} ->
+        Creator.Service.Adventure.get_creator_adventure(params.creator_id, params.adventure_id)
+        |> Domain.Creator.Adventure.publish()
+        |> Domain.Creator.Repository.Adventure.save()
+        |> handle_repository_action(conn)
+
+      {:error, errors} ->
+        conn
+        |> handle_errors(errors)
+    end
+  end
+
   def upload_asset(conn, params) do
     AdventureContract.upload_image(conn, params)
     |> case do
