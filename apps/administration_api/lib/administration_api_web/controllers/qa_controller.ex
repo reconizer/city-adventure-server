@@ -10,6 +10,15 @@ defmodule AdministrationApiWeb.QAController do
   method: GET
   """
   def list(conn, params) do
+    filters = %{
+      "filters" => %{"timestamp" => params |> Map.get("timestamp", nil)},
+      "page" => params |> Map.get("page", "1")
+    }
+
+    params =
+      params
+      |> Map.put("filter", filters)
+
     with {:ok, params} <- QAContract.list(conn, params),
          {:ok, messages} <- AdventureReview.Repository.Message.all(params.filter) do
       conn
