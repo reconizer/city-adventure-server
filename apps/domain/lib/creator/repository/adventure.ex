@@ -34,6 +34,7 @@ defmodule Domain.Creator.Repository.Adventure do
     |> preload(images: [asset: [:asset_conversions]])
     |> preload(:creator_adventure_rating)
     |> apply_filter(filter)
+    |> order_by([adventure], desc: adventure.inserted_at)
     |> Repository.all()
     |> Enum.map(&build_adventure/1)
     |> case do
@@ -170,6 +171,22 @@ defmodule Domain.Creator.Repository.Adventure do
   defp do_filter(query, :by_creator, id) do
     query
     |> where([adventure], adventure.creator_id == ^id)
+  end
+
+  defp do_filter(query, :by_creator_name, name) do
+    query
+    |> join(:inner, [adventure], creator in assoc(adventure, :creator), as: :creator)
+    |> where([adventure, creator: creator], fragment("(? || ?) ilike ?", creator.name, creator.email, ^name))
+  end
+
+  defp do_filter(query, :by_status, status) do
+    query
+    |> where([adventure], adventure.status == ^status)
+  end
+
+  defp do_filter(query, :by_name, name) do
+    query
+    |> where([adventure], ilike(adventure.name, ^(name <> "%")))
   end
 
   defp do_filter(query, _, _) do
