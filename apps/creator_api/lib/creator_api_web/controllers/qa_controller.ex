@@ -5,8 +5,18 @@ defmodule CreatorApiWeb.QAController do
   alias Domain.AdventureReview
   alias Domain.AdventureReview.Message, as: ReviewMessage
 
-  def list(conn, _params) do
-    with {:ok, messages} <- AdventureReview.Repository.Message.all() do
+  def list(conn, params) do
+    filters = %{
+      "filters" => %{"timestamp" => params |> Map.get("timestamp", nil)},
+      "page" => params |> Map.get("page", "1")
+    }
+
+    params =
+      params
+      |> Map.put("filter", filters)
+
+    with {:ok, validate_params} <- QAContract.list(conn, params),
+         {:ok, messages} <- AdventureReview.Repository.Message.all(validate_params.filter) do
       conn
       |> render("list.json", %{list: messages})
     else
