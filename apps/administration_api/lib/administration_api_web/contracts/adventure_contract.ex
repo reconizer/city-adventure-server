@@ -89,6 +89,7 @@ defmodule AdministrationApiWeb.AdventureContract do
       difficulty_level: :integer,
       min_time: :integer,
       max_time: :integer,
+      status: :string,
       name: :string,
       show: :boolean
     })

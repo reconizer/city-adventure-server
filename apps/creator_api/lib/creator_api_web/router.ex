@@ -37,6 +37,7 @@ defmodule CreatorApiWeb.Router do
 
         post("/send_to_pending", AdventureController, :send_to_pending)
         post("/send_to_review", AdventureController, :send_to_review)
+        post("/publish", AdventureController, :publish)
 
         get("/:adventure_id/qa", QAController, :list)
         post("/:adventure_id/qa", QAController, :create)

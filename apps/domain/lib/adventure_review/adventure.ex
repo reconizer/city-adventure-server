@@ -18,8 +18,8 @@ defmodule Domain.AdventureReview.Adventure do
     aggregate_fields()
   end
 
-  @fields ~w(id creator_id status)a
-  @required_fields ~w(id creator_id status)a
+  @fields ~w(id status)a
+  @required_fields ~w(id status)a
 
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(struct, params) do

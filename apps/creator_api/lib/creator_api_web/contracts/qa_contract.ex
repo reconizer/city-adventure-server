@@ -4,9 +4,14 @@ defmodule CreatorApiWeb.QAContract do
   defp list_filters(filter) do
     filter.filters
     |> cast(%{
+      adventure_id: Ecto.UUID,
       timestamp: :integer
     })
+    |> default(%{
+      timestamp: NaiveDateTime.utc_now() |> Timex.to_unix()
+    })
     |> validate(%{
+      adventure_id: :required,
       timestamp: :required
     })
     |> case do
@@ -20,7 +25,6 @@ defmodule CreatorApiWeb.QAContract do
     |> with_creator(conn)
     |> cast(%{
       creator_id: Ecto.UUID,
-      adventure_id: Ecto.UUID,
       author: CreatorApi.Type.Author,
       filter: Domain.Filter.Type
     })
@@ -31,8 +35,7 @@ defmodule CreatorApiWeb.QAContract do
       filter: &list_filters/1
     })
     |> validate(%{
-      creator_id: :required,
-      adventure_id: :required
+      creator_id: :required
     })
   end
 

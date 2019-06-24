@@ -58,6 +58,19 @@ defmodule Domain.Creator.EventHandlers.Adventure do
 
   def process(
         multi,
+        %Domain.Event{aggregate_name: "Creator.Adventure", name: "Published"} = event
+      ) do
+    adventure =
+      Models.Adventure
+      |> Repository.get(event.aggregate_id)
+      |> Models.Adventure.changeset(%{status: "published"})
+
+    multi
+    |> Ecto.Multi.update({event.id, event.name}, adventure)
+  end
+
+  def process(
+        multi,
         %Domain.Event{aggregate_name: "Creator.Adventure", name: "SentToReview"} = event
       ) do
     adventure =
