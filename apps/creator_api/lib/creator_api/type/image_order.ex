@@ -28,8 +28,8 @@ defmodule CreatorApi.Type.ImageOrder do
       changeset.valid? ->
         {:ok,
          %{
-           id: id,
-           sort: sort
+           id: changeset.changes.id,
+           sort: changeset.changes.sort
          }}
 
       true ->

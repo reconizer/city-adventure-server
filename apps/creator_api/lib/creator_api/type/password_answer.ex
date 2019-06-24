@@ -28,8 +28,8 @@ defmodule CreatorApi.Type.PasswordAnswer do
       changeset.valid? ->
         {:ok,
          %{
-           type: type,
-           password: password
+           type: changeset.changes.type,
+           password: changeset.changes.password
          }}
 
       true ->

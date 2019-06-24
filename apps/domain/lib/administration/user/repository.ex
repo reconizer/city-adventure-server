@@ -39,7 +39,7 @@ defmodule Domain.Administration.User.Repository do
   end
 
   @spec build_administrator(nil | Models.Administrator.t()) :: User.entity()
-  def build_administrator(nil), do: {:error, "doesnt exist"}
+  def build_administrator(nil), do: {:error, {:administrator, "doesnt exist"}}
 
   def build_administrator(administrator_model) do
     %User{

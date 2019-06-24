@@ -1,15 +1,18 @@
-defmodule CreatorApi.Type.ClueOrder do
+defmodule AdministrationApi.Type.Author do
   @behaviour Ecto.Type
-  use CreatorApi.Type
+  use AdministrationApi.Type
 
   embedded_schema do
     field(:id, :binary_id)
-    field(:point_id, :binary_id)
-    field(:sort, :integer)
+    field(:type, :string)
   end
 
-  @fields ~w(id point_id sort)a
-  @required_fields ~w(id point_id sort)a
+  @fields ~w(id type)a
+  @required_fields ~w(id)a
+
+  def new(%{"administrator_id" => id}) do
+    %{id: id, type: "administrator"}
+  end
 
   def changeset(struct, params) do
     struct
@@ -17,13 +20,12 @@ defmodule CreatorApi.Type.ClueOrder do
     |> validate_required(@required_fields)
   end
 
-  def cast(%{"point_id" => point_id, "id" => id, "sort" => sort}) do
+  def cast(%{"id" => id, "type" => type}) do
     changeset =
-      %CreatorApi.Type.ClueOrder{}
+      %AdministrationApi.Type.Author{}
       |> changeset(%{
         id: id,
-        point_id: point_id,
-        sort: sort
+        type: type
       })
 
     cond do
@@ -31,8 +33,7 @@ defmodule CreatorApi.Type.ClueOrder do
         {:ok,
          %{
            id: changeset.changes.id,
-           point_id: changeset.changes.point_id,
-           sort: changeset.changes.sort
+           type: changeset.changes.type
          }}
 
       true ->

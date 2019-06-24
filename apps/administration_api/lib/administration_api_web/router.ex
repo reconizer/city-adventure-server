@@ -23,7 +23,6 @@ defmodule AdministrationApiWeb.Router do
       scope "/adventures" do
         get("/", AdventureController, :list)
         get("/statistics", AdventureController, :statistics)
-        get("/:adventure_id", AdventureController, :item)
 
         patch("/", AdventureController, :update)
         post("/", AdventureController, :create)
@@ -33,6 +32,7 @@ defmodule AdministrationApiWeb.Router do
 
         get("/:adventure_id/qa", QAController, :list)
         post("/:adventure_id/qa", QAController, :create)
+        get("/:adventure_id", AdventureController, :item)
       end
 
       scope "/clues" do

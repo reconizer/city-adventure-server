@@ -9,7 +9,6 @@ defmodule ContractTest do
     assert {:error, _} = params |> Contract.cast(%{bar: :string})
   end
 
-  @tag :wip
   test "plug/2" do
     params = %{some: "parameter", other: 123, test: [1, 2, 3, 4]}
 
@@ -30,7 +29,20 @@ defmodule ContractTest do
     assert {:ok, %{some: "parameter - test", other: 1234, test: [1, 2, 3, 4, 5, 6, 7, 8]}} == result
   end
 
-  @tag :wip
+  test "plug/2 accepting 2 arguments for function" do
+    params = %{some: "parameter", other: 123}
+
+    result =
+      params
+      |> Contract.plug(
+        some: fn value, params ->
+          {:ok, "#{value} - #{params.other}"}
+        end
+      )
+
+    assert {:ok, %{some: "parameter - 123", other: 123}} == result
+  end
+
   test "plug/2 with failed plug" do
     params = %{some: "parameter", other: 123, test: [1, 2, 3, 4]}
 
