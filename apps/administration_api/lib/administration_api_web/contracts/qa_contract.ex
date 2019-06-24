@@ -4,9 +4,14 @@ defmodule AdministrationApiWeb.QAContract do
   defp list_filters(filter) do
     filter.filters
     |> cast(%{
+      adventure_id: Ecto.UUID,
       timestamp: :integer
     })
+    |> default(%{
+      timestamp: NaiveDateTime.utc_now() |> Timex.to_unix()
+    })
     |> validate(%{
+      adventure_id: :required,
       timestamp: :required
     })
     |> case do
@@ -20,7 +25,6 @@ defmodule AdministrationApiWeb.QAContract do
     |> with_administrator(conn)
     |> cast(%{
       administrator_id: Ecto.UUID,
-      adventure_id: Ecto.UUID,
       filter: Domain.Filter.Type
     })
     |> default(%{
@@ -30,7 +34,6 @@ defmodule AdministrationApiWeb.QAContract do
       filter: &list_filters/1
     })
     |> validate(%{
-      adventure_id: :required,
       administrator_id: :required
     })
   end

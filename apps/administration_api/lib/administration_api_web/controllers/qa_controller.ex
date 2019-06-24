@@ -11,7 +11,10 @@ defmodule AdministrationApiWeb.QAController do
   """
   def list(conn, params) do
     filters = %{
-      "filters" => %{"timestamp" => params |> Map.get("timestamp", nil)},
+      "filters" => %{
+        "timestamp" => params |> Map.get("timestamp", nil),
+        "adventure_id" => params |> Map.get("adventure_id", nil)
+      },
       "page" => params |> Map.get("page", "1")
     }
 

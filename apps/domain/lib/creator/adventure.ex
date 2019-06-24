@@ -123,6 +123,33 @@ defmodule Domain.Creator.Adventure do
     end
   end
 
+  def publish({:ok, adventure}), do: publish(adventure)
+  def publish({:error, _} = error), do: error
+
+  def publish(adventure) do
+    adventure
+    |> can_be_publish?
+    |> case do
+      true ->
+        adventure
+        |> changeset(%{
+          status: "published"
+        })
+        |> case do
+          %{valid?: true} = changeset ->
+            changeset
+            |> apply_changes
+            |> emit("Published", changeset.changes)
+
+          changeset ->
+            {:error, changeset}
+        end
+
+      false ->
+        {:error, {:adventure_id, "cannot be published"}}
+    end
+  end
+
   @spec send_to_pending(t() | entity()) :: entity()
   def send_to_pending({:ok, adventure}), do: send_to_pending(adventure)
   def send_to_pending({:error, _} = error), do: error
@@ -165,6 +192,10 @@ defmodule Domain.Creator.Adventure do
 
   def can_be_sent_to_review?(adventure) do
     adventure.status == "pending"
+  end
+
+  def can_be_publish?(adventure) do
+    adventure.status == "unpublished"
   end
 
   @spec change(t() | entity(), Map.t()) :: entity()
