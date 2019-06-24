@@ -4,14 +4,10 @@ defmodule AdministrationApiWeb.QAContract do
   defp list_filters(filter) do
     filter.filters
     |> cast(%{
-      by_creator: Ecto.UUID,
-      adventure_id: Ecto.UUID,
-      timestamp: :integer,
-      is_creator: :boolean,
-      is_administrator: :boolean,
-      is_event: :boolean,
-      administrator_id: Ecto.UUID,
-      creator_id: Ecto.UUID
+      timestamp: :integer
+    })
+    |> validate(%{
+      timestamp: :required
     })
     |> case do
       {:ok, filters} -> {:ok, %{filter | filters: filters}}

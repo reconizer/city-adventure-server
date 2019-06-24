@@ -1,13 +1,34 @@
 defmodule CreatorApiWeb.QAContract do
   use CreatorApiWeb, :contract
 
+  defp list_filters(filter) do
+    filter.filters
+    |> cast(%{
+      timestamp: :integer
+    })
+    |> validate(%{
+      timestamp: :required
+    })
+    |> case do
+      {:ok, filters} -> {:ok, %{filter | filters: filters}}
+      error -> error
+    end
+  end
+
   def list(conn, params) do
     params
     |> with_creator(conn)
     |> cast(%{
       creator_id: Ecto.UUID,
       adventure_id: Ecto.UUID,
-      author: CreatorApi.Type.Author
+      author: CreatorApi.Type.Author,
+      filter: Domain.Filter.Type
+    })
+    |> default(%{
+      filter: Domain.Filter.new()
+    })
+    |> plug(%{
+      filter: &list_filters/1
     })
     |> validate(%{
       creator_id: :required,
