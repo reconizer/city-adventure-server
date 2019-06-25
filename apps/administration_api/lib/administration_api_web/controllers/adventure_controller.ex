@@ -3,12 +3,22 @@ defmodule AdministrationApiWeb.AdventureController do
 
   alias AdministrationApiWeb.AdventureContract
   alias Domain.Creator.Repository.Adventure, as: AdventureRepository
+  alias Domain.AdventureReview.Repository.Adventure, as: AdventureReviewRepository
 
   @doc """
   path: /api/adventures/
   method: GET
   """
   def list(conn, params) do
+    filters = %{
+      "filters" => params |> Map.get("filters", %{}),
+      "page" => params |> Map.get("page", "1")
+    }
+
+    params =
+      params
+      |> Map.put("filter", filters)
+
     with {:ok, params} <- AdventureContract.list(conn, params),
          {:ok, adventures} <- AdventureRepository.all(params.filter) do
       conn
@@ -75,6 +85,19 @@ defmodule AdministrationApiWeb.AdventureController do
   path: /api/adventures
   method: PATCH
   """
+  def update(conn, %{"status" => _status} = params) do
+    with {:ok, params} <- AdventureContract.update(conn, params) do
+      AdventureReviewRepository.get(params.adventure_id)
+      |> Domain.AdventureReview.Adventure.change(params)
+      |> Domain.AdventureReview.Repository.Adventure.save()
+      |> handle_repository_action(conn)
+    else
+      error ->
+        conn
+        |> handle_error(error)
+    end
+  end
+
   def update(conn, params) do
     with {:ok, params} <- AdventureContract.update(conn, params) do
       AdventureRepository.get(params.adventure_id)

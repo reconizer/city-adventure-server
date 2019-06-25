@@ -40,6 +40,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     |> preload(creator: :asset)
     |> preload(images: :asset)
     |> preload(:asset)
+    |> preload(:creator_adventure_rating)
     |> preload(points: [clues: [asset: :asset_conversions]])
     |> preload(points: :answers)
     |> Repository.get(adventure_id)
@@ -60,8 +61,28 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       |> preload([adventure, user_rankings, user_adventures, user_rating], user_rankings: user_rankings)
       |> preload(creator: :asset)
       |> preload(:asset)
+      |> preload(:creator_adventure_rating)
       |> where([adventure, user_rankings, user_adventures, user_rating], user_adventures.user_id == ^user_id)
       |> filter_adventure(filters)
+      |> paginate(option)
+      |> Repository.all()
+      |> Enum.map(&load_adventure/1)
+
+    {:ok, result}
+  end
+
+  def index_with_filters(%{filter: %{filters: filters, orders: orders} = option, position: position}) do
+    result =
+      Models.Adventure
+      |> join(:left, [adventure], user_rating in assoc(adventure, :adventure_ratings))
+      |> join(:inner, [adventure, user_rating], start_point in assoc(adventure, :points), on: is_nil(start_point.parent_point_id))
+      |> preload([adventure, user_rating, start_point], adventure_ratings: user_rating)
+      |> preload(creator: :asset)
+      |> preload(:asset)
+      |> preload(:creator_adventure_rating)
+      |> name_filter(filters)
+      |> list_filter(filters, position)
+      |> sort_adventure(orders, position)
       |> paginate(option)
       |> Repository.all()
       |> Enum.map(&load_adventure/1)
@@ -77,22 +98,30 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       description: model.description,
       min_time: model.min_time,
       max_time: model.max_time,
+      rating: model.creator_adventure_rating |> load_rating(),
       completed: model.user_adventures |> set_completed(),
       creator: model.creator |> load_creator(),
       difficulty_level: model.difficulty_level,
       language: model.language,
-      user_ranking: model.user_rankings |> List.first() |> load_user_ranking(),
-      user_rating: model.adventure_ratings |> List.first() |> load_user_rating(),
+      user_ranking: model.user_rankings |> get_user_ranking(),
+      user_rating: model.adventure_ratings |> get_user_rating(),
       asset: model.asset |> load_asset(),
       images: model.images |> enum_load_images(),
       points: model.points |> enum_load_points(),
-      user_adventure: model.user_adventures |> List.first() |> load_user_adventure(),
+      user_adventure: model.user_adventures |> get_user_adventure(),
       user_points: model.user_points |> enum_load_user_points()
     }
   end
 
+  def load_rating(%Models.CreatorAdventureRating{} = model_rating) do
+    model_rating.rating |> Decimal.to_float() |> Float.round(2)
+  end
+
+  def load_rating(_), do: 0
+
   def load_creator(%Models.Creator{} = creator_model) do
     %Creator{
+      id: creator_model.id,
       name: creator_model.name,
       asset: creator_model.asset |> load_asset()
     }
@@ -164,7 +193,16 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
-  def load_user_rating(_), do: nil
+  def get_user_rating(user_rating) when is_list(user_rating) do
+    user_rating
+    |> List.first()
+    |> case do
+      nil -> nil
+      result -> result |> load_user_rating()
+    end
+  end
+
+  def get_user_rating(_), do: nil
 
   def load_user_points(%Models.UserPoint{} = user_point) do
     %UserPoint{
@@ -197,7 +235,7 @@ defmodule Domain.UserAdventure.Repository.Adventure do
 
   defp enum_load_images(_), do: []
 
-  defp set_completed(user_adventures) do
+  defp set_completed(user_adventures) when is_list(user_adventures) do
     user_adventures
     |> List.first()
     |> case do
@@ -209,6 +247,8 @@ defmodule Domain.UserAdventure.Repository.Adventure do
         |> Map.get(:completed)
     end
   end
+
+  defp set_completed(_), do: false
 
   defp load_asset(%Models.Asset{} = asset_model) do
     %Asset{
@@ -248,9 +288,16 @@ defmodule Domain.UserAdventure.Repository.Adventure do
     }
   end
 
-  defp load_user_ranking(_), do: nil
+  def get_user_ranking(user_ranking) when is_list(user_ranking) do
+    user_ranking
+    |> List.first()
+    |> case do
+      nil -> nil
+      result -> result |> load_user_ranking()
+    end
+  end
 
-  def load_user_adventure(nil), do: nil
+  def get_user_ranking(_), do: nil
 
   def load_user_adventure(user_adventure) do
     %UserAdventure{
@@ -259,6 +306,21 @@ defmodule Domain.UserAdventure.Repository.Adventure do
       adventure_id: user_adventure.adventure_id
     }
   end
+
+  def get_user_adventure(user_adventure) when is_list(user_adventure) do
+    user_adventure
+    |> List.first()
+    |> case do
+      nil ->
+        nil
+
+      result ->
+        result
+        |> load_user_adventure()
+    end
+  end
+
+  def get_user_adventure(_), do: nil
 
   defp filter_adventure(query, %{completed: completed}) do
     query
@@ -271,5 +333,63 @@ defmodule Domain.UserAdventure.Repository.Adventure do
 
   defp filter_adventure(query, _) do
     query
+  end
+
+  defp name_filter(query, %{name: name}) do
+    query
+    |> where([adventure, user_rating, start_point], ilike(adventure.name, ^(name <> "%")))
+  end
+
+  defp name_filter(query, _), do: query
+
+  defp list_filter(query, %{difficulty_level: difficulty_level}, _) do
+    query
+    |> where([adventure, user_rating, start_point], adventure.difficulty_level == ^difficulty_level)
+  end
+
+  defp list_filter(query, %{range: range}, %{lat: lat, lng: lng}) do
+    range = range * 1000
+
+    query
+    |> where(
+      [adventure, user_rating, start_point],
+      fragment("st_dwithin(st_setsrid(st_makepoint(?, ?), 4326)::geography, ?::geography, ?)", ^lng, ^lat, start_point.position, ^range)
+    )
+  end
+
+  defp list_filter(query, _, _) do
+    query
+  end
+
+  defp sort_adventure(query, "range", %{lat: lat, lng: lng}) do
+    query
+    |> order_by(
+      [adventure, user_rating, start_point],
+      fragment("st_distance(st_setsrid(st_makepoint(?, ?), 4326)::geography, ?::geography)", ^lng, ^lat, start_point.position)
+    )
+  end
+
+  defp sort_adventure(query, "difficulty_level", _) do
+    query
+    |> order_by(
+      [adventure, user_rating, start_point],
+      desc: adventure.difficulty_level
+    )
+  end
+
+  defp sort_adventure(query, "rating", _) do
+    query
+    |> order_by(
+      [adventure, user_rating, start_point],
+      desc: user_rating.rating
+    )
+  end
+
+  defp sort_adventure(query, _, _) do
+    query
+    |> order_by(
+      [adventure, user_rating, start_point],
+      asc: adventure.name
+    )
   end
 end

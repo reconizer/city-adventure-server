@@ -30,9 +30,9 @@ defmodule CreatorApi.Type.ClueOrder do
       changeset.valid? ->
         {:ok,
          %{
-           id: id,
-           point_id: point_id,
-           sort: sort
+           id: changeset.changes.id,
+           point_id: changeset.changes.point_id,
+           sort: changeset.changes.sort
          }}
 
       true ->

@@ -32,7 +32,8 @@ defmodule Infrastructure.MixProject do
       {:gettext, "~> 0.11"},
       {:poison, "~> 3.0"},
       {:httpoison, "~> 1.4"},
-      {:geo_postgis, "~> 2.0"}
+      {:geo_postgis, "~> 2.0"},
+      {:media_storage, git: "https://github.com/reconizer/ex_media_storage.git", tag: "0.2"}
     ]
   end
 end

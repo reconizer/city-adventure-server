@@ -26,6 +26,8 @@ defmodule Domain.UserAdventure.Adventure do
     field(:description, :string)
     field(:min_time, :integer)
     field(:max_time, :integer)
+    field(:rating, :float)
+    field(:type, :string, default: "free")
     field(:difficulty_level, :integer)
     field(:language, :string)
     embeds_many(:points, Point)

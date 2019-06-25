@@ -42,6 +42,16 @@ defmodule Domain.Profile.Repository.User do
     end
   end
 
+  def get_avatar_list() do
+    result =
+      Models.Asset
+      |> where([asset], asset.type == "avatar")
+      |> Repository.all()
+      |> Enum.map(&load_asset/1)
+
+    {:ok, result}
+  end
+
   def get_asset(%{asset_id: asset_id}) do
     Models.Asset
     |> Repository.get(asset_id)

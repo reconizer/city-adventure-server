@@ -4,7 +4,10 @@ defmodule AdministrationApiWeb.AdventureContract do
   defp list_filters(filter) do
     filter.filters
     |> cast(%{
-      by_creator: Ecto.UUID
+      by_creator: Ecto.UUID,
+      by_creator_name: :string,
+      by_status: :string,
+      by_name: :string
     })
     |> case do
       {:ok, filters} -> {:ok, %{filter | filters: filters}}
@@ -89,6 +92,7 @@ defmodule AdministrationApiWeb.AdventureContract do
       difficulty_level: :integer,
       min_time: :integer,
       max_time: :integer,
+      status: :string,
       name: :string,
       show: :boolean
     })

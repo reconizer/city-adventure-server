@@ -30,6 +30,7 @@ defmodule Domain.CreatorProfile.Repository.Adventure do
     %Adventure{
       id: adventure_model.id,
       difficulty_level: adventure_model.difficulty_level,
+      name: adventure_model.name,
       min_time: adventure_model.min_time,
       max_time: adventure_model.max_time,
       rating: adventure_model.creator_adventure_rating |> get_rating(),

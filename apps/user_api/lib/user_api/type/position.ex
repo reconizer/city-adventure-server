@@ -26,11 +26,11 @@ defmodule UserApi.Type.Position do
       })
 
     cond do
-      %{valid?: true, changes: changes} = changeset ->
+      changeset.valid? ->
         {:ok,
          %{
-           lat: changes.lat,
-           lng: changes.lng
+           lat: changeset.changes.lat,
+           lng: changeset.changes.lng
          }}
 
       true ->
@@ -40,5 +40,16 @@ defmodule UserApi.Type.Position do
 
   def cast(_) do
     :error
+  end
+
+  def type() do
+  end
+
+  def load(_) do
+    {:ok, nil}
+  end
+
+  def dump(_) do
+    {:ok, nil}
   end
 end

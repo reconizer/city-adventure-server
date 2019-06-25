@@ -44,8 +44,7 @@ defmodule UserApi.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
-      {:timex, "~> 3.2"},
-      {:media_storage, git: "https://github.com/reconizer/ex_media_storage.git", tag: "0.2"}
+      {:timex, "~> 3.2"}
     ]
   end
 
