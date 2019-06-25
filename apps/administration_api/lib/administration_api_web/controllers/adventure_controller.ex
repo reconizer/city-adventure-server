@@ -10,6 +10,15 @@ defmodule AdministrationApiWeb.AdventureController do
   method: GET
   """
   def list(conn, params) do
+    filters = %{
+      "filters" => params |> Map.get("filters", %{}),
+      "page" => params |> Map.get("page", "1")
+    }
+
+    params =
+      params
+      |> Map.put("filter", filters)
+
     with {:ok, params} <- AdventureContract.list(conn, params),
          {:ok, adventures} <- AdventureRepository.all(params.filter) do
       conn
