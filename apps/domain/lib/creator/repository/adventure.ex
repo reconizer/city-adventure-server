@@ -178,7 +178,7 @@ defmodule Domain.Creator.Repository.Adventure do
   defp do_filter(query, :by_creator_name, name) do
     query
     |> join(:inner, [adventure], creator in assoc(adventure, :creator), as: :creator)
-    |> where([adventure, creator: creator], fragment("(? || ?) ilike ?", creator.name, creator.email, ^name))
+    |> where([adventure, creator: creator], fragment("(? || ?)::text ilike '%' || ?::text || '%'", creator.name, creator.email, ^name))
   end
 
   defp do_filter(query, :by_status, status) do
