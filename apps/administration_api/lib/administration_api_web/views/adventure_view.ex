@@ -26,6 +26,8 @@ defmodule AdministrationApiWeb.AdventureView do
   def adventure_list_item(adventure) do
     %{
       id: adventure.id,
+      creator_id: adventure.creator_id,
+      creator_name: adventure.creator_name,
       name: adventure.name,
       shown: adventure.show,
       rating: adventure.rating |> render_rating(),

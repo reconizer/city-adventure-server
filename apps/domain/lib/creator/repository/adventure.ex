@@ -11,6 +11,7 @@ defmodule Domain.Creator.Repository.Adventure do
     Models.Adventure
     |> preload(points: [:answers, clues: [asset: [:asset_conversions]]])
     |> preload(:asset)
+    |> preload(:creator)
     |> preload(images: [asset: [:asset_conversions]])
     |> preload(:creator_adventure_rating)
     |> Repository.get(id)
@@ -31,9 +32,11 @@ defmodule Domain.Creator.Repository.Adventure do
     Models.Adventure
     |> preload(points: [:answers, clues: [:asset]])
     |> preload(:asset)
+    |> preload(:creator)
     |> preload(images: [asset: [:asset_conversions]])
     |> preload(:creator_adventure_rating)
     |> apply_filter(filter)
+    |> order_by([adventure], desc: adventure.inserted_at)
     |> Repository.all()
     |> Enum.map(&build_adventure/1)
     |> case do
@@ -172,6 +175,22 @@ defmodule Domain.Creator.Repository.Adventure do
     |> where([adventure], adventure.creator_id == ^id)
   end
 
+  defp do_filter(query, :by_creator_name, name) do
+    query
+    |> join(:inner, [adventure], creator in assoc(adventure, :creator), as: :creator)
+    |> where([adventure, creator: creator], fragment("(? || ?) ilike ?", creator.name, creator.email, ^name))
+  end
+
+  defp do_filter(query, :by_status, status) do
+    query
+    |> where([adventure], adventure.status == ^status)
+  end
+
+  defp do_filter(query, :by_name, name) do
+    query
+    |> where([adventure], ilike(adventure.name, ^(name <> "%")))
+  end
+
   defp do_filter(query, _, _) do
     query
   end
@@ -187,6 +206,7 @@ defmodule Domain.Creator.Repository.Adventure do
       max_time: adventure_model.max_time,
       min_time: adventure_model.min_time,
       creator_id: adventure_model.creator_id,
+      creator_name: adventure_model.creator.name,
       status: adventure_model.status,
       rating: adventure_model.creator_adventure_rating |> adventure_rating(),
       asset: adventure_model.asset |> build_asset(),

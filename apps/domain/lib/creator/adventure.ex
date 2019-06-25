@@ -29,6 +29,7 @@ defmodule Domain.Creator.Adventure do
   embedded_schema do
     field(:creator_id, :binary_id)
     field(:name, :string)
+    field(:creator_name, :string)
     field(:description, :string)
     field(:language, :string)
     field(:difficulty_level, :integer)
