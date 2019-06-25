@@ -31,6 +31,7 @@ defmodule Domain.Creator.Repository.Adventure do
     Models.Adventure
     |> preload(points: [:answers, clues: [:asset]])
     |> preload(:asset)
+    |> preload(:creator)
     |> preload(images: [asset: [:asset_conversions]])
     |> preload(:creator_adventure_rating)
     |> apply_filter(filter)
@@ -204,6 +205,7 @@ defmodule Domain.Creator.Repository.Adventure do
       max_time: adventure_model.max_time,
       min_time: adventure_model.min_time,
       creator_id: adventure_model.creator_id,
+      creator_name: adventure_model.creator.name,
       status: adventure_model.status,
       rating: adventure_model.creator_adventure_rating |> adventure_rating(),
       asset: adventure_model.asset |> build_asset(),
