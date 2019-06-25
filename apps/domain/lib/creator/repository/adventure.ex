@@ -11,6 +11,7 @@ defmodule Domain.Creator.Repository.Adventure do
     Models.Adventure
     |> preload(points: [:answers, clues: [asset: [:asset_conversions]]])
     |> preload(:asset)
+    |> preload(:creator)
     |> preload(images: [asset: [:asset_conversions]])
     |> preload(:creator_adventure_rating)
     |> Repository.get(id)
